@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification UI Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/style_ews.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .notification-preview {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .notification-preview:hover {
+            background-color: #f8f9fa;
+            border-color: #4a90e2;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2 class="mb-4">Notification UI Test</h2>
+        <p class="text-muted">Click on any notification below to test the modal popup</p>
+
+        <div class="notification-preview" onclick="testWeeklyNotification()">
+            <div class="d-flex align-items-center">
+                <div class="symbol symbol-35px me-3">
+                    <span class="symbol-label bg-light-info">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM10 16C6.68629 16 4 13.3137 4 10C4 6.68629 6.68629 4 10 4C13.3137 4 16 6.68629 16 10C16 13.3137 13.3137 16 10 16ZM11 10V6H9V11H14V9H11V10Z" fill="#3E97FF"/>
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <div class="fw-bold">Weekly Check Update 26-May-2025</div>
+                    <div class="text-muted small">2 hours ago</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-preview" onclick="testReminderNotification()">
+            <div class="d-flex align-items-center">
+                <div class="symbol symbol-35px me-3">
+                    <span class="symbol-label bg-light-warning">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2ZM10 16C6.68629 16 4 13.3137 4 10C4 6.68629 6.68629 4 10 4C13.3137 4 16 6.68629 16 10C16 13.3137 13.3137 16 10 16ZM11 6H9V11L13.5 13.5L14.5 11.7L11 9.8V6Z" fill="#FFC700"/>
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <div class="fw-bold">Reminder: [N] Unit Registration(s) Pending Approval for 3 Days</div>
+                    <div class="text-muted small">5 hours ago</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function testWeeklyNotification() {
+            const title = "Weekly Check Update 26-May-2025";
+            const message = `
+                <div style='font-family: Arial, sans-serif;'>
+                    <p><strong>Date:</strong> 26 May 2025</p>
+                    <p>The following <strong>3</strong> units are missing required information:</p>
+                    <ul style='list-style-type: none; padding-left: 0;'>
+                        <li style='margin-bottom: 8px;'>- Model: <strong>[PC200-8]</strong> | SN: <strong>[12345]</strong><br/><span style='color: #dc3545;'>Missing: Shipping Date</span></li>
+                        <li style='margin-bottom: 8px;'>- Model: <strong>[PC210-10]</strong> | SN: <strong>[67890]</strong><br/><span style='color: #dc3545;'>Missing: Shipping Date</span></li>
+                        <li style='margin-bottom: 8px;'>- Model: <strong>[PC220-8]</strong> | SN: <strong>[54321]</strong><br/><span style='color: #dc3545;'>Missing: Shipping Date</span></li>
+                    </ul>
+                    <p>Please complete the missing information by clicking the edit button. You can find it with the status <strong>Incomplete</strong> on the date check.</p>
+                    <p style='margin-top: 1rem;'><em>Regards,<br/>Extended Warranty System (Automated Notification)</em></p>
+                </div>
+            `;
+            const link = "/RegisterUnit/Index";
+            const date = new Date().toISOString();
+            
+            showNotificationModal(title, message, link, date);
+        }
+
+        function testReminderNotification() {
+            const title = "Reminder: [N] Unit Registration(s) Pending Approval for 3 Days";
+            const message = `
+                <div style='font-family: Arial, sans-serif;'>
+                    <p><strong>Date:</strong> 10 Sep 2025</p>
+                    <p>Hello <strong>Approver Name</strong>,</p>
+                    <p>This is an automated reminder that there are <strong>2</strong> unit registration request(s) pending your approval for more than 3 days.</p>
+                    <p><strong>Oldest pending since:</strong> 07-Sep-2025</p>
+                    <p><strong>Pending items:</strong></p>
+                    <ul style='list-style-type: none; padding-left: 0;'>
+                        <li style='margin-bottom: 8px;'>- SN: <strong>[12345]</strong> | Model: <strong>[PC210]</strong></li>
+                        <li style='margin-bottom: 8px;'>- SN: <strong>[67890]</strong> | Model: <strong>[D155A]</strong></li>
+                    </ul>
+                    <p>Please review and take action (Approve/Reject) to avoid delays in DEX registration and downstream processes.</p>
+                    <p style='margin-top: 1rem;'><em>Regards,<br/>Extended Warranty System (Automated Notification)</em></p>
+                </div>
+            `;
+            const link = "/RegisterUnitApproval/Index";
+            const date = new Date().toISOString();
+            
+            showNotificationModal(title, message, link, date);
+        }
+
+        function showNotificationModal(title, message, link, date) {
+            let modal = document.getElementById('notificationDetailModal');
+            if (!modal) {
+                modal = createNotificationModal();
+                document.body.appendChild(modal);
+            }
+
+            document.getElementById('notificationModalTitle').textContent = title;
+            document.getElementById('notificationModalDate').textContent = formatFullDate(date);
+            document.getElementById('notificationModalMessage').innerHTML = message;
+            
+            const viewButton = document.getElementById('notificationModalViewButton');
+            if (link && link !== '#' && link !== '') {
+                viewButton.style.display = 'inline-block';
+                viewButton.onclick = function() {
+                    alert('Would navigate to: ' + link);
+                };
+            } else {
+                viewButton.style.display = 'none';
+            }
+
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+
+        function createNotificationModal() {
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'notificationDetailModal';
+            modal.tabIndex = -1;
+            modal.setAttribute('aria-labelledby', 'notificationModalLabel');
+            modal.setAttribute('aria-hidden', 'true');
+            
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold" id="notificationModalLabel">Notification</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pt-2">
+                            <div class="mb-3">
+                                <h6 class="fw-bold mb-2" id="notificationModalTitle"></h6>
+                                <p class="text-muted fs-7 mb-3" id="notificationModalDate"></p>
+                            </div>
+                            <div class="notification-message-content" id="notificationModalMessage"></div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-primary" id="notificationModalViewButton">
+                                View Pending
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return modal;
+        }
+
+        function formatFullDate(dateString) {
+            const date = new Date(dateString);
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            return 'Date: ' + date.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
+        }
+    </script>
+</body>
+</html>

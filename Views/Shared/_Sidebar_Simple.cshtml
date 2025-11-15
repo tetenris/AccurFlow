@@ -1,0 +1,108 @@
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject AccuFlow.Services.Interfaces.IMenuService MenuService
+@{
+    var currentPath = HttpContextAccessor.HttpContext.Request.Path.ToString().ToLower();
+    var menus = await MenuService.GetMenuHierarchyAsync();
+
+    bool IsActive(string path)
+    {
+        var regex = new System.Text.RegularExpressions.Regex($"^{path}(/.*)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return regex.IsMatch(currentPath);
+    }
+
+    bool IsMenuActive(AccuFlow.Models.Menu.MenuViewModel menu)
+    {
+        if (!string.IsNullOrEmpty(menu.Controller))
+        {
+            return IsActive($"/{menu.Controller}");
+        }
+        
+        // Check if any child is active
+        if (menu.ChildMenus != null && menu.ChildMenus.Any())
+        {
+            return menu.ChildMenus.Any(child => !string.IsNullOrEmpty(child.Controller) && IsActive($"/{child.Controller}"));
+        }
+        
+        return false;
+    }
+}
+
+<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="225px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+    <!--begin::Logo-->
+    <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
+        <!--begin::Logo image-->
+        <a href="@Url.Action("Index", "Home")">
+            <img alt="Logo" src="~/img/logo-black.png" class="w-150px app-sidebar-logo-default" />
+            <img alt="Logo" src="~/img/logo-sm-white.png" class="h-20px app-sidebar-logo-minimize" />
+        </a>
+        <!--end::Logo image-->
+        <!--begin::Sidebar toggle-->
+        <div id="kt_app_sidebar_toggle" class="app-sidebar-toggle btn btn-icon btn-shadow btn-sm btn-color-muted btn-active-color-primary h-30px w-30px start-100 rotate" data-kt-toggle="true" data-kt-toggle-state="active" data-kt-toggle-target="body" data-kt-toggle-name="app-sidebar-minimize">
+            <i class="ki-duotone ki-double-left fs-2 rotate-180">
+                <span class="path1"></span>
+                <span class="path2"></span>
+            </i>
+        </div>
+        <!--end::Sidebar toggle-->
+    </div>
+    <!--end::Logo-->
+    <!--begin::sidebar menu-->
+    <div class="app-sidebar-menu overflow-hidden hover-scroll-overlay-y flex-column-fluid">
+        <!--begin::Menu wrapper-->
+        <div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y">
+            <!--begin::Scroll wrapper-->
+            <div id="kt_app_sidebar_menu_scroll" class="scroll-y my-5 mx-3" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
+                <!--begin::Menu-->
+                <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
+                    <!--begin:Menu item-->
+                    <div class="menu-item">
+                        @foreach (var menu in menus)
+                        {
+                            if (menu.ChildMenus != null && menu.ChildMenus.Any())
+                            {
+                                <!-- Parent menu with children (accordion) -->
+                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion @(IsMenuActive(menu) ? "here show" : "")">
+                                    <span class="menu-link">
+                                        <span class="menu-icon">
+                                            @Html.Raw(menu.Icon)
+                                        </span>
+                                        <span class="menu-title">@menu.Name</span>
+                                        <span class="menu-arrow"></span>
+                                    </span>
+                                    <div class="menu-sub menu-sub-accordion @(IsMenuActive(menu) ? "show" : "")">
+                                        <div class="menu-item">
+                                            @foreach (var child in menu.ChildMenus)
+                                            {
+                                                <a class="menu-link @(IsActive($"/{child.Controller}") ? "active" : "")" href="@Url.Action("Index", child.Controller)">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">@child.Name</span>
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <!-- Single menu item without children -->
+                                <a class="menu-link @(IsActive($"/{menu.Controller}") || (menu.Controller == "Home" && IsActive("/")) ? "active" : "")" href="@Url.Action("Index", menu.Controller)">
+                                    <span class="menu-icon">
+                                        @Html.Raw(menu.Icon)
+                                    </span>
+                                    <span class="menu-title">@menu.Name</span>
+                                </a>
+                            }
+                        }
+                    </div>
+                    <!--end:Menu item-->
+                </div>
+                <!--end::Menu-->
+            </div>
+            <!--end::Scroll wrapper-->
+        </div>
+        <!--end::Menu wrapper-->
+    </div>
+    <!--end::sidebar menu-->
+</div>

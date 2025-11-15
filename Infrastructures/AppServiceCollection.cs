@@ -1,0 +1,27 @@
+﻿using AccuFlow.Services;
+
+namespace AccuFlow.Infrastructures
+{
+    public static class AppServiceCollection
+    {
+        public static IServiceCollection AddAppService(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Register infrastructure services
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            
+            // Register base services
+            services.AddScoped<IBaseService, BaseService>();
+            
+            // Register services
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<Services.Interfaces.IMenuService, MenuService>();
+            services.AddScoped<IChartOfAccountService, ChartOfAccountService>();
+            services.AddScoped<IJournalEntryService, JournalEntryService>();
+
+            return services;
+        }
+    }
+}

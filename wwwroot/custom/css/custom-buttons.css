@@ -1,0 +1,28 @@
+/* Custom Button Styles */
+.button-outline-blue-komatsu {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid #18A4F5;
+    background-color: transparent;
+    color: #18A4F5;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.button-outline-blue-komatsu:hover {
+    background-color: #18A4F5;
+    color: white;
+    border-color: #18A4F5;
+}
+
+.button-outline-blue-komatsu:hover svg path {
+    stroke: white;
+}
+
+.button-outline-blue-komatsu svg {
+    width: 20px;
+    height: 20px;
+}

@@ -1,0 +1,207 @@
+@model AccuFlow.Models.Seed.SeedViewModel
+@{
+    ViewData["Title"] = "Database Seeding";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Database Seeding</h2>
+            
+            <!-- Environment Indicator -->
+            <div class="alert @(Model.IsProduction ? "alert-danger" : "alert-info") mt-3" role="alert">
+                <strong>Environment:</strong> @(Model.IsProduction ? "PRODUCTION" : "Development")
+                @if (Model.IsProduction)
+                {
+                    <text>
+                        <br />
+                        <i class="fas fa-exclamation-triangle"></i> <strong>WARNING:</strong> You are in a production environment. Seeding will require confirmation.
+                    </text>
+                }
+            </div>
+
+            <!-- Message Display Area -->
+            <div id="messageArea" class="mt-3" style="display: none;">
+                <div id="messageContent" class="alert" role="alert"></div>
+            </div>
+
+            <!-- Available Seeders -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Available Seeders</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Roles</h6>
+                                    <p class="mb-0 text-muted">Seeds default roles (Administrator, Accountant, Manager, User)</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="runSeeder('Roles')">
+                                    <i class="fas fa-play"></i> Seed Roles
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Users</h6>
+                                    <p class="mb-0 text-muted">Seeds default users (admin, accountant)</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="runSeeder('Users')">
+                                    <i class="fas fa-play"></i> Seed Users
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Chart of Accounts</h6>
+                                    <p class="mb-0 text-muted">Seeds standard chart of accounts structure</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="runSeeder('ChartOfAccounts')">
+                                    <i class="fas fa-play"></i> Seed Chart of Accounts
+                                </button>
+                            </div>
+                        </div>
+
+                        @if (Model.AvailableSeeders.Contains("SampleTransactions"))
+                        {
+                            <div class="list-group-item list-group-item-warning">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Sample Transactions <span class="badge badge-warning">Dev/Staging Only</span></h6>
+                                        <p class="mb-0 text-muted">Seeds sample journal entries, invoices, and purchase orders for testing</p>
+                                    </div>
+                                    <button class="btn btn-warning btn-sm" onclick="runSeeder('SampleTransactions')">
+                                        <i class="fas fa-flask"></i> Seed Sample Data
+                                    </button>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="list-group-item list-group-item-success">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">Seed All</h6>
+                                    <p class="mb-0 text-muted">Seeds all data in the correct order @(Model.AvailableSeeders.Contains("SampleTransactions") ? "(includes sample transactions)" : "")</p>
+                                </div>
+                                <button class="btn btn-success btn-sm" onclick="runSeeder('All')">
+                                    <i class="fas fa-database"></i> Seed All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal for Production -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Production Environment Confirmation</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>WARNING:</strong> You are about to seed data in a PRODUCTION environment.</p>
+                <p>This operation may modify existing data. Are you sure you want to proceed?</p>
+                <p>Seeder: <strong id="seederNameDisplay"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmButton">Yes, Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var isProduction = @(Model.IsProduction ? "true" : "false");
+        var currentSeederName = '';
+
+        function runSeeder(seederName) {
+            currentSeederName = seederName;
+
+            if (isProduction) {
+                // Show confirmation modal for production
+                $('#seederNameDisplay').text(seederName);
+                $('#confirmModal').modal('show');
+            } else {
+                // Execute directly in development
+                executeSeeder(seederName, false);
+            }
+        }
+
+        // Handle confirmation button click
+        $('#confirmButton').on('click', function() {
+            $('#confirmModal').modal('hide');
+            executeSeeder(currentSeederName, true);
+        });
+
+        function executeSeeder(seederName, confirmed) {
+            // Show loading message
+            showMessage('info', 'Seeding in progress... Please wait.');
+
+            // Disable all buttons
+            $('button').prop('disabled', true);
+
+            $.ajax({
+                url: '@Url.Action("RunSeeder", "Seed")',
+                type: 'POST',
+                data: {
+                    seederName: seederName,
+                    confirmed: confirmed
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showMessage('success', response.message);
+                    } else {
+                        showMessage('danger', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showMessage('danger', 'An error occurred: ' + error);
+                },
+                complete: function() {
+                    // Re-enable all buttons
+                    $('button').prop('disabled', false);
+                }
+            });
+        }
+
+        function showMessage(type, message) {
+            var alertClass = 'alert-' + type;
+            $('#messageContent')
+                .removeClass()
+                .addClass('alert ' + alertClass)
+                .html('<i class="fas fa-' + getIconForType(type) + '"></i> ' + message);
+            $('#messageArea').show();
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(function() {
+                    $('#messageArea').fadeOut();
+                }, 5000);
+            }
+        }
+
+        function getIconForType(type) {
+            switch(type) {
+                case 'success': return 'check-circle';
+                case 'danger': return 'exclamation-circle';
+                case 'info': return 'info-circle';
+                default: return 'info-circle';
+            }
+        }
+    </script>
+}
