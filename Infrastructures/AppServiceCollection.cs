@@ -1,4 +1,5 @@
 ﻿using AccuFlow.Services;
+using KomatsuERP.Services;
 
 namespace AccuFlow.Infrastructures
 {
@@ -20,6 +21,10 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<Services.Interfaces.IMenuService, MenuService>();
             services.AddScoped<IChartOfAccountService, ChartOfAccountService>();
             services.AddScoped<IJournalEntryService, JournalEntryService>();
+            services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
+            services.AddScoped<ITrialBalanceService, TrialBalanceService>();
+            services.AddScoped<IFinancialStatementService, FinancialStatementService>();
+            services.AddScoped<IRoleMenuService, RoleMenuService>();
 
             return services;
         }

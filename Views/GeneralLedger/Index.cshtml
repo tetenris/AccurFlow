@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "General Ledger";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <label>Date From</label>
+                <input type="date" class="form-control" id="filter-date-from" />
+            </div>
+            <div class="col-md-2">
+                <label>Date To</label>
+                <input type="date" class="form-control" id="filter-date-to" />
+            </div>
+            <div class="col-md-2">
+                <label>Account Type</label>
+                <select class="form-select" id="filter-account-type">
+                    <option value="">All Types</option>
+                    <option value="Asset">Asset</option>
+                    <option value="Liability">Liability</option>
+                    <option value="Equity">Equity</option>
+                    <option value="Revenue">Revenue</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Other Income">Other Income</option>
+                    <option value="Other Expense">Other Expense</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" id="btn-apply-filter">Apply Filter</button>
+            </div>
+        </div>
+
+        <div id="ledger-summary-table">
+            <table id="ledger_summary_datatable" class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                <thead>
+                    <tr>
+                        <th>Account Code</th>
+                        <th>Account Name</th>
+                        <th>Type</th>
+                        <th>Total Debit</th>
+                        <th>Total Credit</th>
+                        <th>Balance</th>
+                        <th>Transactions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/generalledger/summary.js"></script>
+}
