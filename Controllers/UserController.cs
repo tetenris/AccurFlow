@@ -1,16 +1,18 @@
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.User;
 using AccuFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccuFlow.Controllers
 {
-    public class UserController : Controller
+    [Authorize]
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
 
-        public UserController(IUserService userService, IRoleService roleService)
+        public UserController(IUserService userService, IRoleService roleService) : base(userService)
         {
             _userService = userService;
             _roleService = roleService;

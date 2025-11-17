@@ -1,9 +1,11 @@
 using AccuFlow.Models.ChartOfAccount;
 using AccuFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccuFlow.Controllers
 {
+    [Authorize]
     public class ChartOfAccountController : BaseController
     {
         private readonly IChartOfAccountService _chartOfAccountService;

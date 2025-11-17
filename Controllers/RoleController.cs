@@ -1,16 +1,20 @@
 using AccuFlow.Models.Role;
 using AccuFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccuFlow.Controllers
 {
+    [Authorize]
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
+        private readonly KomatsuERP.Services.IRoleMenuService _roleMenuService;
 
-        public RoleController(IRoleService roleService) : base(roleService)
+        public RoleController(IRoleService roleService, KomatsuERP.Services.IRoleMenuService roleMenuService) : base(roleService)
         {
             _roleService = roleService;
+            _roleMenuService = roleMenuService;
         }
 
         public IActionResult Index()
@@ -89,6 +93,40 @@ namespace AccuFlow.Controllers
             {
                 await _roleService.FixRoleTypeData();
                 return Ok(new { success = true, message = "Role type data fixed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetRoleMenuPermissions(string roleId = "")
+        {
+            try
+            {
+                Guid parsedRoleId = Guid.Empty;
+                if (!string.IsNullOrEmpty(roleId))
+                {
+                    Guid.TryParse(roleId, out parsedRoleId);
+                }
+                
+                var result = await _roleMenuService.GetRoleMenuPermissionsAsync(parsedRoleId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveRoleMenuPermissions([FromBody] AccuFlow.Models.RoleMenu.SaveRoleMenuRequest request)
+        {
+            try
+            {
+                await _roleMenuService.SaveRoleMenuPermissionsAsync(request);
+                return Ok(new { success = true, message = "Permissions saved successfully" });
             }
             catch (Exception ex)
             {

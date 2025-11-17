@@ -35,36 +35,65 @@
 
 <!-- Modal Add/Edit -->
 <div class="modal fade" id="modal-role" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal-role-title">Add Role</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="form-role">
-                    <input type="hidden" id="role-id" />
-                    <div class="mb-3">
-                        <label class="form-label required">Role Type</label>
-                        <select class="form-select" id="role-type" required>
-                            <option value="">Select Role Type</option>
-                        </select>
+                <div class="row">
+                    <!-- Left Side: Role Info -->
+                    <div class="col-md-4">
+                        <form id="form-role">
+                            <input type="hidden" id="role-id" />
+                            <div class="mb-3">
+                                <label class="form-label required">Role Type</label>
+                                <select class="form-select" id="role-type" required>
+                                    <option value="">Select Role Type</option>
+                                </select>
+                                <small class="text-muted d-none" id="role-type-hint">
+                                    <i class="fa fa-info-circle"></i> Role type cannot be changed when editing
+                                </small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label required">Role Name</label>
+                                <input type="text" class="form-control" id="role-name" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="role-description" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="role-active" checked />
+                                    <label class="form-check-label" for="role-active">Active</label>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label required">Role Name</label>
-                        <input type="text" class="form-control" id="role-name" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" id="role-description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="role-active" checked />
-                            <label class="form-check-label" for="role-active">Active</label>
+
+                    <!-- Right Side: Access Control -->
+                    <div class="col-md-8">
+                        <h5 class="mb-4">Access Control</h5>
+                        
+                        <!-- Full Access -->
+                        <div class="mb-4">
+                            <h6>Full Access</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="select-all-permissions">
+                                <label class="form-check-label" for="select-all-permissions">
+                                    Select All
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Menu Permissions -->
+                        <div id="menu-permissions-container" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -75,5 +104,6 @@
 </div>
 
 @section Scripts {
+    <script src="~/custom/features/role/permissions.js"></script>
     <script src="~/custom/features/role/index.js"></script>
 }

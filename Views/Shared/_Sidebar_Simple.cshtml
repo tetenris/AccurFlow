@@ -1,8 +1,17 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @inject AccuFlow.Services.Interfaces.IMenuService MenuService
+@using System.Security.Claims
 @{
     var currentPath = HttpContextAccessor.HttpContext.Request.Path.ToString().ToLower();
-    var menus = await MenuService.GetMenuHierarchyAsync();
+    
+    // Get user's role ID from claims
+    var roleIdClaim = User.FindFirst("RoleId")?.Value;
+    var roleId = !string.IsNullOrEmpty(roleIdClaim) ? Guid.Parse(roleIdClaim) : Guid.Empty;
+    
+    // Load menu based on role permissions
+    var menus = roleId != Guid.Empty 
+        ? await MenuService.GetMenuHierarchyByRoleAsync(roleId)
+        : await MenuService.GetMenuHierarchyAsync();
 
     bool IsActive(string path)
     {

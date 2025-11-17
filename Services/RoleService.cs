@@ -147,9 +147,20 @@ namespace AccuFlow.Services
             if (role == null)
                 throw new Exception("Role not found");
 
-            // Check if role type is being changed
+            // Check if there are active users using this role
+            var activeUsersWithRole = await _dbContext.Set<UserEntity>()
+                .Where(u => u.RoleId == request.RoleId && !u.IsDeleted && u.IsActive)
+                .ToListAsync();
+
+            // Validate RoleType change
             if (role.RoleType != (RoleEnum)request.RoleType)
             {
+                // Cannot change RoleType if there are users using this role
+                if (activeUsersWithRole.Any())
+                {
+                    throw new Exception($"Cannot change role type. There are {activeUsersWithRole.Count} active user(s) assigned to this role. Please reassign these users first.");
+                }
+
                 // If role type is changing, check if new type already exists
                 var existingRole = await _dbContext.Set<RoleEntity>()
                     .FirstOrDefaultAsync(x => x.RoleType == (RoleEnum)request.RoleType 
@@ -164,8 +175,20 @@ namespace AccuFlow.Services
                 role.RoleType = (RoleEnum)request.RoleType;
                 role.RoleName = request.RoleName;
             }
+
+            // Validate IsActive change (from Active to Inactive)
+            if (role.IsActive && !request.IsActive)
+            {
+                // Cannot deactivate role if there are active users using it
+                if (activeUsersWithRole.Any())
+                {
+                    var userNames = string.Join(", ", activeUsersWithRole.Select(u => u.UserName).Take(5));
+                    var moreUsers = activeUsersWithRole.Count > 5 ? $" and {activeUsersWithRole.Count - 5} more" : "";
+                    throw new Exception($"Cannot deactivate role. There are {activeUsersWithRole.Count} active user(s) assigned to this role ({userNames}{moreUsers}). Please reassign or deactivate these users first.");
+                }
+            }
             
-            // Always allow updating description and status
+            // Update role properties
             role.Description = request.Description ?? string.Empty;
             role.IsActive = request.IsActive;
             
@@ -184,6 +207,31 @@ namespace AccuFlow.Services
             if (role == null)
                 throw new Exception("Role not found");
 
+            // Check if role is still being used by any users
+            var usersWithRole = await _dbContext.Set<UserEntity>()
+                .Where(u => u.RoleId == roleId && !u.IsDeleted)
+                .CountAsync();
+
+            if (usersWithRole > 0)
+            {
+                throw new Exception($"Cannot delete role. There are {usersWithRole} user(s) still assigned to this role. Please reassign or remove these users first.");
+            }
+
+            // Auto-delete related RoleMenu records (cascade delete)
+            var roleMenus = await _dbContext.Set<RoleMenuEntity>()
+                .Where(rm => rm.RoleId == roleId && !rm.IsDeleted)
+                .ToListAsync();
+
+            if (roleMenus.Any())
+            {
+                foreach (var roleMenu in roleMenus)
+                {
+                    roleMenu.IsDeleted = true;
+                    roleMenu.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            // Soft delete the role
             role.IsDeleted = true;
             role.UpdatedAt = DateTime.UtcNow;
 

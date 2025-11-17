@@ -180,10 +180,16 @@ $(document).ready(function () {
         $('#form-role')[0].reset();
 
         // Enable all fields for adding
-        $('#role-type').val('').prop('disabled', false);
+        $('#role-type').val('').prop('disabled', false).removeClass('bg-light');
         $('#role-name').val('').prop('readonly', false);
         $('#role-description').val('').prop('readonly', false);
         $('#role-active').prop('checked', true);
+        
+        // Hide hint for add mode
+        $('#role-type-hint').addClass('d-none');
+
+        // Load permissions for new role (empty roleId)
+        loadMenuPermissions('');
 
         $('#modal-role').modal('show');
     });
@@ -202,17 +208,23 @@ $(document).ready(function () {
             $('#modal-role-title').text('Edit Role');
             $('#role-id').val(response.roleId);
 
-            // Set role type - dropdown bisa diedit
-            $('#role-type').val(String(response.roleType)).prop('disabled', false);
+            // Set role type - READONLY (tidak bisa diganti saat edit)
+            $('#role-type').val(String(response.roleType)).prop('disabled', true).addClass('bg-light');
 
             // Trigger change untuk auto-fill name dan description (readonly)
             $('#role-type').trigger('change');
+
+            // Show hint for edit mode
+            $('#role-type-hint').removeClass('d-none');
 
             // Description can be edited
             $('#role-description').val(response.description).prop('readonly', false);
 
             // Status can be changed
             $('#role-active').prop('checked', response.isActive);
+
+            // Load permissions for this role
+            loadMenuPermissions(roleId);
 
             $('#modal-role').modal('show');
         } catch (error) {
@@ -268,9 +280,27 @@ $(document).ready(function () {
             });
 
             if (response.success) {
+                // Get the roleId (from response for new role, or currentRoleId for edit)
+                const savedRoleId = response.roleId || currentRoleId;
+                
+                // Save permissions
+                const permissions = collectPermissions();
+                console.log('Collected permissions:', permissions);
+                console.log('Total permissions:', permissions.length);
+                
+                await $.ajax({
+                    url: '/Role/SaveRoleMenuPermissions',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        roleId: savedRoleId,
+                        permissions: permissions
+                    })
+                });
+
                 Swal.fire({
                     title: 'Success',
-                    text: response.message,
+                    text: 'Role and permissions saved successfully',
                     icon: 'success',
                     confirmButtonText: 'OK',
                     customClass: {

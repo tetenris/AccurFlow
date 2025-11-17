@@ -48,6 +48,76 @@ namespace AccuFlow.Services
             return rootMenus;
         }
 
+        public async Task<List<MenuViewModel>> GetMenuHierarchyByRoleAsync(Guid roleId)
+        {
+            // Get all menus
+            var allMenus = await _dbContext.Menus
+                .Where(m => !m.IsDeleted)
+                .OrderBy(m => m.Sequence)
+                .ToListAsync();
+
+            // Check if this is Administrator role by RoleType
+            var role = await _dbContext.Set<RoleEntity>()
+                .Where(r => r.RoleId == roleId && !r.IsDeleted)
+                .FirstOrDefaultAsync();
+            
+            var isAdministrator = role?.RoleType == Entities.Enums.RoleEnum.Administrator;
+
+            // Administrator ALWAYS gets full access (bypass RoleMenu check)
+            if (isAdministrator)
+            {
+                return await GetMenuHierarchyAsync();
+            }
+
+            // Get role permissions for non-Administrator roles
+            var roleMenuPermissions = await _dbContext.Set<RoleMenuEntity>()
+                .Where(rm => rm.RoleId == roleId && !rm.IsDeleted)
+                .ToListAsync();
+
+            // If no permissions found for non-Administrator
+            if (!roleMenuPermissions.Any())
+            {
+                // Non-Administrator: show nothing (no access)
+                return new List<MenuViewModel>();
+            }
+
+            // Filter menus based on permissions - only show menus with CanView = true
+            var allowedMenuIds = roleMenuPermissions
+                .Where(rm => rm.CanView)
+                .Select(rm => rm.MenuId)
+                .ToList();
+            
+            var allowedMenus = allMenus.Where(m => allowedMenuIds.Contains(m.MenuId)).ToList();
+
+            var menuViewModels = allowedMenus.Select(m => new MenuViewModel
+            {
+                MenuId = m.MenuId,
+                MenuParentId = m.MenuParentId,
+                Icon = m.Icon,
+                Name = m.Name,
+                Controller = m.Controller,
+                Actions = ParseActions(m.Action),
+                Sequence = m.Sequence
+            }).ToList();
+
+            // Build hierarchy - only include parent if it has permission
+            var rootMenus = menuViewModels.Where(m => m.MenuParentId == null).ToList();
+            
+            foreach (var rootMenu in rootMenus)
+            {
+                var childMenus = menuViewModels
+                    .Where(m => m.MenuParentId == rootMenu.MenuId)
+                    .OrderBy(m => m.Sequence)
+                    .ToList();
+                
+                rootMenu.ChildMenus = childMenus;
+            }
+
+            // Return only root menus that have permission
+            // If parent doesn't have permission, its children won't show either
+            return rootMenus;
+        }
+
         private List<string> ParseActions(string actionJson)
         {
             try
