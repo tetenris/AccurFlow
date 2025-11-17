@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Financial Statements";
+}
+
+<div class="card">
+    <div class="card-body">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="financialTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="income-statement-tab" data-bs-toggle="tab" data-bs-target="#income-statement" type="button" role="tab">
+                    Income Statement
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="balance-sheet-tab" data-bs-toggle="tab" data-bs-target="#balance-sheet" type="button" role="tab">
+                    Balance Sheet
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cash-flow-tab" data-bs-toggle="tab" data-bs-target="#cash-flow" type="button" role="tab">
+                    Cash Flow
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content mt-3" id="financialTabsContent">
+            <!-- Income Statement Tab -->
+            <div class="tab-pane fade show active" id="income-statement" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Date From</label>
+                        <input type="date" class="form-control" id="is-date-from" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date To</label>
+                        <input type="date" class="form-control" id="is-date-to" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is-show-zero" />
+                            <label class="form-check-label" for="is-show-zero">
+                                Show Zero Balance
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" id="btn-generate-is">
+                                <i class="ki-duotone ki-magnifier fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="income-statement-table"></div>
+            </div>
+
+            <!-- Balance Sheet Tab -->
+            <div class="tab-pane fade" id="balance-sheet" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">As of Date</label>
+                        <input type="date" class="form-control" id="bs-as-of-date" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="bs-show-zero" />
+                            <label class="form-check-label" for="bs-show-zero">
+                                Show Zero Balance
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" id="btn-generate-bs">
+                                <i class="ki-duotone ki-magnifier fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="balance-sheet-table"></div>
+            </div>
+
+            <!-- Cash Flow Tab -->
+            <div class="tab-pane fade" id="cash-flow" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Date From</label>
+                        <input type="date" class="form-control" id="cf-date-from" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Date To</label>
+                        <input type="date" class="form-control" id="cf-date-to" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary" id="btn-generate-cf">
+                                <i class="ki-duotone ki-magnifier fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="cash-flow-table"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/financialstatement/index.js"></script>
+}
