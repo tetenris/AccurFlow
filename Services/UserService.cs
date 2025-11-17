@@ -8,7 +8,7 @@ using System.Linq.Dynamic.Core;
 
 namespace AccuFlow.Services
 {
-    public interface IUserService
+    public interface IUserService : IBaseService
     {
         Task<BaseDatatableResponse> Datatable(DataTableUserRequest request);
         Task<UserViewModel?> GetByIdAsync(Guid id);

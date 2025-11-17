@@ -1,0 +1,253 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login - AccuFlow</title>
+    <link rel="shortcut icon" href="~/assets/media/logos/favicon.ico" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <link href="~/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .login-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+        .login-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background: white;
+        }
+        .login-right {
+            flex: 1;
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 60px;
+            position: relative;
+        }
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .social-login {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .social-btn:hover {
+            border-color: #1abc9c;
+            transform: translateY(-2px);
+        }
+        .divider-text {
+            color: #95a5a6;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control-modern {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-control-modern:focus {
+            outline: none;
+            background: #ebebeb;
+        }
+        .forgot-password {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .forgot-password a {
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-signin {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-signin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(26, 188, 156, 0.3);
+        }
+        .right-content {
+            text-align: center;
+        }
+        .right-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .right-subtitle {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        .btn-signup {
+            padding: 15px 60px;
+            background: transparent;
+            border: 2px solid white;
+            border-radius: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-signup:hover {
+            background: white;
+            color: #1abc9c;
+        }
+        .alert-modern {
+            background: #fee;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #c0392b;
+        }
+        .demo-badge {
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: rgba(26, 188, 156, 0.1);
+            border-radius: 8px;
+            color: #16a085;
+            font-size: 13px;
+        }
+        @@media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+            .login-right {
+                display: none;
+            }
+            .login-left {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Left Side - Login Form -->
+        <div class="login-left">
+            <div class="login-form-wrapper">
+                <h1 class="login-title">Sign in</h1>
+
+                <!-- Social Login Buttons -->
+                <div class="social-login">
+                    <div class="social-btn">
+                        <i class="fab fa-facebook-f" style="color: #3b5998;"></i>
+                    </div>
+                    <div class="social-btn">
+                        <i class="fab fa-google" style="color: #db4437;"></i>
+                    </div>
+                    <div class="social-btn">
+                        <i class="fab fa-linkedin-in" style="color: #0077b5;"></i>
+                    </div>
+                </div>
+
+                <div class="divider-text">atau gunakan akun anda</div>
+
+                <!-- Error Message -->
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-modern">
+                        <strong>Login Failed!</strong> @Html.ValidationSummary(false, "", new { @class = "" })
+                    </div>
+                }
+
+                <!-- Login Form -->
+                <form method="post" asp-action="Login" asp-controller="Account">
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                    <div class="form-group">
+                        <input type="text" name="username" class="form-control-modern" placeholder="Username" required autocomplete="off" />
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" name="password" class="form-control-modern" placeholder="Password" required autocomplete="off" />
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#">Lupa kata sandi anda?</a>
+                    </div>
+
+                    <button type="submit" class="btn-signin">Sign In</button>
+
+                    <div class="demo-badge">
+                        <strong>Demo:</strong> admin / admin
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side - Welcome Message -->
+        <div class="login-right">
+            <div class="right-content">
+                <h2 class="right-title">Halo, Teman!</h2>
+                <p class="right-subtitle">Daftarkan diri anda dan mulai gunakan<br />layanan kami segera</p>
+                <button class="btn-signup" onclick="alert('Sign up feature coming soon!')">SIGN UP</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/assets/plugins/global/plugins.bundle.js"></script>
+    <script src="~/assets/js/scripts.bundle.js"></script>
+</body>
+</html>

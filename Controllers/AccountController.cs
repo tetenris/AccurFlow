@@ -37,7 +37,9 @@ namespace AccuFlow.Controllers
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("FullName", user.FullName)
+                new Claim("FullName", user.FullName),
+                new Claim("RoleId", user.RoleId.ToString()),
+                new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -61,6 +63,13 @@ namespace AccuFlow.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LogoutGet()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
