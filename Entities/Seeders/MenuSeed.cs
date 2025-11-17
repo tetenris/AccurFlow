@@ -138,6 +138,42 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "JournalEntry",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post"",""reverse""]",
                     Sequence = 1
+                },
+                
+                // General Ledger (Child of Accounting)
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000012"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "General Ledger",
+                    Controller = "GeneralLedger",
+                    Action = @"[""view""]",
+                    Sequence = 2
+                },
+                
+                // Trial Balance (Child of Accounting)
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000013"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "Trial Balance",
+                    Controller = "TrialBalance",
+                    Action = @"[""view""]",
+                    Sequence = 3
+                },
+                
+                // Financial Statements (Child of Accounting)
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000014"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "Financial Statements",
+                    Controller = "FinancialStatement",
+                    Action = @"[""view""]",
+                    Sequence = 4
                 }
             };
         }

@@ -15,6 +15,7 @@ namespace AccuFlow.Entities.EntityConfigurations
             // Indexes
             builder.HasIndex(x => x.JournalId);
             builder.HasIndex(x => x.AccountId);
+            builder.HasIndex(x => new { x.AccountId, x.JournalId }).HasDatabaseName("IX_JournalLines_AccountId_JournalId");
 
             // Relationships
             builder.HasOne(x => x.JournalEntry)
