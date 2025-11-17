@@ -1,0 +1,70 @@
+@{
+    ViewData["Title"] = "Trial Balance";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <label>As of Date</label>
+                <input type="date" class="form-control" id="filter-as-of-date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-2">
+                <label>Account Type</label>
+                <select class="form-select" id="filter-account-type">
+                    <option value="">All Types</option>
+                    <option value="Asset">Asset</option>
+                    <option value="Liability">Liability</option>
+                    <option value="Equity">Equity</option>
+                    <option value="Revenue">Revenue</option>
+                    <option value="Expense">Expense</option>
+                    <option value="Other Income">Other Income</option>
+                    <option value="Other Expense">Other Expense</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label>&nbsp;</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="filter-show-zero" />
+                    <label class="form-check-label" for="filter-show-zero">
+                        Show Zero Balance
+                    </label>
+                </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" class="btn btn-primary w-100" id="btn-generate">Generate</button>
+            </div>
+        </div>
+
+        <div id="trial-balance-result" style="display:none;">
+            <div class="alert alert-info mb-3">
+                <strong>As of:</strong> <span id="report-date"></span>
+            </div>
+
+            <div id="trial-balance-table"></div>
+
+            <div class="mt-3">
+                <table class="table table-bordered">
+                    <tr class="fw-bold">
+                        <td colspan="2" class="text-end">TOTAL:</td>
+                        <td class="text-end" id="total-debit">0.00</td>
+                        <td class="text-end" id="total-credit">0.00</td>
+                    </tr>
+                    <tr id="difference-row" style="display:none;">
+                        <td colspan="2" class="text-end">Difference:</td>
+                        <td colspan="2" class="text-end text-danger" id="difference-amount">0.00</td>
+                    </tr>
+                    <tr id="balance-indicator">
+                        <td colspan="4" class="text-center">
+                            <span id="balance-status"></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/trialbalance/index.js"></script>
+}
