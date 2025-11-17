@@ -1,10 +1,12 @@
 using AccuFlow.Models.JournalEntry;
 using AccuFlow.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFlow.Controllers
 {
+    [Authorize]
     public class JournalEntryController : BaseController
     {
         private readonly IJournalEntryService _journalEntryService;

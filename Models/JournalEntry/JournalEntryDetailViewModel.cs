@@ -1,3 +1,5 @@
+using KomatsuERP.Models.JournalEntry;
+
 namespace AccuFlow.Models.JournalEntry
 {
     public class JournalEntryDetailViewModel
