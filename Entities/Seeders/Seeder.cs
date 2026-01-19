@@ -73,6 +73,25 @@ namespace AccuFlow.Entities.Seeders
             }
         }
 
+        public static async Task SeedCustomers(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding Customers...");
+            var customers = CustomerSeed.GetCustomerSeedData();
+            var existingCustomers = await dbContext.Customers.ToListAsync();
+            var newCustomers = customers.Where(c => !existingCustomers.Any(ec => ec.CustomerId == c.CustomerId)).ToList();
+            
+            if (newCustomers.Any())
+            {
+                dbContext.Customers.AddRange(newCustomers);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newCustomers.Count} customers");
+            }
+            else
+            {
+                logger.LogInformation("No new customers to seed");
+            }
+        }
+
         public static async Task SeedSampleTransactions(AppDbContext dbContext, ILogger logger)
         {
             logger.LogInformation("Seeding Sample Transactions...");
@@ -106,6 +125,7 @@ namespace AccuFlow.Entities.Seeders
             await SeedRoles(dbContext, logger);
             await SeedUsers(dbContext, logger);
             await SeedChartOfAccounts(dbContext, logger);
+            await SeedCustomers(dbContext, logger);
             await SeedMenu(dbContext, logger);
             
             // Only seed sample transactions in Development or Staging

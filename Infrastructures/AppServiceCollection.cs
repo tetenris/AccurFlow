@@ -25,6 +25,7 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<ITrialBalanceService, TrialBalanceService>();
             services.AddScoped<IFinancialStatementService, FinancialStatementService>();
             services.AddScoped<IRoleMenuService, RoleMenuService>();
+            services.AddScoped<ICustomerService, CustomerService>();
 
             return services;
         }

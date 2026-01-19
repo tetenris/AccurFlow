@@ -111,20 +111,24 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - _Requirements: All_
   
 
-  - [ ] 5.2 Implement Index action for main view
+  - [x] 5.2 Implement Index action for main view
+
     - Return view with ViewData title
     - _Requirements: 5.1_
 
   
+
   - [ ] 5.3 Implement Datatable endpoint for listing accounts
     - POST endpoint accepting `DataTableChartOfAccountRequest`
     - Return JSON with paginated and filtered results
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
+
   
   - [ ] 5.4 Implement GetById endpoint
     - GET endpoint accepting account ID
     - Return account details as JSON
+
 
     - _Requirements: 6.1_
   
@@ -133,17 +137,20 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Used for tree view and parent account dropdown
 
     - _Requirements: 2.1, 2.2, 2.3_
+
   
   - [ ] 5.6 Implement GetParentAccounts endpoint
     - GET endpoint accepting account type parameter
 
     - Return filtered list of potential parent accounts
+
     - _Requirements: 1.5, 2.1_
   
   - [ ] 5.7 Implement Create endpoint
     - POST endpoint accepting `CreateChartOfAccountRequest`
     - Return success/error response with appropriate HTTP status codes
     - Include try-catch for error handling
+
 
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
   
@@ -155,11 +162,13 @@ This implementation plan breaks down the Chart of Accounts Management feature in
   
   - [x] 5.9 Implement Delete endpoint
 
+
     - DELETE endpoint accepting account ID
     - Return success/error response with validation messages
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
   
-  - [ ] 5.10 Implement ToggleStatus endpoint
+  - [x] 5.10 Implement ToggleStatus endpoint
+
     - POST endpoint accepting account ID
 
     - Toggle between active and inactive status
@@ -175,10 +184,12 @@ This implementation plan breaks down the Chart of Accounts Management feature in
 - [ ] 6. Create Index view (Views/ChartOfAccount/Index.cshtml)
   - [x] 6.1 Create view file with page layout
 
+
     - Add page title and "Add New Account" button
     - Add filter section (Account Type dropdown, Status dropdown, Search input)
     - Add Export button
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
+
 
   
   - [ ] 6.2 Add DataTable HTML structure
@@ -187,6 +198,7 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - _Requirements: 5.5_
   
 
+
   - [ ] 6.3 Add Create/Edit modal HTML
     - Create modal dialog with form fields (Account Code, Name, Type, Parent, Description, IsHeader checkbox, IsActive checkbox, Opening Balance)
     - Add validation message placeholders
@@ -194,9 +206,11 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - _Requirements: 1.1, 6.1_
 
 
+
 - [ ] 7. Create JavaScript file for Index page (wwwroot/custom/features/chartofaccount/index.js)
   - [ ] 7.1 Initialize DataTable with server-side processing
     - Configure DataTable with AJAX source pointing to Datatable endpoint
+
 
     - Define columns with custom rendering for hierarchy (indentation), status badges, and action buttons
     - Implement tree view with expand/collapse functionality
@@ -207,6 +221,7 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Reload DataTable when filters change
     - _Requirements: 5.2, 5.3, 5.4_
 
+
   
   - [ ] 7.3 Implement Create modal functionality
     - Show modal on "Add New Account" button click
@@ -214,6 +229,7 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Implement real-time account code validation
     - Handle form submission with AJAX POST to Create endpoint
     - Show success/error messages using SweetAlert or Toastr
+
     - Reload DataTable on successful creation
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
   
@@ -221,11 +237,13 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Load account data on Edit button click
     - Pre-fill form fields with existing data
     - Load parent account dropdown
+
     - Handle form submission with AJAX POST to Edit endpoint
 
     - Reload DataTable on successful update
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
   
+
   - [ ] 7.5 Implement Delete functionality
     - Show confirmation dialog on Delete button click
     - Send AJAX DELETE request to Delete endpoint
@@ -233,6 +251,7 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Handle validation errors (account has transactions, has children)
     - Reload DataTable on successful deletion
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
+
   
   - [ ] 7.6 Implement Toggle Status functionality
     - Send AJAX POST request to ToggleStatus endpoint on status button click
@@ -248,9 +267,11 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - Display validation error messages
     - _Requirements: 12.1, 12.2, 12.3, 12.4_
   
+
   - [ ] 7.8 Implement account code auto-suggestion
     - Call GenerateAccountCode endpoint when parent account or type changes
     - Pre-fill account code input with suggested code
+
 
     - Allow user to override suggested code
     - _Requirements: 4.4_
@@ -269,7 +290,8 @@ This implementation plan breaks down the Chart of Accounts Management feature in
     - _Requirements: All_
 
   
-  - [ ] 8.3 Update Program.cs to call ChartOfAccounts seeder
+  - [x] 8.3 Update Program.cs to call ChartOfAccounts seeder
+
     - Add ChartOfAccounts seeding to auto-seed section
     - _Requirements: All_
 
