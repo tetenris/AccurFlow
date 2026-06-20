@@ -45,7 +45,24 @@ namespace AccuFlow.Infrastructures
             var roleIdClaim = context.HttpContext.User.FindFirst("RoleId")?.Value;
             if (!Guid.TryParse(roleIdClaim, out var roleId))
             {
-                context.Result = new ForbidResult();
+                context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.Value });
+                return;
+            }
+
+            var userIdClaim = context.HttpContext.User.FindFirst("UserId")?.Value;
+            if (!Guid.TryParse(userIdClaim, out var userId))
+            {
+                context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.Value });
+                return;
+            }
+
+            var userExists = await _dbContext.Users
+                .AsNoTracking()
+                .AnyAsync(x => x.UserId == userId && x.IsActive && !x.IsDeleted);
+
+            if (!userExists)
+            {
+                context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.Value });
                 return;
             }
 
@@ -55,11 +72,11 @@ namespace AccuFlow.Infrastructures
 
             if (role == null)
             {
-                context.Result = new ForbidResult();
+                context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl = context.HttpContext.Request.Path.Value });
                 return;
             }
 
-            if (role.RoleType == RoleEnum.SuperAdministrator)
+            if (role.RoleType == RoleEnum.SuperAdministrator || role.RoleType == RoleEnum.Administrator)
             {
                 return;
             }

@@ -201,6 +201,7 @@ namespace AccuFlow.Entities.Seeders
             var menus = MenuSeed.GetMenuSeedData();
             var existingMenus = await dbContext.Menus.ToListAsync();
             var newMenus = menus.Where(m => !existingMenus.Any(em => em.MenuId == m.MenuId)).ToList();
+            var seedMenuIds = menus.Select(m => m.MenuId).ToHashSet();
             
             if (newMenus.Any())
             {
@@ -231,6 +232,14 @@ namespace AccuFlow.Entities.Seeders
                 existingMenu.IsDeleted = false;
                 existingMenu.DeletedAt = null;
                 existingMenu.DeletedBy = null;
+                updatedMenus++;
+            }
+
+            foreach (var existingMenu in existingMenus.Where(m => !seedMenuIds.Contains(m.MenuId) && !m.IsDeleted))
+            {
+                existingMenu.IsDeleted = true;
+                existingMenu.DeletedAt = DateTime.UtcNow;
+                existingMenu.DeletedBy = "System";
                 updatedMenus++;
             }
 
@@ -308,19 +317,8 @@ namespace AccuFlow.Entities.Seeders
             
             await SeedRoles(dbContext, logger);
             await SeedUsers(dbContext, logger);
-            await SeedChartOfAccounts(dbContext, logger);
-            await SeedCustomers(dbContext, logger);
-            await SeedSuppliers(dbContext, logger);
-            await SeedBusinessModules(dbContext, logger);
             await SeedMenu(dbContext, logger);
             await SeedRoleMenus(dbContext, logger);
-            
-            // Only seed sample transactions in Development or Staging
-            if (environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase) || 
-                environmentName.Equals("Staging", StringComparison.OrdinalIgnoreCase))
-            {
-                await SeedSampleTransactions(dbContext, logger);
-            }
             
             logger.LogInformation("SeedAll completed successfully");
         }

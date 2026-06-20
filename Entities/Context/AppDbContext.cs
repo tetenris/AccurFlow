@@ -14,8 +14,8 @@ namespace AccuFlow.Entities.Context
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<RoleMenuEntity> RoleMenus { get; set; }
-        public DbSet<ChartOfAccountEntity> ChartOfAccounts { get; set; }
         public DbSet<MenuEntity> Menus { get; set; }
+        public DbSet<ChartOfAccountEntity> ChartOfAccounts { get; set; }
         public DbSet<JournalEntryEntity> JournalEntries { get; set; }
         public DbSet<JournalLineEntity> JournalLines { get; set; }
         public DbSet<CustomerEntity> Customers { get; set; }
@@ -57,8 +57,30 @@ namespace AccuFlow.Entities.Context
                     .OnDelete(DeleteBehavior.Restrict);
             });
             
-            // Apply configurations
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+            modelBuilder.ApplyConfiguration(new EntityConfigurations.UserEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new EntityConfigurations.RoleEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new EntityConfigurations.MenuEntityConfiguration());
+
+            modelBuilder.Ignore<ChartOfAccountEntity>();
+            modelBuilder.Ignore<JournalEntryEntity>();
+            modelBuilder.Ignore<JournalLineEntity>();
+            modelBuilder.Ignore<CustomerEntity>();
+            modelBuilder.Ignore<SupplierEntity>();
+            modelBuilder.Ignore<InvoiceEntity>();
+            modelBuilder.Ignore<InvoiceLineEntity>();
+            modelBuilder.Ignore<PaymentEntity>();
+            modelBuilder.Ignore<PaymentAllocationEntity>();
+            modelBuilder.Ignore<PurchaseOrderEntity>();
+            modelBuilder.Ignore<PurchaseOrderLineEntity>();
+            modelBuilder.Ignore<ItemEntity>();
+            modelBuilder.Ignore<WarehouseEntity>();
+            modelBuilder.Ignore<StockMovementEntity>();
+            modelBuilder.Ignore<StockOpnameEntity>();
+            modelBuilder.Ignore<StockOpnameLineEntity>();
+            modelBuilder.Ignore<ApprovalRequestEntity>();
+            modelBuilder.Ignore<ApprovalHistoryEntity>();
+            modelBuilder.Ignore<DocumentAttachmentEntity>();
+            modelBuilder.Ignore<TaxEntity>();
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

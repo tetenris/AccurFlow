@@ -107,6 +107,14 @@ namespace AccuFlow.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult AccessDenied(string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
         [Authorize]
         [HttpGet]
         public IActionResult ChangePassword()

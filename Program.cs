@@ -17,6 +17,7 @@ builder.Services.AddAuthentication("Cookies")
     {
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(24);
     });
 
@@ -64,10 +65,6 @@ using (var scope = app.Services.CreateScope())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     await AccuFlow.Entities.Seeders.Seeder.SeedRoles(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedUsers(appDbContext, logger);
-    await AccuFlow.Entities.Seeders.Seeder.SeedChartOfAccounts(appDbContext, logger);
-    await AccuFlow.Entities.Seeders.Seeder.SeedCustomers(appDbContext, logger);
-    await AccuFlow.Entities.Seeders.Seeder.SeedSuppliers(appDbContext, logger);
-    await AccuFlow.Entities.Seeders.Seeder.SeedBusinessModules(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedMenu(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedRoleMenus(appDbContext, logger);
 }

@@ -1,0 +1,63 @@
+@{
+    Layout = null;
+    var returnUrl = ViewData["ReturnUrl"] as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Access Denied - AccuFlow</title>
+    <link href="~/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            margin: 0;
+            background: linear-gradient(135deg, #fff7e8 0%, #e9f5ee 58%, #f8eadc 100%);
+        }
+
+        .denied-card {
+            width: min(520px, calc(100vw - 32px));
+            padding: 34px;
+            border: 1px solid rgba(23, 49, 47, 0.12);
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: 0 24px 60px rgba(22, 50, 47, 0.12);
+            text-align: center;
+        }
+
+        .denied-icon {
+            display: grid;
+            place-items: center;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            border-radius: 24px;
+            color: #b4442f;
+            background: rgba(217, 107, 75, 0.14);
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <main class="denied-card">
+        <div class="denied-icon"><i class="fa fa-lock"></i></div>
+        <h1 class="fw-bolder mb-3">Access Denied</h1>
+        <p class="text-muted mb-8">
+            Anda tidak memiliki akses ke halaman ini. Silakan hubungi administrator jika akses diperlukan.
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a class="btn btn-primary" href="@Url.Action("Index", "Home")">Back to Dashboard</a>
+            <a class="btn btn-light" href="@Url.Action("LogoutGet", "Account")">Logout</a>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            <div class="text-muted fs-8 mt-6">Requested: @returnUrl</div>
+        }
+    </main>
+</body>
+</html>
