@@ -24,6 +24,9 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTablePaymentRequest request) => Json(await _paymentService.Datatable(request));
 
+        [HttpGet]
+        public async Task<IActionResult> GetById(Guid id) => Json(await _paymentService.GetById(id));
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreatePaymentRequest request)
         {
@@ -31,6 +34,34 @@ namespace AccuFlow.Controllers
             {
                 await _paymentService.Create(request, _currentUserService!.UserId);
                 return Ok(new { success = true, message = "Payment created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromBody] UpdatePaymentRequest request)
+        {
+            try
+            {
+                await _paymentService.Edit(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Payment updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] Guid id)
+        {
+            try
+            {
+                await _paymentService.Delete(id, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Payment deleted successfully" });
             }
             catch (Exception ex)
             {

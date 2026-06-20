@@ -15,8 +15,10 @@ namespace AccuFlow.Services
     public interface IInvoiceService : IBaseService
     {
         Task<BaseDatatableResponse> Datatable(DataTableInvoiceRequest request);
-        Task<InvoiceViewModel?> GetById(Guid id);
+        Task<InvoiceDetailViewModel?> GetById(Guid id);
         Task Create(CreateInvoiceRequest request, Guid userId);
+        Task Edit(UpdateInvoiceRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
         Task Post(Guid id, Guid userId);
         Task Cancel(Guid id, Guid userId);
     }
@@ -69,20 +71,51 @@ namespace AccuFlow.Services
             return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
         }
 
-        public async Task<InvoiceViewModel?> GetById(Guid id)
+        public async Task<InvoiceDetailViewModel?> GetById(Guid id)
         {
-            return await _dbContext.Invoices.Include(x => x.Customer).Include(x => x.Supplier).Where(x => x.InvoiceId == id && !x.IsDeleted)
-                .Select(x => new InvoiceViewModel
+            return await _dbContext.Invoices
+                .Include(x => x.Customer)
+                .Include(x => x.Supplier)
+                .Include(x => x.JournalEntry)
+                .Include(x => x.Lines.Where(l => !l.IsDeleted))
+                    .ThenInclude(x => x.Item)
+                .Include(x => x.Lines.Where(l => !l.IsDeleted))
+                    .ThenInclude(x => x.Account)
+                .Where(x => x.InvoiceId == id && !x.IsDeleted)
+                .Select(x => new InvoiceDetailViewModel
                 {
                     InvoiceId = x.InvoiceId,
                     InvoiceNumber = x.InvoiceNumber,
                     InvoiceType = x.InvoiceType,
                     InvoiceDate = x.InvoiceDate,
                     DueDate = x.DueDate,
+                    CustomerId = x.CustomerId,
+                    SupplierId = x.SupplierId,
                     PartnerName = x.Customer != null ? x.Customer.CustomerName : x.Supplier != null ? x.Supplier.SupplierName : string.Empty,
                     Status = x.Status,
                     TotalAmount = x.TotalAmount,
-                    PaidAmount = x.PaidAmount
+                    PaidAmount = x.PaidAmount,
+                    JournalId = x.JournalId,
+                    JournalNumber = x.JournalEntry != null ? x.JournalEntry.JournalNumber : null,
+                    Notes = x.Notes,
+                    CanEdit = x.Status == "Draft",
+                    CanDelete = x.Status == "Draft",
+                    CanPost = x.Status == "Draft",
+                    CanCancel = x.Status != "Cancelled" && x.PaidAmount == 0,
+                    Lines = x.Lines.Where(l => !l.IsDeleted).Select(l => new InvoiceLineViewModel
+                    {
+                        InvoiceLineId = l.InvoiceLineId,
+                        ItemId = l.ItemId,
+                        ItemName = l.Item != null ? l.Item.ItemName : null,
+                        AccountId = l.AccountId,
+                        AccountName = l.Account != null ? l.Account.AccountName : null,
+                        Description = l.Description,
+                        Quantity = l.Quantity,
+                        UnitPrice = l.UnitPrice,
+                        DiscountAmount = l.DiscountAmount,
+                        TaxAmount = l.TaxAmount,
+                        LineTotal = l.LineTotal
+                    }).ToList()
                 }).FirstOrDefaultAsync();
         }
 
@@ -129,6 +162,79 @@ namespace AccuFlow.Services
             }
 
             _dbContext.Invoices.Add(invoice);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Edit(UpdateInvoiceRequest request, Guid userId)
+        {
+            var invoice = await _dbContext.Invoices
+                .Include(x => x.Lines)
+                .FirstOrDefaultAsync(x => x.InvoiceId == request.InvoiceId && !x.IsDeleted);
+            if (invoice == null) throw new Exception("Invoice not found");
+            if (invoice.Status != "Draft") throw new Exception("Only draft invoice can be edited");
+            if (request.InvoiceType == "Sales" && !request.CustomerId.HasValue) throw new Exception("Customer is required for sales invoice");
+            if (request.InvoiceType == "Purchase" && !request.SupplierId.HasValue) throw new Exception("Supplier is required for purchase invoice");
+            if (!request.Lines.Any()) throw new Exception("Invoice lines are required");
+
+            invoice.InvoiceType = request.InvoiceType;
+            invoice.InvoiceDate = request.InvoiceDate;
+            invoice.DueDate = request.DueDate;
+            invoice.CustomerId = request.InvoiceType == "Sales" ? request.CustomerId : null;
+            invoice.SupplierId = request.InvoiceType == "Purchase" ? request.SupplierId : null;
+            invoice.Notes = request.Notes;
+            invoice.SubTotal = 0;
+            invoice.DiscountAmount = 0;
+            invoice.TaxAmount = 0;
+            invoice.TotalAmount = 0;
+            invoice.UpdatedBy = userId.ToString();
+            invoice.UpdatedAt = DateTime.UtcNow;
+
+            foreach (var oldLine in invoice.Lines)
+            {
+                oldLine.IsDeleted = true;
+                oldLine.DeletedBy = userId.ToString();
+                oldLine.DeletedAt = DateTime.UtcNow;
+            }
+
+            foreach (var line in request.Lines)
+            {
+                var lineTotal = (line.Quantity * line.UnitPrice) - line.DiscountAmount + line.TaxAmount;
+                invoice.Lines.Add(new InvoiceLineEntity
+                {
+                    InvoiceLineId = Guid.NewGuid(),
+                    ItemId = line.ItemId,
+                    AccountId = line.AccountId,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    UnitPrice = line.UnitPrice,
+                    DiscountAmount = line.DiscountAmount,
+                    TaxAmount = line.TaxAmount,
+                    LineTotal = lineTotal,
+                    CreatedBy = userId.ToString()
+                });
+                invoice.SubTotal += line.Quantity * line.UnitPrice;
+                invoice.DiscountAmount += line.DiscountAmount;
+                invoice.TaxAmount += line.TaxAmount;
+                invoice.TotalAmount += lineTotal;
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var invoice = await _dbContext.Invoices.Include(x => x.Lines).FirstOrDefaultAsync(x => x.InvoiceId == id && !x.IsDeleted);
+            if (invoice == null) throw new Exception("Invoice not found");
+            if (invoice.Status != "Draft") throw new Exception("Only draft invoice can be deleted");
+            invoice.IsDeleted = true;
+            invoice.DeletedBy = userId.ToString();
+            invoice.DeletedAt = DateTime.UtcNow;
+            foreach (var line in invoice.Lines)
+            {
+                line.IsDeleted = true;
+                line.DeletedBy = userId.ToString();
+                line.DeletedAt = DateTime.UtcNow;
+            }
             await _dbContext.SaveChangesAsync();
         }
 
@@ -250,7 +356,10 @@ namespace AccuFlow.Services
     public interface IPaymentService : IBaseService
     {
         Task<BaseDatatableResponse> Datatable(DataTablePaymentRequest request);
+        Task<PaymentDetailViewModel?> GetById(Guid id);
         Task Create(CreatePaymentRequest request, Guid userId);
+        Task Edit(UpdatePaymentRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
         Task Post(Guid id, Guid userId);
     }
 
@@ -289,6 +398,47 @@ namespace AccuFlow.Services
             return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
         }
 
+        public async Task<PaymentDetailViewModel?> GetById(Guid id)
+        {
+            return await _dbContext.Payments
+                .Include(x => x.Customer)
+                .Include(x => x.Supplier)
+                .Include(x => x.CashBankAccount)
+                .Include(x => x.JournalEntry)
+                .Include(x => x.Allocations.Where(a => !a.IsDeleted))
+                    .ThenInclude(x => x.Invoice)
+                .Where(x => x.PaymentId == id && !x.IsDeleted)
+                .Select(x => new PaymentDetailViewModel
+                {
+                    PaymentId = x.PaymentId,
+                    PaymentNumber = x.PaymentNumber,
+                    PaymentType = x.PaymentType,
+                    PaymentDate = x.PaymentDate,
+                    CustomerId = x.CustomerId,
+                    SupplierId = x.SupplierId,
+                    PartnerName = x.Customer != null ? x.Customer.CustomerName : x.Supplier != null ? x.Supplier.SupplierName : string.Empty,
+                    CashBankAccountId = x.CashBankAccountId,
+                    CashBankAccountName = x.CashBankAccount.AccountName,
+                    PaymentMethod = x.PaymentMethod,
+                    Status = x.Status,
+                    TotalAmount = x.TotalAmount,
+                    JournalId = x.JournalId,
+                    JournalNumber = x.JournalEntry != null ? x.JournalEntry.JournalNumber : null,
+                    ReferenceNumber = x.ReferenceNumber,
+                    Notes = x.Notes,
+                    CanEdit = x.Status == "Draft",
+                    CanDelete = x.Status == "Draft",
+                    CanPost = x.Status == "Draft",
+                    Allocations = x.Allocations.Where(a => !a.IsDeleted).Select(a => new PaymentAllocationViewModel
+                    {
+                        PaymentAllocationId = a.PaymentAllocationId,
+                        InvoiceId = a.InvoiceId,
+                        InvoiceNumber = a.Invoice.InvoiceNumber,
+                        AllocatedAmount = a.AllocatedAmount
+                    }).ToList()
+                }).FirstOrDefaultAsync();
+        }
+
         public async Task Create(CreatePaymentRequest request, Guid userId)
         {
             var payment = new PaymentEntity
@@ -320,6 +470,66 @@ namespace AccuFlow.Services
             }
 
             _dbContext.Payments.Add(payment);
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Edit(UpdatePaymentRequest request, Guid userId)
+        {
+            var payment = await _dbContext.Payments
+                .Include(x => x.Allocations)
+                .FirstOrDefaultAsync(x => x.PaymentId == request.PaymentId && !x.IsDeleted);
+            if (payment == null) throw new Exception("Payment not found");
+            if (payment.Status != "Draft") throw new Exception("Only draft payment can be edited");
+            if (!request.Allocations.Any()) throw new Exception("Payment allocation is required");
+
+            payment.PaymentType = request.PaymentType;
+            payment.PaymentDate = request.PaymentDate;
+            payment.CustomerId = request.PaymentType == "Receipt" ? request.CustomerId : null;
+            payment.SupplierId = request.PaymentType == "Payment" ? request.SupplierId : null;
+            payment.CashBankAccountId = request.CashBankAccountId;
+            payment.PaymentMethod = request.PaymentMethod;
+            payment.ReferenceNumber = request.ReferenceNumber;
+            payment.Notes = request.Notes;
+            payment.TotalAmount = 0;
+            payment.UpdatedBy = userId.ToString();
+            payment.UpdatedAt = DateTime.UtcNow;
+
+            foreach (var oldAllocation in payment.Allocations)
+            {
+                oldAllocation.IsDeleted = true;
+                oldAllocation.DeletedBy = userId.ToString();
+                oldAllocation.DeletedAt = DateTime.UtcNow;
+            }
+
+            foreach (var allocation in request.Allocations)
+            {
+                payment.Allocations.Add(new PaymentAllocationEntity
+                {
+                    PaymentAllocationId = Guid.NewGuid(),
+                    InvoiceId = allocation.InvoiceId,
+                    AllocatedAmount = allocation.AllocatedAmount,
+                    CreatedBy = userId.ToString()
+                });
+                payment.TotalAmount += allocation.AllocatedAmount;
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var payment = await _dbContext.Payments.Include(x => x.Allocations).FirstOrDefaultAsync(x => x.PaymentId == id && !x.IsDeleted);
+            if (payment == null) throw new Exception("Payment not found");
+            if (payment.Status != "Draft") throw new Exception("Only draft payment can be deleted");
+            payment.IsDeleted = true;
+            payment.DeletedBy = userId.ToString();
+            payment.DeletedAt = DateTime.UtcNow;
+            foreach (var allocation in payment.Allocations)
+            {
+                allocation.IsDeleted = true;
+                allocation.DeletedBy = userId.ToString();
+                allocation.DeletedAt = DateTime.UtcNow;
+            }
             await _dbContext.SaveChangesAsync();
         }
 
@@ -413,7 +623,10 @@ namespace AccuFlow.Services
     public interface IPurchaseOrderService : IBaseService
     {
         Task<BaseDatatableResponse> Datatable(DataTablePurchaseOrderRequest request);
+        Task<PurchaseOrderDetailViewModel?> GetById(Guid id);
         Task Create(CreatePurchaseOrderRequest request, Guid userId);
+        Task Edit(UpdatePurchaseOrderRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
         Task Approve(Guid id, Guid userId);
         Task ConvertToInvoice(Guid id, Guid userId);
     }
@@ -440,6 +653,45 @@ namespace AccuFlow.Services
                     TotalAmount = x.TotalAmount
                 }).ToListAsync();
             return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task<PurchaseOrderDetailViewModel?> GetById(Guid id)
+        {
+            return await _dbContext.PurchaseOrders
+                .Include(x => x.Supplier)
+                .Include(x => x.PurchaseInvoice)
+                .Include(x => x.Lines.Where(l => !l.IsDeleted))
+                    .ThenInclude(x => x.Item)
+                .Where(x => x.PurchaseOrderId == id && !x.IsDeleted)
+                .Select(x => new PurchaseOrderDetailViewModel
+                {
+                    PurchaseOrderId = x.PurchaseOrderId,
+                    PurchaseOrderNumber = x.PurchaseOrderNumber,
+                    OrderDate = x.OrderDate,
+                    ExpectedDate = x.ExpectedDate,
+                    SupplierId = x.SupplierId,
+                    SupplierName = x.Supplier.SupplierName,
+                    Status = x.Status,
+                    TotalAmount = x.TotalAmount,
+                    PurchaseInvoiceId = x.PurchaseInvoiceId,
+                    PurchaseInvoiceNumber = x.PurchaseInvoice != null ? x.PurchaseInvoice.InvoiceNumber : null,
+                    Notes = x.Notes,
+                    CanEdit = x.Status == "Draft",
+                    CanDelete = x.Status == "Draft",
+                    CanApprove = x.Status == "Draft",
+                    CanConvert = x.Status == "Approved" && !x.PurchaseInvoiceId.HasValue,
+                    Lines = x.Lines.Where(l => !l.IsDeleted).Select(l => new PurchaseOrderLineViewModel
+                    {
+                        PurchaseOrderLineId = l.PurchaseOrderLineId,
+                        ItemId = l.ItemId,
+                        ItemName = l.Item != null ? l.Item.ItemName : null,
+                        Description = l.Description,
+                        Quantity = l.Quantity,
+                        UnitPrice = l.UnitPrice,
+                        TaxAmount = l.TaxAmount,
+                        LineTotal = l.LineTotal
+                    }).ToList()
+                }).FirstOrDefaultAsync();
         }
 
         public async Task Create(CreatePurchaseOrderRequest request, Guid userId)
@@ -477,10 +729,76 @@ namespace AccuFlow.Services
             await _dbContext.SaveChangesAsync();
         }
 
+        public async Task Edit(UpdatePurchaseOrderRequest request, Guid userId)
+        {
+            var po = await _dbContext.PurchaseOrders
+                .Include(x => x.Lines)
+                .FirstOrDefaultAsync(x => x.PurchaseOrderId == request.PurchaseOrderId && !x.IsDeleted);
+            if (po == null) throw new Exception("Purchase order not found");
+            if (po.Status != "Draft") throw new Exception("Only draft purchase order can be edited");
+            if (!request.Lines.Any()) throw new Exception("Purchase order lines are required");
+
+            po.OrderDate = request.OrderDate;
+            po.ExpectedDate = request.ExpectedDate;
+            po.SupplierId = request.SupplierId;
+            po.Notes = request.Notes;
+            po.SubTotal = 0;
+            po.TaxAmount = 0;
+            po.TotalAmount = 0;
+            po.UpdatedBy = userId.ToString();
+            po.UpdatedAt = DateTime.UtcNow;
+
+            foreach (var oldLine in po.Lines)
+            {
+                oldLine.IsDeleted = true;
+                oldLine.DeletedBy = userId.ToString();
+                oldLine.DeletedAt = DateTime.UtcNow;
+            }
+
+            foreach (var line in request.Lines)
+            {
+                var lineTotal = (line.Quantity * line.UnitPrice) + line.TaxAmount;
+                po.Lines.Add(new PurchaseOrderLineEntity
+                {
+                    PurchaseOrderLineId = Guid.NewGuid(),
+                    ItemId = line.ItemId,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    UnitPrice = line.UnitPrice,
+                    TaxAmount = line.TaxAmount,
+                    LineTotal = lineTotal,
+                    CreatedBy = userId.ToString()
+                });
+                po.SubTotal += line.Quantity * line.UnitPrice;
+                po.TaxAmount += line.TaxAmount;
+                po.TotalAmount += lineTotal;
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var po = await _dbContext.PurchaseOrders.Include(x => x.Lines).FirstOrDefaultAsync(x => x.PurchaseOrderId == id && !x.IsDeleted);
+            if (po == null) throw new Exception("Purchase order not found");
+            if (po.Status != "Draft") throw new Exception("Only draft purchase order can be deleted");
+            po.IsDeleted = true;
+            po.DeletedBy = userId.ToString();
+            po.DeletedAt = DateTime.UtcNow;
+            foreach (var line in po.Lines)
+            {
+                line.IsDeleted = true;
+                line.DeletedBy = userId.ToString();
+                line.DeletedAt = DateTime.UtcNow;
+            }
+            await _dbContext.SaveChangesAsync();
+        }
+
         public async Task Approve(Guid id, Guid userId)
         {
             var po = await _dbContext.PurchaseOrders.FirstOrDefaultAsync(x => x.PurchaseOrderId == id && !x.IsDeleted);
             if (po == null) throw new Exception("Purchase order not found");
+            if (po.Status != "Draft") throw new Exception("Only draft purchase order can be approved");
             po.Status = "Approved";
             po.UpdatedBy = userId.ToString();
             await _dbContext.SaveChangesAsync();

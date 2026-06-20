@@ -1,4 +1,5 @@
 let paymentTable;
+let currentPaymentId = null;
 
 $(document).ready(function () {
     loadLookups();
@@ -30,7 +31,7 @@ $(document).ready(function () {
             { data: 'paymentMethod' },
             { data: 'status', render: data => `<span class="badge badge-light-primary">${data}</span>` },
             { data: 'totalAmount', render: formatCurrency },
-            { data: 'paymentId', orderable: false, render: data => `<button class="btn btn-sm btn-light-success btn-post" data-id="${data}">Post</button>` }
+            { data: null, orderable: false, render: row => actionButtons(row) }
         ]
     });
 
@@ -41,15 +42,65 @@ $(document).ready(function () {
     $('#payment_datatable').on('click', '.btn-post', function () {
         $.ajax({ url: '/Payment/Post', type: 'POST', contentType: 'application/json', data: JSON.stringify($(this).data('id')), success: () => paymentTable.ajax.reload() });
     });
+    $('#payment_datatable').on('click', '.btn-detail', function () { showDetail($(this).data('id')); });
+    $('#payment_datatable').on('click', '.btn-edit', function () { openEditModal($(this).data('id')); });
+    $('#payment_datatable').on('click', '.btn-delete', function () { deletePayment($(this).data('id')); });
 });
 
+function actionButtons(row) {
+    const id = row.paymentId;
+    const draftButtons = row.status === 'Draft'
+        ? `<button class="btn btn-sm btn-light-primary btn-edit" data-id="${id}">Edit</button> <button class="btn btn-sm btn-light-danger btn-delete" data-id="${id}">Delete</button> <button class="btn btn-sm btn-light-success btn-post" data-id="${id}">Post</button>`
+        : '';
+    return `<div class="d-flex gap-1"><button class="btn btn-sm btn-light-info btn-detail" data-id="${id}">Detail</button>${draftButtons}</div>`;
+}
+
 function openCreateModal() {
+    currentPaymentId = null;
     $('#allocated-amount').val(0);
     $('#reference-number').val('');
     $('#payment-notes').val('');
     togglePartnerType();
     loadOpenInvoices();
     $('#payment_modal').modal('show');
+}
+
+function openEditModal(id) {
+    $.get(`/Payment/GetById?id=${id}`, data => {
+        currentPaymentId = data.paymentId;
+        $('#payment-type').val(data.paymentType);
+        $('#payment-date').val(data.paymentDate?.substring(0, 10));
+        $('#payment-method').val(data.paymentMethod);
+        $('#payment-customer-id').val(data.customerId || '');
+        $('#payment-supplier-id').val(data.supplierId || '');
+        $('#cash-bank-account-id').val(data.cashBankAccountId);
+        const allocation = data.allocations?.[0] || {};
+        $('#invoice-id').val(allocation.invoiceId || '');
+        $('#allocated-amount').val(allocation.allocatedAmount || 0);
+        $('#reference-number').val(data.referenceNumber || '');
+        $('#payment-notes').val(data.notes || '');
+        togglePartnerType();
+        loadOpenInvoices();
+        $('#payment_modal').modal('show');
+    });
+}
+
+function showDetail(id) {
+    $.get(`/Payment/GetById?id=${id}`, data => {
+        const allocations = (data.allocations || []).map(a => `<tr><td>${a.invoiceNumber}</td><td>${formatCurrency(a.allocatedAmount)}</td></tr>`).join('');
+        $('#payment-detail-content').html(`
+            <div class="row g-3 mb-4">
+                <div class="col-md-4"><strong>No:</strong> ${data.paymentNumber}</div>
+                <div class="col-md-4"><strong>Type:</strong> ${data.paymentType}</div>
+                <div class="col-md-4"><strong>Status:</strong> ${data.status}</div>
+                <div class="col-md-6"><strong>Partner:</strong> ${data.partnerName}</div>
+                <div class="col-md-6"><strong>Journal:</strong> ${data.journalNumber || '-'}</div>
+                <div class="col-md-12"><strong>Notes:</strong> ${data.notes || '-'}</div>
+            </div>
+            <table class="table table-sm"><thead><tr><th>Invoice</th><th>Allocated</th></tr></thead><tbody>${allocations}</tbody></table>
+            <div class="text-end fw-bold">Total: ${formatCurrency(data.totalAmount)}</div>`);
+        $('#payment_detail_modal').modal('show');
+    });
 }
 
 function togglePartnerType() {
@@ -90,15 +141,21 @@ function savePayment() {
         notes: $('#payment-notes').val(),
         allocations: [{ invoiceId: $('#invoice-id').val(), allocatedAmount: amount }]
     };
+    if (currentPaymentId) request.paymentId = currentPaymentId;
 
     $.ajax({
-        url: '/Payment/Create',
+        url: currentPaymentId ? '/Payment/Edit' : '/Payment/Create',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(request),
         success: () => { $('#payment_modal').modal('hide'); paymentTable.ajax.reload(); },
         error: xhr => alert(xhr.responseJSON?.message || 'Failed to save payment')
     });
+}
+
+function deletePayment(id) {
+    if (!confirm('Delete this draft payment?')) return;
+    $.ajax({ url: '/Payment/Delete', type: 'DELETE', contentType: 'application/json', data: JSON.stringify(id), success: () => paymentTable.ajax.reload(), error: xhr => alert(xhr.responseJSON?.message || 'Failed to delete payment') });
 }
 
 function formatCurrency(amount) {

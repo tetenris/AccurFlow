@@ -55,6 +55,34 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> Edit([FromBody] UpdateInvoiceRequest request)
+        {
+            try
+            {
+                await _invoiceService.Edit(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Invoice updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] Guid id)
+        {
+            try
+            {
+                await _invoiceService.Delete(id, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Invoice deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Post([FromBody] Guid id)
         {
             try

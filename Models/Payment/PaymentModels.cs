@@ -37,6 +37,35 @@ namespace AccuFlow.Models.Payment
         public List<CreatePaymentAllocationRequest> Allocations { get; set; } = new();
     }
 
+    public class UpdatePaymentRequest : CreatePaymentRequest
+    {
+        public Guid PaymentId { get; set; }
+    }
+
+    public class PaymentDetailViewModel : PaymentViewModel
+    {
+        public Guid? CustomerId { get; set; }
+        public Guid? SupplierId { get; set; }
+        public Guid CashBankAccountId { get; set; }
+        public string CashBankAccountName { get; set; } = string.Empty;
+        public Guid? JournalId { get; set; }
+        public string? JournalNumber { get; set; }
+        public string? ReferenceNumber { get; set; }
+        public string? Notes { get; set; }
+        public bool CanEdit { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanPost { get; set; }
+        public List<PaymentAllocationViewModel> Allocations { get; set; } = new();
+    }
+
+    public class PaymentAllocationViewModel
+    {
+        public Guid PaymentAllocationId { get; set; }
+        public Guid InvoiceId { get; set; }
+        public string InvoiceNumber { get; set; } = string.Empty;
+        public decimal AllocatedAmount { get; set; }
+    }
+
     public class CreatePaymentAllocationRequest
     {
         public Guid InvoiceId { get; set; }

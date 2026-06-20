@@ -91,3 +91,10 @@
 - Payment list sudah punya modal create sederhana dengan alokasi satu invoice.
 - Purchase Order list sudah punya modal create sederhana untuk satu baris PO.
 - Belum dilakukan smoke test runtime; validasi baru sampai `dotnet build AccuFlow.sln` berhasil.
+
+## Rencana Lanjutan Hardening
+1. Selesai - Detail transaksi: Invoice detail, Payment detail, dan Purchase Order detail dengan line, jurnal terkait, dan tombol aksi status dasar.
+2. Selesai - Edit/delete draft: Invoice, Payment, dan Purchase Order bisa diedit/dihapus selama status masih `Draft`.
+3. Attachment fisik: upload, download, delete file, dan storage configurable.
+4. PDF: print invoice, payment receipt, dan purchase order.
+5. Smoke test runtime setelah transaksi inti dan dokumen siap.

@@ -24,6 +24,9 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTablePurchaseOrderRequest request) => Json(await _purchaseOrderService.Datatable(request));
 
+        [HttpGet]
+        public async Task<IActionResult> GetById(Guid id) => Json(await _purchaseOrderService.GetById(id));
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreatePurchaseOrderRequest request)
         {
@@ -31,6 +34,34 @@ namespace AccuFlow.Controllers
             {
                 await _purchaseOrderService.Create(request, _currentUserService!.UserId);
                 return Ok(new { success = true, message = "Purchase order created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromBody] UpdatePurchaseOrderRequest request)
+        {
+            try
+            {
+                await _purchaseOrderService.Edit(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase order updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] Guid id)
+        {
+            try
+            {
+                await _purchaseOrderService.Delete(id, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase order deleted successfully" });
             }
             catch (Exception ex)
             {

@@ -39,6 +39,40 @@ namespace AccuFlow.Models.Invoice
         public List<CreateInvoiceLineRequest> Lines { get; set; } = new();
     }
 
+    public class UpdateInvoiceRequest : CreateInvoiceRequest
+    {
+        public Guid InvoiceId { get; set; }
+    }
+
+    public class InvoiceDetailViewModel : InvoiceViewModel
+    {
+        public Guid? CustomerId { get; set; }
+        public Guid? SupplierId { get; set; }
+        public Guid? JournalId { get; set; }
+        public string? JournalNumber { get; set; }
+        public string? Notes { get; set; }
+        public bool CanEdit { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanPost { get; set; }
+        public bool CanCancel { get; set; }
+        public List<InvoiceLineViewModel> Lines { get; set; } = new();
+    }
+
+    public class InvoiceLineViewModel
+    {
+        public Guid InvoiceLineId { get; set; }
+        public Guid? ItemId { get; set; }
+        public string? ItemName { get; set; }
+        public Guid? AccountId { get; set; }
+        public string? AccountName { get; set; }
+        public string Description { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal TaxAmount { get; set; }
+        public decimal LineTotal { get; set; }
+    }
+
     public class CreateInvoiceLineRequest
     {
         public Guid? ItemId { get; set; }
