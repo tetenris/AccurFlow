@@ -1,6 +1,8 @@
-﻿using AccuFlow.Services;
+using AccuFlow.Services;
+using AccuFlow.Models.Account;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -16,6 +18,7 @@ namespace AccuFlow.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -23,6 +26,7 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
         {
             var user = await _accountService.ValidateUser(username, password);
@@ -65,7 +69,72 @@ namespace AccuFlow.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordViewModel());
+        }
+
         [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            await _accountService.RequestPasswordResetAsync(model.Email);
+            ViewBag.SuccessMessage = "Jika email terdaftar, instruksi reset password akan dikirim setelah layanan email aktif.";
+            return View(new ForgotPasswordViewModel());
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Profile()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var userIdValue = User.FindFirst("UserId")?.Value;
+                if (string.IsNullOrWhiteSpace(userIdValue) || !Guid.TryParse(userIdValue, out var userId))
+                {
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return RedirectToAction(nameof(Login));
+                }
+
+                await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+                ViewBag.SuccessMessage = "Password berhasil diperbarui.";
+                return View(new ChangePasswordViewModel());
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -73,6 +142,7 @@ namespace AccuFlow.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> LogoutGet()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

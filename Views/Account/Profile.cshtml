@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="row g-6">
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-body text-center py-10">
+                <div class="symbol symbol-90px symbol-circle mb-5">
+                    <div class="symbol-label bg-light-primary text-primary fs-1 fw-bold">
+                        @((TempData["FullName"]?.ToString() ?? "U").Substring(0, 1).ToUpper())
+                    </div>
+                </div>
+                <h3 class="mb-1">@TempData["FullName"]</h3>
+                <div class="badge badge-light-success mb-6">@TempData["RoleName"]</div>
+                <a asp-action="ChangePassword" asp-controller="Account" class="btn btn-primary w-100">
+                    <i class="fa fa-lock"></i> Change Password
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card h-100">
+            <div class="card-header border-0 pt-6">
+                <div class="card-title">
+                    <h3>Account Information</h3>
+                </div>
+            </div>
+            <div class="card-body py-6">
+                <div class="d-flex flex-column gap-5">
+                    <div>
+                        <div class="text-muted fs-7">Username</div>
+                        <div class="fw-bold fs-5">@ViewBag.UserName</div>
+                    </div>
+                    <div>
+                        <div class="text-muted fs-7">Full Name</div>
+                        <div class="fw-bold fs-5">@TempData["FullName"]</div>
+                    </div>
+                    <div>
+                        <div class="text-muted fs-7">Role</div>
+                        <div class="fw-bold fs-5">@TempData["RoleName"]</div>
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <i class="fa fa-info-circle me-2"></i>
+                        Untuk perubahan data profil selain password, hubungi administrator aplikasi.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
