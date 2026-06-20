@@ -27,6 +27,14 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id) => Json(await _paymentService.GetById(id));
 
+        [HttpGet]
+        public async Task<IActionResult> Print(Guid id)
+        {
+            var payment = await _paymentService.GetById(id);
+            if (payment == null) return NotFound();
+            return View(payment);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreatePaymentRequest request)
         {

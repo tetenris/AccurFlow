@@ -27,6 +27,14 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id) => Json(await _purchaseOrderService.GetById(id));
 
+        [HttpGet]
+        public async Task<IActionResult> Print(Guid id)
+        {
+            var purchaseOrder = await _purchaseOrderService.GetById(id);
+            if (purchaseOrder == null) return NotFound();
+            return View(purchaseOrder);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreatePurchaseOrderRequest request)
         {

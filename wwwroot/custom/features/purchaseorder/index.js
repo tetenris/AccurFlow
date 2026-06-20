@@ -82,6 +82,7 @@ function showDetail(id) {
                 <div class="col-md-6"><strong>Invoice:</strong> ${data.purchaseInvoiceNumber || '-'}</div>
                 <div class="col-md-12"><strong>Notes:</strong> ${data.notes || '-'}</div>
             </div>
+            <div class="mb-4"><a class="btn btn-sm btn-light-primary" target="_blank" href="/PurchaseOrder/Print?id=${data.purchaseOrderId}">Print / PDF</a></div>
             <table class="table table-sm"><thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th></tr></thead><tbody>${lines}</tbody></table>
             <div class="text-end fw-bold mb-5">Total: ${formatCurrency(data.totalAmount)}</div>
             ${attachmentSection('PurchaseOrder', data.purchaseOrderId)}`);

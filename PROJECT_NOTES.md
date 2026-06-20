@@ -96,5 +96,5 @@
 1. Selesai - Detail transaksi: Invoice detail, Payment detail, dan Purchase Order detail dengan line, jurnal terkait, dan tombol aksi status dasar.
 2. Selesai - Edit/delete draft: Invoice, Payment, dan Purchase Order bisa diedit/dihapus selama status masih `Draft`.
 3. Selesai - Attachment fisik: upload, download, delete file, dan storage configurable untuk Invoice, Payment, dan Purchase Order.
-4. PDF: print invoice, payment receipt, dan purchase order.
+4. Selesai - PDF/print: print-ready page untuk invoice, payment receipt, dan purchase order. Export PDF native belum memakai DinkToPdf; browser print dapat Save as PDF.
 5. Smoke test runtime setelah transaksi inti dan dokumen siap.

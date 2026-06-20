@@ -97,6 +97,7 @@ function showDetail(id) {
                 <div class="col-md-6"><strong>Journal:</strong> ${data.journalNumber || '-'}</div>
                 <div class="col-md-12"><strong>Notes:</strong> ${data.notes || '-'}</div>
             </div>
+            <div class="mb-4"><a class="btn btn-sm btn-light-primary" target="_blank" href="/Payment/Print?id=${data.paymentId}">Print / PDF</a></div>
             <table class="table table-sm"><thead><tr><th>Invoice</th><th>Allocated</th></tr></thead><tbody>${allocations}</tbody></table>
             <div class="text-end fw-bold mb-5">Total: ${formatCurrency(data.totalAmount)}</div>
             ${attachmentSection('Payment', data.paymentId)}`);
