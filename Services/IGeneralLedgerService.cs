@@ -1,7 +1,7 @@
 using AccuFlow.Services;
-using KomatsuERP.Models.GeneralLedger;
+using AccuFlow.Models.GeneralLedger;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public interface IGeneralLedgerService : IBaseService
 {

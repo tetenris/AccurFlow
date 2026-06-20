@@ -1,7 +1,7 @@
 using AccuFlow.Models.RoleMenu;
 using AccuFlow.Services;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public interface IRoleMenuService : IBaseService
 {

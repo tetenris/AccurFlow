@@ -13,12 +13,37 @@ namespace AccuFlow.Entities.Seeders
             var roles = RoleSeed.GetRoleSeedData();
             var existingRoles = await dbContext.Roles.ToListAsync();
             var newRoles = roles.Where(r => !existingRoles.Any(er => er.RoleId == r.RoleId)).ToList();
+            var updatedRoles = 0;
+
+            foreach (var seedRole in roles)
+            {
+                var existingRole = existingRoles.FirstOrDefault(r => r.RoleId == seedRole.RoleId);
+                if (existingRole == null)
+                {
+                    continue;
+                }
+
+                existingRole.RoleType = seedRole.RoleType;
+                existingRole.RoleName = seedRole.RoleName;
+                existingRole.Description = seedRole.Description;
+                existingRole.Permissions = seedRole.Permissions;
+                existingRole.IsActive = true;
+                existingRole.IsDeleted = false;
+                existingRole.DeletedAt = null;
+                existingRole.DeletedBy = null;
+                updatedRoles++;
+            }
             
             if (newRoles.Any())
             {
                 dbContext.Roles.AddRange(newRoles);
                 await dbContext.SaveChangesAsync();
                 logger.LogInformation($"Seeded {newRoles.Count} roles");
+            }
+            else if (updatedRoles > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedRoles} roles");
             }
             else
             {
@@ -32,12 +57,38 @@ namespace AccuFlow.Entities.Seeders
             var users = UserSeed.GetUserSeedData();
             var existingUsers = await dbContext.Users.ToListAsync();
             var newUsers = users.Where(u => !existingUsers.Any(eu => eu.UserId == u.UserId)).ToList();
+            var updatedUsers = 0;
+
+            foreach (var seedUser in users)
+            {
+                var existingUser = existingUsers.FirstOrDefault(u => u.UserId == seedUser.UserId);
+                if (existingUser == null)
+                {
+                    continue;
+                }
+
+                existingUser.UserName = seedUser.UserName;
+                existingUser.Email = seedUser.Email;
+                existingUser.FullName = seedUser.FullName;
+                existingUser.PasswordHash = seedUser.PasswordHash;
+                existingUser.RoleId = seedUser.RoleId;
+                existingUser.IsActive = true;
+                existingUser.IsDeleted = false;
+                existingUser.DeletedAt = null;
+                existingUser.DeletedBy = null;
+                updatedUsers++;
+            }
             
             if (newUsers.Any())
             {
                 dbContext.Users.AddRange(newUsers);
                 await dbContext.SaveChangesAsync();
                 logger.LogInformation($"Seeded {newUsers.Count} users");
+            }
+            else if (updatedUsers > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedUsers} users");
             }
             else
             {
@@ -92,6 +143,50 @@ namespace AccuFlow.Entities.Seeders
             }
         }
 
+        public static async Task SeedSuppliers(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding Suppliers...");
+            var suppliers = SupplierSeed.GetSupplierSeedData();
+            var existingSuppliers = await dbContext.Suppliers.ToListAsync();
+            var newSuppliers = suppliers.Where(s => !existingSuppliers.Any(es => es.SupplierId == s.SupplierId)).ToList();
+
+            if (newSuppliers.Any())
+            {
+                dbContext.Suppliers.AddRange(newSuppliers);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newSuppliers.Count} suppliers");
+            }
+            else
+            {
+                logger.LogInformation("No new suppliers to seed");
+            }
+        }
+
+        public static async Task SeedBusinessModules(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding business module master data...");
+
+            var warehouses = BusinessModuleSeed.GetWarehouseSeedData();
+            var existingWarehouseIds = await dbContext.Warehouses.Select(x => x.WarehouseId).ToListAsync();
+            var newWarehouses = warehouses.Where(x => !existingWarehouseIds.Contains(x.WarehouseId)).ToList();
+            if (newWarehouses.Any())
+            {
+                dbContext.Warehouses.AddRange(newWarehouses);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newWarehouses.Count} warehouses");
+            }
+
+            var taxes = BusinessModuleSeed.GetTaxSeedData();
+            var existingTaxIds = await dbContext.Taxes.Select(x => x.TaxId).ToListAsync();
+            var newTaxes = taxes.Where(x => !existingTaxIds.Contains(x.TaxId)).ToList();
+            if (newTaxes.Any())
+            {
+                dbContext.Taxes.AddRange(newTaxes);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newTaxes.Count} taxes");
+            }
+        }
+
         public static async Task SeedSampleTransactions(AppDbContext dbContext, ILogger logger)
         {
             logger.LogInformation("Seeding Sample Transactions...");
@@ -116,6 +211,94 @@ namespace AccuFlow.Entities.Seeders
             {
                 logger.LogInformation("No new menus to seed");
             }
+
+            var updatedMenus = 0;
+            foreach (var seedMenu in menus)
+            {
+                var existingMenu = existingMenus.FirstOrDefault(m => m.MenuId == seedMenu.MenuId);
+                if (existingMenu == null)
+                {
+                    continue;
+                }
+
+                existingMenu.MenuParentId = seedMenu.MenuParentId;
+                existingMenu.Icon = seedMenu.Icon;
+                existingMenu.Name = seedMenu.Name;
+                existingMenu.Controller = seedMenu.Controller;
+                existingMenu.Action = seedMenu.Action;
+                existingMenu.Sequence = seedMenu.Sequence;
+                existingMenu.IsDeleted = false;
+                existingMenu.DeletedAt = null;
+                existingMenu.DeletedBy = null;
+                updatedMenus++;
+            }
+
+            if (updatedMenus > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Updated {updatedMenus} existing menus");
+            }
+
+        }
+
+        public static async Task SeedRoleMenus(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding Role Menu permissions...");
+
+            var systemRoleIds = new[]
+            {
+                Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                Guid.Parse("00000000-0000-0000-0000-000000000002")
+            };
+            var adminPermissions = RoleMenuSeed.GetDefaultAdminPermissions();
+            var existingPermissions = await dbContext.RoleMenus
+                .Where(x => systemRoleIds.Contains(x.RoleId))
+                .ToListAsync();
+
+            var updatedCount = 0;
+            foreach (var roleId in systemRoleIds)
+            {
+                foreach (var permission in adminPermissions)
+                {
+                    var existing = existingPermissions.FirstOrDefault(x => x.RoleId == roleId && x.MenuId == permission.MenuId);
+                    if (existing == null)
+                    {
+                        dbContext.RoleMenus.Add(new RoleMenuEntity
+                        {
+                            RoleMenuId = Guid.NewGuid(),
+                            RoleId = roleId,
+                            MenuId = permission.MenuId,
+                            CanView = true,
+                            CanAdd = true,
+                            CanEdit = true,
+                            CanDelete = true,
+                            CanPost = true,
+                            CanReverse = true,
+                            CreatedBy = "System",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        updatedCount++;
+                        continue;
+                    }
+
+                    existing.CanView = true;
+                    existing.CanAdd = true;
+                    existing.CanEdit = true;
+                    existing.CanDelete = true;
+                    existing.CanPost = true;
+                    existing.CanReverse = true;
+                    existing.IsDeleted = false;
+                    existing.DeletedAt = null;
+                    existing.DeletedBy = null;
+                    updatedCount++;
+                }
+            }
+
+            if (updatedCount > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedCount} admin role menu permissions");
+            }
         }
 
         public static async Task SeedAll(AppDbContext dbContext, ILogger logger, string environmentName)
@@ -126,7 +309,10 @@ namespace AccuFlow.Entities.Seeders
             await SeedUsers(dbContext, logger);
             await SeedChartOfAccounts(dbContext, logger);
             await SeedCustomers(dbContext, logger);
+            await SeedSuppliers(dbContext, logger);
+            await SeedBusinessModules(dbContext, logger);
             await SeedMenu(dbContext, logger);
+            await SeedRoleMenus(dbContext, logger);
             
             // Only seed sample transactions in Development or Staging
             if (environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase) || 

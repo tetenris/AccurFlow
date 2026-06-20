@@ -2,12 +2,12 @@ using AccuFlow.Entities;
 using AccuFlow.Entities.Context;
 using AccuFlow.Entities.Entity;
 using AccuFlow.Services;
-using KomatsuERP.Models.GeneralLedger;
+using AccuFlow.Models.GeneralLedger;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public class GeneralLedgerService : BaseService, IGeneralLedgerService
 {

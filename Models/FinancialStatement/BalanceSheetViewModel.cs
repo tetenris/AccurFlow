@@ -1,4 +1,4 @@
-namespace KomatsuERP.Models.FinancialStatement;
+namespace AccuFlow.Models.FinancialStatement;
 
 public class BalanceSheetViewModel
 {

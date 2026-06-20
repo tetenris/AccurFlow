@@ -1,12 +1,12 @@
 using AccuFlow.Entities.Context;
 using AccuFlow.Entities.Entity;
 using AccuFlow.Services;
-using KomatsuERP.Models.TrialBalance;
+using AccuFlow.Models.TrialBalance;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public class TrialBalanceService : BaseService, ITrialBalanceService
 {

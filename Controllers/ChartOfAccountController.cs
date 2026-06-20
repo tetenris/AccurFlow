@@ -43,6 +43,13 @@ namespace AccuFlow.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetActiveAccounts()
+        {
+            var result = await _chartOfAccountService.GetActiveAccountsAsync();
+            return Json(result);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetParentAccounts(string accountType)
         {
             var result = await _chartOfAccountService.GetParentAccountsAsync(accountType);

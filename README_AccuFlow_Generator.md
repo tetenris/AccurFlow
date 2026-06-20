@@ -2,6 +2,8 @@
 
 Generator untuk membuat project **AccuFlow** (Accounting System) berdasarkan template **KMSI.SuperApps.Ews**.
 
+> Status: repository siap dipindahkan ke GitHub dan seluruh branch dapat dipush ke remote baru AccurFlow.
+
 ## 🚀 Cara Penggunaan
 
 ### 1. Generate Project Structure

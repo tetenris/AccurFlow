@@ -1,12 +1,12 @@
 using AccuFlow.Entities.Context;
 using AccuFlow.Entities.Entity;
 using AccuFlow.Services;
-using KomatsuERP.Models.FinancialStatement;
+using AccuFlow.Models.FinancialStatement;
 using Microsoft.EntityFrameworkCore;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public class FinancialStatementService : BaseService, IFinancialStatementService
 {

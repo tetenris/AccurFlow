@@ -1,4 +1,4 @@
-namespace KomatsuERP.Models.GeneralLedger;
+namespace AccuFlow.Models.GeneralLedger;
 
 public class AccountLedgerViewModel
 {

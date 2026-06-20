@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AccuFlow.Controllers
 {
-    // [Authorize(Roles = "Administrator")] // Commented out for development
+    [Authorize(Roles = "Super Administrator")]
     public class SeedController : BaseController
     {
         private readonly AppDbContext _dbContext;
@@ -29,7 +29,10 @@ namespace AccuFlow.Controllers
                 "Users",
                 "ChartOfAccounts",
                 "Customers",
-                "Menu"
+                "Suppliers",
+                "BusinessModules",
+                "Menu",
+                "RoleMenus"
             };
             
             // Add sample transactions seeder only in Development or Staging
@@ -85,8 +88,17 @@ namespace AccuFlow.Controllers
                         case "customers":
                             await Seeder.SeedCustomers(_dbContext, _logger);
                             break;
+                        case "suppliers":
+                            await Seeder.SeedSuppliers(_dbContext, _logger);
+                            break;
+                        case "businessmodules":
+                            await Seeder.SeedBusinessModules(_dbContext, _logger);
+                            break;
                         case "menu":
                             await Seeder.SeedMenu(_dbContext, _logger);
+                            break;
+                        case "rolemenus":
+                            await Seeder.SeedRoleMenus(_dbContext, _logger);
                             break;
                         case "sampletransactions":
                             // Only allow in Development or Staging

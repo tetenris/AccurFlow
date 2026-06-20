@@ -19,6 +19,22 @@ namespace AccuFlow.Entities.Context
         public DbSet<JournalEntryEntity> JournalEntries { get; set; }
         public DbSet<JournalLineEntity> JournalLines { get; set; }
         public DbSet<CustomerEntity> Customers { get; set; }
+        public DbSet<SupplierEntity> Suppliers { get; set; }
+        public DbSet<InvoiceEntity> Invoices { get; set; }
+        public DbSet<InvoiceLineEntity> InvoiceLines { get; set; }
+        public DbSet<PaymentEntity> Payments { get; set; }
+        public DbSet<PaymentAllocationEntity> PaymentAllocations { get; set; }
+        public DbSet<PurchaseOrderEntity> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderLineEntity> PurchaseOrderLines { get; set; }
+        public DbSet<ItemEntity> Items { get; set; }
+        public DbSet<WarehouseEntity> Warehouses { get; set; }
+        public DbSet<StockMovementEntity> StockMovements { get; set; }
+        public DbSet<StockOpnameEntity> StockOpnames { get; set; }
+        public DbSet<StockOpnameLineEntity> StockOpnameLines { get; set; }
+        public DbSet<ApprovalRequestEntity> ApprovalRequests { get; set; }
+        public DbSet<ApprovalHistoryEntity> ApprovalHistories { get; set; }
+        public DbSet<DocumentAttachmentEntity> DocumentAttachments { get; set; }
+        public DbSet<TaxEntity> Taxes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

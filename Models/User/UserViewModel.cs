@@ -28,9 +28,7 @@ namespace AccuFlow.Models.User
         [StringLength(255, ErrorMessage = "Email cannot exceed 255 characters")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 100 characters")]
-        public string Password { get; set; } = string.Empty;
+        public string? Password { get; set; }
 
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(255, ErrorMessage = "Full name cannot exceed 255 characters")]

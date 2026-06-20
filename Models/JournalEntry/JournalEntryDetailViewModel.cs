@@ -1,4 +1,4 @@
-using KomatsuERP.Models.JournalEntry;
+using AccuFlow.Models.JournalEntry;
 
 namespace AccuFlow.Models.JournalEntry
 {

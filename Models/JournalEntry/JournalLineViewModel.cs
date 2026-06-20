@@ -1,4 +1,4 @@
-namespace KomatsuERP.Models.JournalEntry;
+namespace AccuFlow.Models.JournalEntry;
 
 public class JournalLineViewModel
 {

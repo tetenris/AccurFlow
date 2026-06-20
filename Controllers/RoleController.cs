@@ -9,9 +9,9 @@ namespace AccuFlow.Controllers
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
-        private readonly KomatsuERP.Services.IRoleMenuService _roleMenuService;
+        private readonly IRoleMenuService _roleMenuService;
 
-        public RoleController(IRoleService roleService, KomatsuERP.Services.IRoleMenuService roleMenuService) : base(roleService)
+        public RoleController(IRoleService roleService, IRoleMenuService roleMenuService) : base(roleService)
         {
             _roleService = roleService;
             _roleMenuService = roleMenuService;
@@ -42,8 +42,8 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _roleService.Create(request, _currentUserService.UserId);
-                return Ok(new { success = true, message = "Role created successfully" });
+                var roleId = await _roleService.Create(request, _currentUserService.UserId);
+                return Ok(new { success = true, message = "Role created successfully", roleId });
             }
             catch (Exception ex)
             {
