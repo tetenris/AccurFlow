@@ -20,6 +20,7 @@ namespace AccuFlow.Services
 
     public class UserService : BaseService, IUserService
     {
+        private const string DefaultPassword = "Qwerty@123";
         private readonly ICurrentUserService _currentUserService;
 
         public UserService(AppDbContext dbContext, ICurrentUserService currentUserService) : base(dbContext)
@@ -157,7 +158,7 @@ namespace AccuFlow.Services
                 UserId = Guid.NewGuid(),
                 UserName = model.UserName,
                 Email = model.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(DefaultPassword),
                 FullName = model.FullName,
                 RoleId = model.RoleId,
                 IsActive = model.IsActive,

@@ -169,10 +169,6 @@ $(document).ready(function () {
         $('#form-user')[0].reset();
         $('#user-role').val('');
         $('#user-active').prop('checked', true);
-        
-        // Show password field in add mode
-        $('#user-password').closest('.mb-3').show();
-        $('#user-password').prop('required', true);
 
         $('#modal-user').modal('show');
     });
@@ -195,9 +191,6 @@ $(document).ready(function () {
             $('#user-role').val(response.roleId);
             $('#user-active').prop('checked', response.isActive);
             
-            // Hide password field in edit mode
-            $('#user-password').closest('.mb-3').hide();
-
             $('#modal-user').modal('show');
         } catch (error) {
             Swal.fire({
@@ -217,7 +210,6 @@ $(document).ready(function () {
     $('#btn-save-user').on('click', async function () {
         const userName = $('#user-username').val().trim();
         const email = $('#user-email').val().trim();
-        const password = $('#user-password').val();
         const fullName = $('#user-fullname').val().trim();
         const roleId = $('#user-role').val();
 
@@ -228,12 +220,6 @@ $(document).ready(function () {
 
         if (!email) {
             Swal.fire('Warning', 'Email is required', 'warning');
-            return;
-        }
-
-        // Password only required for add mode
-        if (!isEditMode && !password) {
-            Swal.fire('Warning', 'Password is required', 'warning');
             return;
         }
 
@@ -254,11 +240,6 @@ $(document).ready(function () {
             RoleId: roleId,
             IsActive: $('#user-active').is(':checked')
         };
-
-        // Only include password for add mode
-        if (!isEditMode && password) {
-            data.Password = password;
-        }
 
         if (isEditMode) {
             data.UserId = currentUserId;

@@ -17,9 +17,12 @@ namespace AccuFlow.Services
 
         public async Task<UserEntity?> ValidateUser(string username, string password)
         {
+            var normalizedUsername = username.Trim().ToLower();
             var user = await _dbContext.Users
                 .Include(x => x.Role)
-                .FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted && x.IsActive);
+                .FirstOrDefaultAsync(x => !x.IsDeleted
+                    && x.IsActive
+                    && (x.UserName.ToLower() == normalizedUsername || x.Email.ToLower() == normalizedUsername));
 
             if (user == null || string.IsNullOrWhiteSpace(user.PasswordHash))
             {
