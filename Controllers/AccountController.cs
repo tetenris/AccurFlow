@@ -35,6 +35,10 @@ namespace AccuFlow.Controllers
 
             var claims = new List<Claim>
             {
+                new Claim("UserId", user.UserId.ToString()),
+                new Claim("UserName", user.UserName),
+                new Claim("Email", user.Email),
+                new Claim("RoleName", user.Role?.RoleName ?? "User"),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("FullName", user.FullName),

@@ -17,9 +17,20 @@ namespace AccuFlow.Services
 
         public async Task<UserEntity?> ValidateUser(string username, string password)
         {
-            // TODO: Implement proper password hashing
             var user = await _dbContext.Users
+                .Include(x => x.Role)
                 .FirstOrDefaultAsync(x => x.UserName == username && !x.IsDeleted && x.IsActive);
+
+            if (user == null || string.IsNullOrWhiteSpace(user.PasswordHash))
+            {
+                return null;
+            }
+
+            var isValidPassword = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            if (!isValidPassword)
+            {
+                return null;
+            }
 
             return user;
         }

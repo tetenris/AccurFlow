@@ -33,6 +33,11 @@ namespace AccuFlow.Infrastructures
 
             try
             {
+                if (typeof(T) == typeof(Guid))
+                {
+                    return Guid.TryParse(claim.Value, out var guidValue) ? (T)(object)guidValue : default(T)!;
+                }
+
                 return (T)Convert.ChangeType(claim.Value, typeof(T));
             }
             catch
