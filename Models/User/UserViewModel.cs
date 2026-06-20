@@ -9,6 +9,10 @@ namespace AccuFlow.Models.User
         public string Email { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public bool IsLocked { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTime? PasswordExpiresAt { get; set; }
+        public DateTime? LockedAt { get; set; }
         public Guid RoleId { get; set; }
         public string RoleName { get; set; } = string.Empty;
         public string? CreatedBy { get; set; }

@@ -22,6 +22,15 @@ namespace AccuFlow.Entities.EntityConfigurations
             
             builder.Property(u => u.PasswordHash)
                 .IsRequired();
+
+            builder.Property(u => u.FailedLoginAttempts)
+                .HasDefaultValue(0);
+
+            builder.Property(u => u.IsLocked)
+                .HasDefaultValue(false);
+
+            builder.Property(u => u.LockedReason)
+                .HasMaxLength(255);
             
             builder.Property(u => u.FullName)
                 .IsRequired()

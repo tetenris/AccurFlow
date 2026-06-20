@@ -91,6 +91,20 @@ namespace AccuFlow.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Unlock([FromBody] Guid id)
+        {
+            try
+            {
+                await _userService.UnlockAsync(id);
+                return Ok(new { success = true, message = "User unlocked successfully. Password reset to default Qwerty@123 and user must change it on next login." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
         [HttpDelete]
         public async Task<IActionResult> Delete([FromBody] Guid id)
         {

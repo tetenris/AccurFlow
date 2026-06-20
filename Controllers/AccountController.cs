@@ -29,13 +29,16 @@ namespace AccuFlow.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
         {
-            var user = await _accountService.ValidateUser(username, password);
+            var result = await _accountService.ValidateUser(username, password);
 
-            if (user == null)
+            if (!result.Succeeded || result.User == null)
             {
-                ModelState.AddModelError("", "Invalid username or password");
+                ModelState.AddModelError("", result.Message);
                 return View();
             }
+
+            var user = result.User;
+            var passwordExpired = user.PasswordExpiresAt.HasValue && user.PasswordExpiresAt.Value <= DateTime.UtcNow;
 
             var claims = new List<Claim>
             {
@@ -47,6 +50,7 @@ namespace AccuFlow.Controllers
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("FullName", user.FullName),
                 new Claim("RoleId", user.RoleId.ToString()),
+                new Claim("PasswordExpired", passwordExpired.ToString().ToLowerInvariant()),
                 new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
             };
 
@@ -61,6 +65,12 @@ namespace AccuFlow.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
+
+            if (passwordExpired)
+            {
+                TempData["PasswordExpiredMessage"] = "Password anda sudah lebih dari 1 bulan. Silakan ganti password untuk melanjutkan.";
+                return RedirectToAction(nameof(ChangePassword));
+            }
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
@@ -122,9 +132,11 @@ namespace AccuFlow.Controllers
                     return RedirectToAction(nameof(Login));
                 }
 
+                var wasPasswordExpired = string.Equals(User.FindFirst("PasswordExpired")?.Value, "true", StringComparison.OrdinalIgnoreCase);
                 await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
-                ViewBag.SuccessMessage = "Password berhasil diperbarui.";
-                return View(new ChangePasswordViewModel());
+                await RefreshPasswordExpiredClaimAsync(false);
+                TempData["SuccessMessage"] = "Password berhasil diperbarui.";
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
@@ -147,6 +159,31 @@ namespace AccuFlow.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
+        }
+
+        private async Task RefreshPasswordExpiredClaimAsync(bool passwordExpired)
+        {
+            var identity = User.Identity as ClaimsIdentity;
+            if (identity == null)
+            {
+                return;
+            }
+
+            var existingClaim = identity.FindFirst("PasswordExpired");
+            if (existingClaim != null)
+            {
+                identity.RemoveClaim(existingClaim);
+            }
+
+            identity.AddClaim(new Claim("PasswordExpired", passwordExpired.ToString().ToLowerInvariant()));
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity),
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(24)
+                });
         }
     }
 }

@@ -21,12 +21,23 @@ namespace AccuFlow.Infrastructures
             var controller = context.RouteData.Values["controller"]?.ToString();
             var action = context.RouteData.Values["action"]?.ToString();
 
-            if (string.IsNullOrWhiteSpace(controller) || string.IsNullOrWhiteSpace(action) || IsExcludedController(controller))
+            if (string.IsNullOrWhiteSpace(controller) || string.IsNullOrWhiteSpace(action))
             {
                 return;
             }
 
             if (context.HttpContext.User.Identity?.IsAuthenticated != true)
+            {
+                return;
+            }
+
+            if (IsPasswordExpired(context) && !IsPasswordChangeAllowed(controller, action))
+            {
+                context.Result = new RedirectToActionResult("ChangePassword", "Account", null);
+                return;
+            }
+
+            if (IsExcludedController(controller))
             {
                 return;
             }
@@ -77,6 +88,21 @@ namespace AccuFlow.Infrastructures
             return controller.Equals("Account", StringComparison.OrdinalIgnoreCase);
         }
 
+        private static bool IsPasswordExpired(AuthorizationFilterContext context)
+        {
+            return string.Equals(context.HttpContext.User.FindFirst("PasswordExpired")?.Value, "true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPasswordChangeAllowed(string controller, string action)
+        {
+            if (!controller.Equals("Account", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return IsAny(action, "ChangePassword", "Logout", "LogoutGet");
+        }
+
         private static bool HasPermission(RoleMenuEntity roleMenu, string action)
         {
             return MapAction(action) switch
@@ -103,7 +129,7 @@ namespace AccuFlow.Infrastructures
                 return "add";
             }
 
-            if (IsAny(action, "Edit", "Update", "UpdateItem", "SaveRoleMenuPermissions", "FixRoleTypeData"))
+            if (IsAny(action, "Edit", "Update", "UpdateItem", "SaveRoleMenuPermissions", "FixRoleTypeData", "Unlock"))
             {
                 return "edit";
             }

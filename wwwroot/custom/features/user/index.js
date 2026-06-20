@@ -107,7 +107,11 @@ $(document).ready(function () {
             { data: "roleName" },
             {
                 data: "isActive",
-                render: function (data) {
+                render: function (data, type, row) {
+                    if (row.isLocked) {
+                        return '<span class="badge badge-light-danger">Locked</span>';
+                    }
+
                     return data
                         ? '<span class="badge badge-light-success">Active</span>'
                         : '<span class="badge badge-light-warning">Inactive</span>';
@@ -119,6 +123,12 @@ $(document).ready(function () {
                 searchable: false,
                 className: 'action-cell text-center',
                 render: function (data, type, row) {
+                    const unlockButton = row.isLocked
+                        ? `<button class="btn btn-sm btn-icon btn-light-info btn-unlock" data-id="${data}" title="Unlock Password">
+                                <i class='fa fa-unlock'></i>
+                           </button>`
+                        : '';
+
                     return `
                         <div class="d-flex gap-2 justify-content-center">
                             <button class="btn btn-sm btn-icon btn-light-primary btn-detail" data-id="${data}" title="View Detail">
@@ -130,6 +140,7 @@ $(document).ready(function () {
                             <button class="btn btn-sm btn-icon btn-light-danger btn-delete" data-id="${data}" data-candelete="${!row.isActive}" title="Delete">
                                 <i class='fa fa-trash-alt'></i>
                             </button>
+                            ${unlockButton}
                             <button class="btn btn-sm btn-icon btn-light-warning btn-audit" 
                                 data-id="${data}" 
                                 data-createdby="${row.createdBy}" 
@@ -289,6 +300,7 @@ $(document).ready(function () {
         try {
             const response = await $.get(`/User/GetById?id=${userId}`);
             const statusText = response.isActive ? 'Active' : 'Inactive';
+            const lockStatus = response.isLocked ? 'Locked' : 'Unlocked';
 
             Swal.fire({
                 title: 'User Details',
@@ -315,6 +327,23 @@ $(document).ready(function () {
                                 <td class="fw-bold">Status</td>
                                 <td>${statusText}</td>
                             </tr>
+                            <tr>
+                                <td class="fw-bold">Password Lock</td>
+                                <td>${lockStatus}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Failed Login</td>
+                                <td>${response.failedLoginAttempts || 0}</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Password Expires At</td>
+                                <td>${response.passwordExpiresAt ? moment(response.passwordExpiresAt).format('DD-MMM-YYYY HH:mm') : '-'}</td>
+                            </tr>
+                            ${response.lockedAt ? `
+                            <tr>
+                                <td class="fw-bold">Locked At</td>
+                                <td>${moment(response.lockedAt).format('DD-MMM-YYYY HH:mm')}</td>
+                            </tr>` : ''}
                             <tr>
                                 <td class="fw-bold">Created At</td>
                                 <td>${moment(response.createdAt).format('DD-MMM-YYYY HH:mm')}</td>
@@ -346,6 +375,61 @@ $(document).ready(function () {
                 buttonsStyling: false
             });
         }
+    });
+
+    // Unlock User
+    $('#user_datatable').on('click', '.btn-unlock', function () {
+        const userId = $(this).data('id');
+
+        Swal.fire({
+            title: 'Unlock password?',
+            text: 'Password user akan direset ke default Qwerty@123 dan user wajib ganti password saat login berikutnya.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Unlock',
+            cancelButtonText: 'Cancel',
+            customClass: {
+                confirmButton: 'btn btn-info',
+                cancelButton: 'btn btn-secondary'
+            },
+            buttonsStyling: false
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await $.ajax({
+                        url: '/User/Unlock',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(userId)
+                    });
+
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Unlocked!',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'btn btn-success'
+                            },
+                            buttonsStyling: false
+                        });
+                        table.ajax.reload();
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.responseJSON?.message || 'Failed to unlock user',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: false
+                    });
+                }
+            }
+        });
     });
 
     // Audit Trail

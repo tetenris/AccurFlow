@@ -15,6 +15,7 @@ namespace AccuFlow.Services
         Task<UserViewModel?> GetByIdAsync(Guid id);
         Task CreateAsync(CreateUserViewModel model);
         Task UpdateAsync(UpdateUserViewModel model);
+        Task UnlockAsync(Guid id);
         Task DeleteAsync(Guid id);
     }
 
@@ -81,6 +82,10 @@ namespace AccuFlow.Services
                     Email = u.Email,
                     FullName = u.FullName,
                     IsActive = u.IsActive,
+                    IsLocked = u.IsLocked,
+                    FailedLoginAttempts = u.FailedLoginAttempts,
+                    PasswordExpiresAt = u.PasswordExpiresAt,
+                    LockedAt = u.LockedAt,
                     RoleId = u.RoleId,
                     RoleName = u.Role != null ? u.Role.RoleName : "",
                     CreatedBy = u.CreatedBy,
@@ -115,6 +120,10 @@ namespace AccuFlow.Services
                 Email = user.Email,
                 FullName = user.FullName,
                 IsActive = user.IsActive,
+                IsLocked = user.IsLocked,
+                FailedLoginAttempts = user.FailedLoginAttempts,
+                PasswordExpiresAt = user.PasswordExpiresAt,
+                LockedAt = user.LockedAt,
                 RoleId = user.RoleId,
                 RoleName = user.Role?.RoleName ?? "",
                 CreatedBy = user.CreatedBy,
@@ -159,6 +168,8 @@ namespace AccuFlow.Services
                 UserName = model.UserName,
                 Email = model.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(DefaultPassword),
+                PasswordChangedAt = DateTime.UtcNow.AddDays(-31),
+                PasswordExpiresAt = DateTime.UtcNow.AddDays(-1),
                 FullName = model.FullName,
                 RoleId = model.RoleId,
                 IsActive = model.IsActive,
@@ -223,6 +234,40 @@ namespace AccuFlow.Services
 
             // Password tidak bisa diubah di menu user management
             // Password hanya bisa diubah melalui menu change password
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task UnlockAsync(Guid id)
+        {
+            var user = await _dbContext.Set<UserEntity>()
+                .FirstOrDefaultAsync(u => u.UserId == id && !u.IsDeleted);
+
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            var currentRole = await _dbContext.Set<RoleEntity>().FirstOrDefaultAsync(r => r.RoleId == user.RoleId && !r.IsDeleted);
+            if (currentRole?.RoleType == RoleEnum.SuperAdministrator && !await IsCurrentUserSuperAdministratorAsync())
+            {
+                throw new Exception("Super Administrator user cannot be unlocked from User Management");
+            }
+
+            if (!user.IsLocked)
+            {
+                throw new Exception("User is not locked");
+            }
+
+            user.IsLocked = false;
+            user.FailedLoginAttempts = 0;
+            user.LockedAt = null;
+            user.LockedReason = null;
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(DefaultPassword);
+            user.PasswordChangedAt = DateTime.UtcNow.AddDays(-31);
+            user.PasswordExpiresAt = DateTime.UtcNow.AddDays(-1);
+            user.UpdatedBy = _currentUserService.UserId.ToString();
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();
         }

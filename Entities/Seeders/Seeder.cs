@@ -70,9 +70,10 @@ namespace AccuFlow.Entities.Seeders
                 existingUser.UserName = seedUser.UserName;
                 existingUser.Email = seedUser.Email;
                 existingUser.FullName = seedUser.FullName;
-                existingUser.PasswordHash = seedUser.PasswordHash;
                 existingUser.RoleId = seedUser.RoleId;
                 existingUser.IsActive = true;
+                existingUser.PasswordChangedAt ??= DateTime.UtcNow;
+                existingUser.PasswordExpiresAt ??= existingUser.PasswordChangedAt.Value.AddDays(30);
                 existingUser.IsDeleted = false;
                 existingUser.DeletedAt = null;
                 existingUser.DeletedBy = null;
