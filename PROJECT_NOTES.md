@@ -51,7 +51,7 @@
 - Purchase Order belum ada entity/controller/service/view; hanya disebut di TODO sample seed.
 - Payment/Receipt belum ada modul.
 - Inventory/Stock Management/Stock Opname/Stock Card belum ada modul.
-- Supplier menu sudah disediakan di `MenuSeed.cs`, tapi tidak ada `SupplierController`, entity, service, model, atau view.
+- Supplier module belum ada; menu Supplier sudah dihapus dari seed dan auto-disabled jika sudah terlanjur ada di database.
 - Aging Report belum ada.
 - Approval workflow belum ada backend; hanya ada partial view `_HistoryApprovalModal.cshtml` dan sisa JS invoice approval.
 - PDF generation belum dipakai walaupun package `DinkToPdf` sudah terpasang.
@@ -73,5 +73,5 @@
 1. Selesai - Perbaiki auth/login: tambah `UseAuthentication`, validasi BCrypt, claim user lengkap, dan pastikan `CurrentUserService` terbaca benar.
 2. Selesai - Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan ganti credential Hangfire hardcoded dengan role auth dari konfigurasi.
 3. Selesai - Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
-4. Bersihkan sisa template: hapus/abaikan JS lama seperti `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
+4. Selesai - Bersihkan sisa template: hapus JS lama `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
 5. Tambah modul bisnis bertahap: mulai dari Supplier, lalu Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.

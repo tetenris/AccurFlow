@@ -116,6 +116,28 @@ namespace AccuFlow.Entities.Seeders
             {
                 logger.LogInformation("No new menus to seed");
             }
+
+            var disabledMenuIds = new[]
+            {
+                Guid.Parse("00000000-0000-0000-0000-000000000009")
+            };
+
+            var menusToDisable = await dbContext.Menus
+                .Where(m => disabledMenuIds.Contains(m.MenuId) && !m.IsDeleted)
+                .ToListAsync();
+
+            if (menusToDisable.Any())
+            {
+                foreach (var menu in menusToDisable)
+                {
+                    menu.IsDeleted = true;
+                    menu.DeletedAt = DateTime.UtcNow;
+                    menu.DeletedBy = "system";
+                }
+
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Disabled {menusToDisable.Count} unavailable menus");
+            }
         }
 
         public static async Task SeedAll(AppDbContext dbContext, ILogger logger, string environmentName)

@@ -104,18 +104,6 @@ namespace AccuFlow.Entities.Seeders
                     Sequence = 2
                 },
                 
-                // Suppliers (Child of Master)
-                new MenuEntity
-                {
-                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000009"),
-                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000006"),
-                    Icon = "",
-                    Name = "Suppliers",
-                    Controller = "Supplier",
-                    Action = @"[""view"",""add"",""edit"",""delete""]",
-                    Sequence = 3
-                },
-                
                 // Accounting (Parent)
                 new MenuEntity
                 {
