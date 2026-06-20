@@ -30,6 +30,9 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> DatatableItems([FromBody] DataTableItemRequest request) => Json(await _inventoryService.DatatableItems(request));
 
+        [HttpGet]
+        public async Task<IActionResult> GetActiveItems() => Json(await _inventoryService.GetActiveItems());
+
         [HttpPost]
         public async Task<IActionResult> CreateItem([FromBody] CreateItemRequest request)
         {

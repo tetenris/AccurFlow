@@ -12,6 +12,7 @@ namespace AccuFlow.Services
     public interface IInventoryService : IBaseService
     {
         Task<BaseDatatableResponse> DatatableItems(DataTableItemRequest request);
+        Task<List<ItemViewModel>> GetActiveItems();
         Task CreateItem(CreateItemRequest request, Guid userId);
         Task<BaseDatatableResponse> StockCard(DataTableStockMovementRequest request);
     }
@@ -67,6 +68,25 @@ namespace AccuFlow.Services
                 CreatedBy = userId.ToString()
             });
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<List<ItemViewModel>> GetActiveItems()
+        {
+            return await _dbContext.Items
+                .Where(x => x.IsActive && !x.IsDeleted)
+                .OrderBy(x => x.ItemCode)
+                .Select(x => new ItemViewModel
+                {
+                    ItemId = x.ItemId,
+                    ItemCode = x.ItemCode,
+                    ItemName = x.ItemName,
+                    ItemType = x.ItemType,
+                    Unit = x.Unit,
+                    SalesPrice = x.SalesPrice,
+                    PurchasePrice = x.PurchasePrice,
+                    IsActive = x.IsActive
+                })
+                .ToListAsync();
         }
 
         public async Task<BaseDatatableResponse> StockCard(DataTableStockMovementRequest request)

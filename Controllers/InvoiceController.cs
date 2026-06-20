@@ -27,6 +27,19 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id) => Json(await _invoiceService.GetById(id));
 
+        [HttpGet]
+        public async Task<IActionResult> GetOpenInvoices(string invoiceType)
+        {
+            var result = await _invoiceService.Datatable(new DataTableInvoiceRequest
+            {
+                InvoiceType = invoiceType,
+                Page = 1,
+                Size = 1000
+            });
+
+            return Json(result.Data);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateInvoiceRequest request)
         {

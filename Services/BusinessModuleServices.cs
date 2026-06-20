@@ -23,7 +23,18 @@ namespace AccuFlow.Services
 
     public class InvoiceService : BaseService, IInvoiceService
     {
-        public InvoiceService(AppDbContext dbContext) : base(dbContext) { }
+        private static readonly Guid AccountsReceivableAccountId = Guid.Parse("10000000-0000-0000-0000-000000000004");
+        private static readonly Guid AccountsPayableAccountId = Guid.Parse("20000000-0000-0000-0000-000000000002");
+        private static readonly Guid TaxPayableAccountId = Guid.Parse("20000000-0000-0000-0000-000000000003");
+        private static readonly Guid SalesRevenueAccountId = Guid.Parse("40000000-0000-0000-0000-000000000002");
+        private static readonly Guid CostOfGoodsSoldAccountId = Guid.Parse("50000000-0000-0000-0000-000000000002");
+
+        private readonly IJournalEntryService _journalEntryService;
+
+        public InvoiceService(AppDbContext dbContext, IJournalEntryService journalEntryService) : base(dbContext)
+        {
+            _journalEntryService = journalEntryService;
+        }
 
         public async Task<BaseDatatableResponse> Datatable(DataTableInvoiceRequest request)
         {
@@ -123,10 +134,16 @@ namespace AccuFlow.Services
 
         public async Task Post(Guid id, Guid userId)
         {
-            var invoice = await _dbContext.Invoices.FirstOrDefaultAsync(x => x.InvoiceId == id && !x.IsDeleted);
+            var invoice = await _dbContext.Invoices
+                .Include(x => x.Lines)
+                .FirstOrDefaultAsync(x => x.InvoiceId == id && !x.IsDeleted);
             if (invoice == null) throw new Exception("Invoice not found");
             if (invoice.Status != "Draft") throw new Exception("Only draft invoice can be posted");
+            if (invoice.JournalId.HasValue) throw new Exception("Invoice already has journal entry");
+
+            var journalId = await CreateInvoiceJournal(invoice, userId);
             invoice.Status = "Posted";
+            invoice.JournalId = journalId;
             invoice.UpdatedBy = userId.ToString();
             await _dbContext.SaveChangesAsync();
         }
@@ -148,6 +165,86 @@ namespace AccuFlow.Services
             var next = last == null ? 1 : int.Parse(last.InvoiceNumber[(prefix.Length + 1)..]) + 1;
             return $"{prefix}-{next:D5}";
         }
+
+        private async Task<Guid> CreateInvoiceJournal(InvoiceEntity invoice, Guid userId)
+        {
+            var lines = new List<Models.JournalEntry.JournalLineRequest>();
+            var description = $"Auto journal for {invoice.InvoiceNumber}";
+
+            if (invoice.InvoiceType == "Purchase")
+            {
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = CostOfGoodsSoldAccountId,
+                    Description = description,
+                    DebitAmount = invoice.SubTotal - invoice.DiscountAmount,
+                    CreditAmount = 0
+                });
+
+                if (invoice.TaxAmount > 0)
+                {
+                    lines.Add(new Models.JournalEntry.JournalLineRequest
+                    {
+                        AccountId = TaxPayableAccountId,
+                        Description = description,
+                        DebitAmount = invoice.TaxAmount,
+                        CreditAmount = 0
+                    });
+                }
+
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = AccountsPayableAccountId,
+                    Description = description,
+                    DebitAmount = 0,
+                    CreditAmount = invoice.TotalAmount
+                });
+            }
+            else
+            {
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = AccountsReceivableAccountId,
+                    Description = description,
+                    DebitAmount = invoice.TotalAmount,
+                    CreditAmount = 0
+                });
+
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = SalesRevenueAccountId,
+                    Description = description,
+                    DebitAmount = 0,
+                    CreditAmount = invoice.SubTotal - invoice.DiscountAmount
+                });
+
+                if (invoice.TaxAmount > 0)
+                {
+                    lines.Add(new Models.JournalEntry.JournalLineRequest
+                    {
+                        AccountId = TaxPayableAccountId,
+                        Description = description,
+                        DebitAmount = 0,
+                        CreditAmount = invoice.TaxAmount
+                    });
+                }
+            }
+
+            var journalId = await _journalEntryService.CreateAsync(new Models.JournalEntry.CreateJournalEntryRequest
+            {
+                JournalDate = invoice.InvoiceDate,
+                Description = description,
+                JournalLines = lines
+            }, userId);
+
+            await _journalEntryService.PostAsync(new Models.JournalEntry.PostJournalRequest
+            {
+                JournalId = journalId,
+                PostedDate = invoice.InvoiceDate
+            }, userId);
+
+            return journalId;
+        }
     }
 
     public interface IPaymentService : IBaseService
@@ -159,7 +256,15 @@ namespace AccuFlow.Services
 
     public class PaymentService : BaseService, IPaymentService
     {
-        public PaymentService(AppDbContext dbContext) : base(dbContext) { }
+        private static readonly Guid AccountsReceivableAccountId = Guid.Parse("10000000-0000-0000-0000-000000000004");
+        private static readonly Guid AccountsPayableAccountId = Guid.Parse("20000000-0000-0000-0000-000000000002");
+
+        private readonly IJournalEntryService _journalEntryService;
+
+        public PaymentService(AppDbContext dbContext, IJournalEntryService journalEntryService) : base(dbContext)
+        {
+            _journalEntryService = journalEntryService;
+        }
 
         public async Task<BaseDatatableResponse> Datatable(DataTablePaymentRequest request)
         {
@@ -223,6 +328,10 @@ namespace AccuFlow.Services
             var payment = await _dbContext.Payments.Include(x => x.Allocations).FirstOrDefaultAsync(x => x.PaymentId == id && !x.IsDeleted);
             if (payment == null) throw new Exception("Payment not found");
             if (payment.Status != "Draft") throw new Exception("Only draft payment can be posted");
+            if (!payment.Allocations.Any()) throw new Exception("Payment allocation is required");
+            if (payment.JournalId.HasValue) throw new Exception("Payment already has journal entry");
+
+            var journalId = await CreatePaymentJournal(payment, userId);
             foreach (var allocation in payment.Allocations)
             {
                 var invoice = await _dbContext.Invoices.FirstOrDefaultAsync(x => x.InvoiceId == allocation.InvoiceId && !x.IsDeleted);
@@ -231,6 +340,7 @@ namespace AccuFlow.Services
                 invoice.Status = invoice.PaidAmount >= invoice.TotalAmount ? "Paid" : "PartiallyPaid";
             }
             payment.Status = "Posted";
+            payment.JournalId = journalId;
             payment.UpdatedBy = userId.ToString();
             await _dbContext.SaveChangesAsync();
         }
@@ -241,6 +351,62 @@ namespace AccuFlow.Services
             var last = await _dbContext.Payments.Where(x => x.PaymentNumber.StartsWith(prefix + "-")).OrderByDescending(x => x.PaymentNumber).FirstOrDefaultAsync();
             var next = last == null ? 1 : int.Parse(last.PaymentNumber[(prefix.Length + 1)..]) + 1;
             return $"{prefix}-{next:D5}";
+        }
+
+        private async Task<Guid> CreatePaymentJournal(PaymentEntity payment, Guid userId)
+        {
+            var description = $"Auto journal for {payment.PaymentNumber}";
+            var lines = new List<Models.JournalEntry.JournalLineRequest>();
+
+            if (payment.PaymentType == "Payment")
+            {
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = AccountsPayableAccountId,
+                    Description = description,
+                    DebitAmount = payment.TotalAmount,
+                    CreditAmount = 0
+                });
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = payment.CashBankAccountId,
+                    Description = description,
+                    DebitAmount = 0,
+                    CreditAmount = payment.TotalAmount
+                });
+            }
+            else
+            {
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = payment.CashBankAccountId,
+                    Description = description,
+                    DebitAmount = payment.TotalAmount,
+                    CreditAmount = 0
+                });
+                lines.Add(new Models.JournalEntry.JournalLineRequest
+                {
+                    AccountId = AccountsReceivableAccountId,
+                    Description = description,
+                    DebitAmount = 0,
+                    CreditAmount = payment.TotalAmount
+                });
+            }
+
+            var journalId = await _journalEntryService.CreateAsync(new Models.JournalEntry.CreateJournalEntryRequest
+            {
+                JournalDate = payment.PaymentDate,
+                Description = description,
+                JournalLines = lines
+            }, userId);
+
+            await _journalEntryService.PostAsync(new Models.JournalEntry.PostJournalRequest
+            {
+                JournalId = journalId,
+                PostedDate = payment.PaymentDate
+            }, userId);
+
+            return journalId;
         }
     }
 

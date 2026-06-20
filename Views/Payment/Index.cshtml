@@ -21,8 +21,9 @@
                     <option value="Posted">Posted</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
                 <button class="btn btn-primary" id="btn-apply-filter">Apply Filter</button>
+                <button class="btn btn-success" id="btn-add-payment">Add Payment</button>
             </div>
         </div>
         <div class="table-responsive">
@@ -41,6 +42,72 @@
                     </tr>
                 </thead>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="payment_modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Payment / Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <label>Type</label>
+                        <select class="form-select" id="payment-type">
+                            <option value="Receipt">Receipt</option>
+                            <option value="Payment">Payment</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Date</label>
+                        <input type="date" class="form-control" id="payment-date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Method</label>
+                        <select class="form-select" id="payment-method">
+                            <option value="BankTransfer">Bank Transfer</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Giro">Giro</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" id="payment-customer-wrapper">
+                        <label>Customer</label>
+                        <select class="form-select" id="payment-customer-id"></select>
+                    </div>
+                    <div class="col-md-6 d-none" id="payment-supplier-wrapper">
+                        <label>Supplier</label>
+                        <select class="form-select" id="payment-supplier-id"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Cash/Bank Account</label>
+                        <select class="form-select" id="cash-bank-account-id"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Invoice</label>
+                        <select class="form-select" id="invoice-id"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Amount</label>
+                        <input type="number" class="form-control" id="allocated-amount" value="0" min="0" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Reference No</label>
+                        <input type="text" class="form-control" id="reference-number" />
+                    </div>
+                    <div class="col-md-12">
+                        <label>Notes</label>
+                        <textarea class="form-control" id="payment-notes"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btn-save-payment">Save</button>
+            </div>
         </div>
     </div>
 </div>

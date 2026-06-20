@@ -83,3 +83,11 @@
 - Approval Workflow: approval request/history entity, service, controller, view list, approve/reject dasar.
 - Document Attachment: entity dan service datatable dasar; upload/download file fisik belum diimplementasikan.
 - Tax Management: entity dan seed PPN 11%; UI CRUD tax belum dibuat.
+
+## Status Hardening Transaksi
+- Invoice post sekarang membuat dan mem-posting jurnal otomatis untuk sales invoice dan purchase invoice.
+- Payment post sekarang membuat dan mem-posting jurnal otomatis untuk receipt dan supplier payment, lalu update paid amount invoice.
+- Invoice list sudah punya modal create sederhana untuk satu baris transaksi.
+- Payment list sudah punya modal create sederhana dengan alokasi satu invoice.
+- Purchase Order list sudah punya modal create sederhana untuk satu baris PO.
+- Belum dilakukan smoke test runtime; validasi baru sampai `dotnet build AccuFlow.sln` berhasil.

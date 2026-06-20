@@ -24,8 +24,9 @@
                     <option value="Cancelled">Cancelled</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-md-6 d-flex align-items-end justify-content-end gap-2">
                 <button class="btn btn-primary" id="btn-apply-filter">Apply Filter</button>
+                <button class="btn btn-success" id="btn-add-invoice">Add Invoice</button>
             </div>
         </div>
         <div class="table-responsive">
@@ -45,6 +46,76 @@
                     </tr>
                 </thead>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="invoice_modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Invoice</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <label>Invoice Type</label>
+                        <select class="form-select" id="invoice-type">
+                            <option value="Sales">Sales</option>
+                            <option value="Purchase">Purchase</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Invoice Date</label>
+                        <input type="date" class="form-control" id="invoice-date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Due Date</label>
+                        <input type="date" class="form-control" id="due-date" value="@DateTime.Today.AddDays(30).ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="col-md-6" id="customer-wrapper">
+                        <label>Customer</label>
+                        <select class="form-select" id="customer-id"></select>
+                    </div>
+                    <div class="col-md-6 d-none" id="supplier-wrapper">
+                        <label>Supplier</label>
+                        <select class="form-select" id="supplier-id"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Revenue/Expense Account</label>
+                        <select class="form-select" id="account-id"></select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Description</label>
+                        <input type="text" class="form-control" id="line-description" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Quantity</label>
+                        <input type="number" class="form-control" id="quantity" value="1" min="1" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Unit Price</label>
+                        <input type="number" class="form-control" id="unit-price" value="0" min="0" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Discount</label>
+                        <input type="number" class="form-control" id="discount-amount" value="0" min="0" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tax</label>
+                        <input type="number" class="form-control" id="tax-amount" value="0" min="0" />
+                    </div>
+                    <div class="col-md-12">
+                        <label>Notes</label>
+                        <textarea class="form-control" id="notes"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btn-save-invoice">Save</button>
+            </div>
         </div>
     </div>
 </div>
