@@ -1,0 +1,28 @@
+@{
+    ViewData["Title"] = "Purchase Orders";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="purchase_order_datatable" class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>PO No</th>
+                        <th>Order Date</th>
+                        <th>Expected Date</th>
+                        <th>Supplier</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/purchaseorder/index.js"></script>
+}

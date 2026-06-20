@@ -111,6 +111,31 @@ namespace AccuFlow.Entities.Seeders
             }
         }
 
+        public static async Task SeedBusinessModules(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding business module master data...");
+
+            var warehouses = BusinessModuleSeed.GetWarehouseSeedData();
+            var existingWarehouseIds = await dbContext.Warehouses.Select(x => x.WarehouseId).ToListAsync();
+            var newWarehouses = warehouses.Where(x => !existingWarehouseIds.Contains(x.WarehouseId)).ToList();
+            if (newWarehouses.Any())
+            {
+                dbContext.Warehouses.AddRange(newWarehouses);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newWarehouses.Count} warehouses");
+            }
+
+            var taxes = BusinessModuleSeed.GetTaxSeedData();
+            var existingTaxIds = await dbContext.Taxes.Select(x => x.TaxId).ToListAsync();
+            var newTaxes = taxes.Where(x => !existingTaxIds.Contains(x.TaxId)).ToList();
+            if (newTaxes.Any())
+            {
+                dbContext.Taxes.AddRange(newTaxes);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newTaxes.Count} taxes");
+            }
+        }
+
         public static async Task SeedSampleTransactions(AppDbContext dbContext, ILogger logger)
         {
             logger.LogInformation("Seeding Sample Transactions...");
@@ -174,6 +199,7 @@ namespace AccuFlow.Entities.Seeders
             await SeedChartOfAccounts(dbContext, logger);
             await SeedCustomers(dbContext, logger);
             await SeedSuppliers(dbContext, logger);
+            await SeedBusinessModules(dbContext, logger);
             await SeedMenu(dbContext, logger);
             
             // Only seed sample transactions in Development or Staging

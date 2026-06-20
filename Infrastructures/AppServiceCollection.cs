@@ -26,6 +26,13 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IRoleMenuService, RoleMenuService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<ISupplierService, SupplierService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IPaymentService, PaymentService>();
+            services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+            services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IAgingReportService, AgingReportService>();
+            services.AddScoped<IApprovalService, ApprovalService>();
+            services.AddScoped<IDocumentAttachmentService, DocumentAttachmentService>();
 
             return services;
         }

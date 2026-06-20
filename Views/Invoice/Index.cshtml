@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Invoice Management";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-5">
+            <div class="col-md-3">
+                <label>Invoice Type</label>
+                <select class="form-select" id="filter-invoice-type">
+                    <option value="">All Types</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Purchase">Purchase</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Status</label>
+                <select class="form-select" id="filter-status">
+                    <option value="">All Status</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Posted">Posted</option>
+                    <option value="PartiallyPaid">Partially Paid</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary" id="btn-apply-filter">Apply Filter</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table id="invoice_datatable" class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Invoice No</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Due Date</th>
+                        <th>Partner</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Outstanding</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/invoice/index.js"></script>
+}

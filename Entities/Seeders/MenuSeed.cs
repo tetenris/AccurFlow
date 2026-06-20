@@ -174,6 +174,105 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "FinancialStatement",
                     Action = @"[""view""]",
                     Sequence = 4
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000015"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "Invoices",
+                    Controller = "Invoice",
+                    Action = @"[""view"",""add"",""post"",""cancel""]",
+                    Sequence = 5
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000016"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "Payments & Receipts",
+                    Controller = "Payment",
+                    Action = @"[""view"",""add"",""post""]",
+                    Sequence = 6
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000017"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000010"),
+                    Icon = "",
+                    Name = "Aging Report",
+                    Controller = "AgingReport",
+                    Action = @"[""view""]",
+                    Sequence = 7
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-delivery fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
+                    Name = "Purchasing",
+                    Controller = "",
+                    Action = @"[]",
+                    Sequence = 6
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000019"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
+                    Icon = "",
+                    Name = "Purchase Orders",
+                    Controller = "PurchaseOrder",
+                    Action = @"[""view"",""add"",""approve"",""convert""]",
+                    Sequence = 1
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-package fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
+                    Name = "Inventory",
+                    Controller = "",
+                    Action = @"[]",
+                    Sequence = 7
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000021"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Items",
+                    Controller = "Inventory",
+                    Action = @"[""view"",""add"",""edit"",""delete""]",
+                    Sequence = 1
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000022"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Stock Card",
+                    Controller = "Inventory",
+                    Action = @"[""view""]",
+                    Sequence = 2
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000023"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-shield-tick fs-2""><span class=""path1""></span><span class=""path2""></span></i>",
+                    Name = "Approvals",
+                    Controller = "Approval",
+                    Action = @"[""view"",""approve"",""reject""]",
+                    Sequence = 8
                 }
             };
         }

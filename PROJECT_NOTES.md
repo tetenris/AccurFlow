@@ -72,4 +72,14 @@
 2. Selesai - Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan ganti credential Hangfire hardcoded dengan role auth dari konfigurasi.
 3. Selesai - Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
 4. Selesai - Bersihkan sisa template: hapus JS lama `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
-5. Berjalan - Tambah modul bisnis bertahap: Supplier master sudah dibuat, lanjut Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.
+5. Berjalan - Modul bisnis tahap awal sudah dibuat tanpa commit: Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, Aging Report, Approval Workflow, dan Document Attachment. Masih perlu hardening detail transaksi, posting jurnal otomatis lengkap, PDF export, upload file fisik, dan testing UI end-to-end.
+
+## Status Roadmap Bisnis
+- Invoice/Billing: entity, migration, service, controller, menu, view list, JS datatable, create draft, post, cancel.
+- Payment/Receipt: entity, migration, service, controller, menu, view list, JS datatable, allocation invoice, post payment.
+- AR/AP Aging: report dari invoice outstanding dengan bucket current, 1-30, 31-60, 61-90, dan >90 hari.
+- Purchase Order: entity, migration, service, controller, menu, view list, approve, convert to purchase invoice.
+- Inventory: item, warehouse, stock movement, stock opname entity, item list, stock card list, seed warehouse awal.
+- Approval Workflow: approval request/history entity, service, controller, view list, approve/reject dasar.
+- Document Attachment: entity dan service datatable dasar; upload/download file fisik belum diimplementasikan.
+- Tax Management: entity dan seed PPN 11%; UI CRUD tax belum dibuat.

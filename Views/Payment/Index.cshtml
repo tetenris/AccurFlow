@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Payment & Receipt";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-5">
+            <div class="col-md-3">
+                <label>Type</label>
+                <select class="form-select" id="filter-payment-type">
+                    <option value="">All Types</option>
+                    <option value="Receipt">Receipt</option>
+                    <option value="Payment">Payment</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Status</label>
+                <select class="form-select" id="filter-status">
+                    <option value="">All Status</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Posted">Posted</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary" id="btn-apply-filter">Apply Filter</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table id="payment_datatable" class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Payment No</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Partner</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/payment/index.js"></script>
+}

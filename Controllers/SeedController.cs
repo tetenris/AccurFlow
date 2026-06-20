@@ -30,6 +30,7 @@ namespace AccuFlow.Controllers
                 "ChartOfAccounts",
                 "Customers",
                 "Suppliers",
+                "BusinessModules",
                 "Menu"
             };
             
@@ -88,6 +89,9 @@ namespace AccuFlow.Controllers
                             break;
                         case "suppliers":
                             await Seeder.SeedSuppliers(_dbContext, _logger);
+                            break;
+                        case "businessmodules":
+                            await Seeder.SeedBusinessModules(_dbContext, _logger);
                             break;
                         case "menu":
                             await Seeder.SeedMenu(_dbContext, _logger);
