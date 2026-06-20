@@ -2,6 +2,7 @@ using AccuFlow.Entities.Context;
 using AccuFlow.Entities.Entity;
 using AccuFlow.Entities.Enums;
 using AccuFlow.Entities.Enums.Extensions;
+using AccuFlow.Infrastructures;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Role;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -24,14 +25,18 @@ namespace AccuFlow.Services
 
     public class RoleService : BaseService, IRoleService
     {
-        public RoleService(AppDbContext dbContext) : base(dbContext)
+        private readonly ICurrentUserService _currentUserService;
+
+        public RoleService(AppDbContext dbContext, ICurrentUserService currentUserService) : base(dbContext)
         {
+            _currentUserService = currentUserService;
         }
 
         public async Task<BaseDatatableResponse> Datatable(DataTableRoleRequest request)
         {
+            var isSuperAdministrator = await IsCurrentUserSuperAdministratorAsync();
             var query = _dbContext.Set<RoleEntity>()
-                .Where(x => !x.IsDeleted)
+                .Where(x => !x.IsDeleted && (isSuperAdministrator || x.RoleType != RoleEnum.SuperAdministrator))
                 .AsQueryable();
 
             var totalRecord = await query.CountAsync();
@@ -94,8 +99,10 @@ namespace AccuFlow.Services
 
         public async Task<RoleViewModel?> GetById(Guid roleId)
         {
+            var isSuperAdministrator = await IsCurrentUserSuperAdministratorAsync();
+
             return await _dbContext.Set<RoleEntity>()
-                .Where(x => x.RoleId == roleId && !x.IsDeleted)
+                .Where(x => x.RoleId == roleId && !x.IsDeleted && (isSuperAdministrator || x.RoleType != RoleEnum.SuperAdministrator))
                 .Select(x => new RoleViewModel
                 {
                     RoleId = x.RoleId,
@@ -148,6 +155,9 @@ namespace AccuFlow.Services
 
             if (role == null)
                 throw new Exception("Role not found");
+
+            if (role.RoleType == RoleEnum.SuperAdministrator)
+                throw new Exception("Super Administrator role cannot be edited from Role Management");
 
             // Check if there are active users using this role
             var activeUsersWithRole = await _dbContext.Set<UserEntity>()
@@ -209,6 +219,9 @@ namespace AccuFlow.Services
             if (role == null)
                 throw new Exception("Role not found");
 
+            if (role.RoleType == RoleEnum.SuperAdministrator)
+                throw new Exception("Super Administrator role cannot be deleted from Role Management");
+
             // Check if role is still being used by any users
             var usersWithRole = await _dbContext.Set<UserEntity>()
                 .Where(u => u.RoleId == roleId && !u.IsDeleted)
@@ -242,13 +255,18 @@ namespace AccuFlow.Services
 
         public List<SelectListItem> GetRoleDropdown()
         {
-            return EnumExtention.ToSelectList<RoleEnum>();
+            var roles = EnumExtention.ToSelectList<RoleEnum>();
+            return IsCurrentUserSuperAdministrator()
+                ? roles
+                : roles.Where(x => x.Value != ((int)RoleEnum.SuperAdministrator).ToString()).ToList();
         }
 
         public async Task<List<RoleViewModel>> GetActiveRolesAsync()
         {
+            var isSuperAdministrator = await IsCurrentUserSuperAdministratorAsync();
+
             return await _dbContext.Set<RoleEntity>()
-                .Where(x => x.IsActive && !x.IsDeleted)
+                .Where(x => x.IsActive && !x.IsDeleted && (isSuperAdministrator || x.RoleType != RoleEnum.SuperAdministrator))
                 .Select(x => new RoleViewModel
                 {
                     RoleId = x.RoleId,
@@ -275,11 +293,42 @@ namespace AccuFlow.Services
                     role.RoleType = RoleEnum.Accountant;
                 else if (roleName.Contains("manager"))
                     role.RoleType = RoleEnum.Manager;
-                else if (roleName.Contains("user"))
-                    role.RoleType = RoleEnum.User;
+                else if (roleName.Contains("finance"))
+                    role.RoleType = RoleEnum.FinanceStaff;
+                else if (roleName.Contains("ar"))
+                    role.RoleType = RoleEnum.AROfficer;
+                else if (roleName.Contains("ap"))
+                    role.RoleType = RoleEnum.APOfficer;
+                else if (roleName.Contains("purchasing"))
+                    role.RoleType = RoleEnum.Purchasing;
+                else if (roleName.Contains("sales"))
+                    role.RoleType = RoleEnum.Sales;
+                else if (roleName.Contains("warehouse"))
+                    role.RoleType = RoleEnum.Warehouse;
+                else if (roleName.Contains("viewer") || roleName.Contains("user"))
+                    role.RoleType = RoleEnum.Viewer;
             }
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        private bool IsCurrentUserSuperAdministrator()
+        {
+            return string.Equals(_currentUserService.RoleName, "Super Administrator", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task<bool> IsCurrentUserSuperAdministratorAsync()
+        {
+            if (_currentUserService.RoleId == Guid.Empty)
+            {
+                return false;
+            }
+
+            return await _dbContext.Set<RoleEntity>()
+                .AnyAsync(x => x.RoleId == _currentUserService.RoleId
+                    && x.RoleType == RoleEnum.SuperAdministrator
+                    && x.IsActive
+                    && !x.IsDeleted);
         }
     }
 }

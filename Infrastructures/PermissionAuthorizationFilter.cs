@@ -48,7 +48,7 @@ namespace AccuFlow.Infrastructures
                 return;
             }
 
-            if (role.RoleType == RoleEnum.Administrator)
+            if (role.RoleType == RoleEnum.SuperAdministrator)
             {
                 return;
             }

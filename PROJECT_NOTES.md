@@ -114,3 +114,23 @@
 3. Selesai - Fix create role return `roleId`, lalu sync permission admin saat seeding.
 4. Selesai - Perbaiki sidebar agar parent menu tetap muncul jika ada child yang boleh dilihat.
 5. Sembunyikan tombol UI berdasarkan permission setelah backend enforcement siap.
+
+## Super Administrator
+- Role `Super Administrator` ditambahkan sebagai role teknis tertinggi dan berbeda dari `Administrator`.
+- `Super Administrator` disembunyikan dari Role Management dan dropdown role agar tidak bisa diedit/dihapus dari UI operasional.
+- User seed `admin` memakai role `Super Administrator`; user seed `administrator` memakai role `Administrator`.
+- `SeedController` dan Hangfire dashboard dibatasi ke role `Super Administrator`.
+- `Administrator` tetap mendapat full operational permission melalui sync `RoleMenus`, tapi tidak bypass permission filter seperti `Super Administrator`.
+
+## Daftar Role Final
+- `Super Administrator`: role teknis tertinggi, hidden dari menu role/user operasional, untuk seeding, Hangfire, dan maintenance.
+- `Administrator`: admin aplikasi harian dengan full operational permission.
+- `Manager`: review laporan dan approval dokumen.
+- `Accountant`: jurnal, posting, payment, invoice, dan laporan accounting.
+- `Finance Staff`: persiapan invoice dan payment operasional.
+- `AR Officer`: customer invoice, receipt, dan AR aging.
+- `AP Officer`: supplier invoice, supplier payment, dan AP aging.
+- `Purchasing`: supplier dan purchase order.
+- `Sales`: customer dan sales invoice.
+- `Warehouse`: item, stock movement, stock opname, dan stock card.
+- `Viewer`: read-only dashboard dan laporan.

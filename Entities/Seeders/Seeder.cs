@@ -13,12 +13,37 @@ namespace AccuFlow.Entities.Seeders
             var roles = RoleSeed.GetRoleSeedData();
             var existingRoles = await dbContext.Roles.ToListAsync();
             var newRoles = roles.Where(r => !existingRoles.Any(er => er.RoleId == r.RoleId)).ToList();
+            var updatedRoles = 0;
+
+            foreach (var seedRole in roles)
+            {
+                var existingRole = existingRoles.FirstOrDefault(r => r.RoleId == seedRole.RoleId);
+                if (existingRole == null)
+                {
+                    continue;
+                }
+
+                existingRole.RoleType = seedRole.RoleType;
+                existingRole.RoleName = seedRole.RoleName;
+                existingRole.Description = seedRole.Description;
+                existingRole.Permissions = seedRole.Permissions;
+                existingRole.IsActive = true;
+                existingRole.IsDeleted = false;
+                existingRole.DeletedAt = null;
+                existingRole.DeletedBy = null;
+                updatedRoles++;
+            }
             
             if (newRoles.Any())
             {
                 dbContext.Roles.AddRange(newRoles);
                 await dbContext.SaveChangesAsync();
                 logger.LogInformation($"Seeded {newRoles.Count} roles");
+            }
+            else if (updatedRoles > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedRoles} roles");
             }
             else
             {
@@ -32,12 +57,41 @@ namespace AccuFlow.Entities.Seeders
             var users = UserSeed.GetUserSeedData();
             var existingUsers = await dbContext.Users.ToListAsync();
             var newUsers = users.Where(u => !existingUsers.Any(eu => eu.UserId == u.UserId)).ToList();
+            var updatedUsers = 0;
+
+            foreach (var seedUser in users)
+            {
+                var existingUser = existingUsers.FirstOrDefault(u => u.UserId == seedUser.UserId);
+                if (existingUser == null)
+                {
+                    continue;
+                }
+
+                existingUser.UserName = seedUser.UserName;
+                existingUser.Email = seedUser.Email;
+                existingUser.FullName = seedUser.FullName;
+                existingUser.RoleId = seedUser.RoleId;
+                existingUser.IsActive = true;
+                existingUser.IsDeleted = false;
+                existingUser.DeletedAt = null;
+                existingUser.DeletedBy = null;
+                if (string.IsNullOrWhiteSpace(existingUser.PasswordHash))
+                {
+                    existingUser.PasswordHash = seedUser.PasswordHash;
+                }
+                updatedUsers++;
+            }
             
             if (newUsers.Any())
             {
                 dbContext.Users.AddRange(newUsers);
                 await dbContext.SaveChangesAsync();
                 logger.LogInformation($"Seeded {newUsers.Count} users");
+            }
+            else if (updatedUsers > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedUsers} users");
             }
             else
             {
@@ -194,32 +248,53 @@ namespace AccuFlow.Entities.Seeders
         {
             logger.LogInformation("Seeding Role Menu permissions...");
 
+            var systemRoleIds = new[]
+            {
+                Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                Guid.Parse("00000000-0000-0000-0000-000000000002")
+            };
             var adminPermissions = RoleMenuSeed.GetDefaultAdminPermissions();
             var existingPermissions = await dbContext.RoleMenus
-                .Where(x => x.RoleId == Guid.Parse("00000000-0000-0000-0000-000000000001"))
+                .Where(x => systemRoleIds.Contains(x.RoleId))
                 .ToListAsync();
 
             var updatedCount = 0;
-            foreach (var permission in adminPermissions)
+            foreach (var roleId in systemRoleIds)
             {
-                var existing = existingPermissions.FirstOrDefault(x => x.MenuId == permission.MenuId);
-                if (existing == null)
+                foreach (var permission in adminPermissions)
                 {
-                    dbContext.RoleMenus.Add(permission);
-                    updatedCount++;
-                    continue;
-                }
+                    var existing = existingPermissions.FirstOrDefault(x => x.RoleId == roleId && x.MenuId == permission.MenuId);
+                    if (existing == null)
+                    {
+                        dbContext.RoleMenus.Add(new RoleMenuEntity
+                        {
+                            RoleMenuId = Guid.NewGuid(),
+                            RoleId = roleId,
+                            MenuId = permission.MenuId,
+                            CanView = true,
+                            CanAdd = true,
+                            CanEdit = true,
+                            CanDelete = true,
+                            CanPost = true,
+                            CanReverse = true,
+                            CreatedBy = "System",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                        updatedCount++;
+                        continue;
+                    }
 
-                existing.CanView = true;
-                existing.CanAdd = true;
-                existing.CanEdit = true;
-                existing.CanDelete = true;
-                existing.CanPost = true;
-                existing.CanReverse = true;
-                existing.IsDeleted = false;
-                existing.DeletedAt = null;
-                existing.DeletedBy = null;
-                updatedCount++;
+                    existing.CanView = true;
+                    existing.CanAdd = true;
+                    existing.CanEdit = true;
+                    existing.CanDelete = true;
+                    existing.CanPost = true;
+                    existing.CanReverse = true;
+                    existing.IsDeleted = false;
+                    existing.DeletedAt = null;
+                    existing.DeletedBy = null;
+                    updatedCount++;
+                }
             }
 
             if (updatedCount > 0)

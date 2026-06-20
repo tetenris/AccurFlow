@@ -9,7 +9,7 @@ namespace AccuFlow.Entities.Seeders
         /// </summary>
         public static List<RoleMenuEntity> GetDefaultAdminPermissions()
         {
-            var adminRoleId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            var adminRoleId = Guid.Parse("00000000-0000-0000-0000-000000000002");
             var menus = MenuSeed.GetMenuSeedData();
             var permissions = new List<RoleMenuEntity>();
 

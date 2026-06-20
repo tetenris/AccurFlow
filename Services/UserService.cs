@@ -1,5 +1,6 @@
 using AccuFlow.Entities.Context;
 using AccuFlow.Entities.Entity;
+using AccuFlow.Entities.Enums;
 using AccuFlow.Infrastructures;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.User;
@@ -28,9 +29,11 @@ namespace AccuFlow.Services
 
         public async Task<BaseDatatableResponse> Datatable(DataTableUserRequest request)
         {
+            var isSuperAdministrator = await IsCurrentUserSuperAdministratorAsync();
             var query = _dbContext.Set<UserEntity>()
                 .Where(x => !x.IsDeleted)
                 .Include(u => u.Role)
+                .Where(x => isSuperAdministrator || x.Role == null || x.Role.RoleType != RoleEnum.SuperAdministrator)
                 .AsQueryable();
 
             // Search
@@ -97,9 +100,10 @@ namespace AccuFlow.Services
 
         public async Task<UserViewModel?> GetByIdAsync(Guid id)
         {
+            var isSuperAdministrator = await IsCurrentUserSuperAdministratorAsync();
             var user = await _dbContext.Set<UserEntity>()
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && !u.IsDeleted);
+                .FirstOrDefaultAsync(u => u.UserId == id && !u.IsDeleted && (isSuperAdministrator || u.Role == null || u.Role.RoleType != RoleEnum.SuperAdministrator));
 
             if (user == null) return null;
 
@@ -146,6 +150,8 @@ namespace AccuFlow.Services
                 throw new Exception("Selected role does not exist");
             }
 
+            await EnsureCanAssignRoleAsync(model.RoleId);
+
             var user = new UserEntity
             {
                 UserId = Guid.NewGuid(),
@@ -173,6 +179,12 @@ namespace AccuFlow.Services
                 throw new Exception("User not found");
             }
 
+            var currentRole = await _dbContext.Set<RoleEntity>().FirstOrDefaultAsync(r => r.RoleId == user.RoleId && !r.IsDeleted);
+            if (currentRole?.RoleType == RoleEnum.SuperAdministrator && !await IsCurrentUserSuperAdministratorAsync())
+            {
+                throw new Exception("Super Administrator user cannot be edited from User Management");
+            }
+
             // Check if email already exists (excluding current user)
             var existingUser = await _dbContext.Set<UserEntity>()
                 .FirstOrDefaultAsync(u => u.Email == model.Email && u.UserId != model.UserId && !u.IsDeleted);
@@ -198,6 +210,8 @@ namespace AccuFlow.Services
                 throw new Exception("Selected role does not exist");
             }
 
+            await EnsureCanAssignRoleAsync(model.RoleId);
+
             user.UserName = model.UserName;
             user.Email = model.Email;
             user.FullName = model.FullName;
@@ -222,12 +236,43 @@ namespace AccuFlow.Services
                 throw new Exception("User not found");
             }
 
+            var currentRole = await _dbContext.Set<RoleEntity>().FirstOrDefaultAsync(r => r.RoleId == user.RoleId && !r.IsDeleted);
+            if (currentRole?.RoleType == RoleEnum.SuperAdministrator && !await IsCurrentUserSuperAdministratorAsync())
+            {
+                throw new Exception("Super Administrator user cannot be deleted from User Management");
+            }
+
             // Soft delete
             user.IsDeleted = true;
             user.DeletedBy = _currentUserService.UserId.ToString();
             user.DeletedAt = DateTime.UtcNow;
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        private async Task EnsureCanAssignRoleAsync(Guid roleId)
+        {
+            var targetRole = await _dbContext.Set<RoleEntity>()
+                .FirstOrDefaultAsync(r => r.RoleId == roleId && !r.IsDeleted);
+
+            if (targetRole?.RoleType == RoleEnum.SuperAdministrator && !await IsCurrentUserSuperAdministratorAsync())
+            {
+                throw new Exception("Only Super Administrator can assign Super Administrator role");
+            }
+        }
+
+        private async Task<bool> IsCurrentUserSuperAdministratorAsync()
+        {
+            if (_currentUserService.RoleId == Guid.Empty)
+            {
+                return false;
+            }
+
+            return await _dbContext.Set<RoleEntity>()
+                .AnyAsync(x => x.RoleId == _currentUserService.RoleId
+                    && x.RoleType == RoleEnum.SuperAdministrator
+                    && x.IsActive
+                    && !x.IsDeleted);
         }
     }
 }

@@ -61,9 +61,10 @@ namespace AccuFlow.Services
                 .Where(r => r.RoleId == roleId && !r.IsDeleted)
                 .FirstOrDefaultAsync();
             
-            var isAdministrator = role?.RoleType == Entities.Enums.RoleEnum.Administrator;
+            var isAdministrator = role?.RoleType == Entities.Enums.RoleEnum.SuperAdministrator
+                || role?.RoleType == Entities.Enums.RoleEnum.Administrator;
 
-            // Administrator ALWAYS gets full access (bypass RoleMenu check)
+            // Super Administrator and Administrator always get full menu access.
             if (isAdministrator)
             {
                 return await GetMenuHierarchyAsync();
