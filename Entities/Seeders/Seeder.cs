@@ -92,6 +92,25 @@ namespace AccuFlow.Entities.Seeders
             }
         }
 
+        public static async Task SeedSuppliers(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding Suppliers...");
+            var suppliers = SupplierSeed.GetSupplierSeedData();
+            var existingSuppliers = await dbContext.Suppliers.ToListAsync();
+            var newSuppliers = suppliers.Where(s => !existingSuppliers.Any(es => es.SupplierId == s.SupplierId)).ToList();
+
+            if (newSuppliers.Any())
+            {
+                dbContext.Suppliers.AddRange(newSuppliers);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newSuppliers.Count} suppliers");
+            }
+            else
+            {
+                logger.LogInformation("No new suppliers to seed");
+            }
+        }
+
         public static async Task SeedSampleTransactions(AppDbContext dbContext, ILogger logger)
         {
             logger.LogInformation("Seeding Sample Transactions...");
@@ -117,27 +136,33 @@ namespace AccuFlow.Entities.Seeders
                 logger.LogInformation("No new menus to seed");
             }
 
-            var disabledMenuIds = new[]
+            var updatedMenus = 0;
+            foreach (var seedMenu in menus)
             {
-                Guid.Parse("00000000-0000-0000-0000-000000000009")
-            };
-
-            var menusToDisable = await dbContext.Menus
-                .Where(m => disabledMenuIds.Contains(m.MenuId) && !m.IsDeleted)
-                .ToListAsync();
-
-            if (menusToDisable.Any())
-            {
-                foreach (var menu in menusToDisable)
+                var existingMenu = existingMenus.FirstOrDefault(m => m.MenuId == seedMenu.MenuId);
+                if (existingMenu == null)
                 {
-                    menu.IsDeleted = true;
-                    menu.DeletedAt = DateTime.UtcNow;
-                    menu.DeletedBy = "system";
+                    continue;
                 }
 
-                await dbContext.SaveChangesAsync();
-                logger.LogInformation($"Disabled {menusToDisable.Count} unavailable menus");
+                existingMenu.MenuParentId = seedMenu.MenuParentId;
+                existingMenu.Icon = seedMenu.Icon;
+                existingMenu.Name = seedMenu.Name;
+                existingMenu.Controller = seedMenu.Controller;
+                existingMenu.Action = seedMenu.Action;
+                existingMenu.Sequence = seedMenu.Sequence;
+                existingMenu.IsDeleted = false;
+                existingMenu.DeletedAt = null;
+                existingMenu.DeletedBy = null;
+                updatedMenus++;
             }
+
+            if (updatedMenus > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Updated {updatedMenus} existing menus");
+            }
+
         }
 
         public static async Task SeedAll(AppDbContext dbContext, ILogger logger, string environmentName)
@@ -148,6 +173,7 @@ namespace AccuFlow.Entities.Seeders
             await SeedUsers(dbContext, logger);
             await SeedChartOfAccounts(dbContext, logger);
             await SeedCustomers(dbContext, logger);
+            await SeedSuppliers(dbContext, logger);
             await SeedMenu(dbContext, logger);
             
             // Only seed sample transactions in Development or Staging

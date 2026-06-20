@@ -19,6 +19,7 @@ namespace AccuFlow.Entities.Context
         public DbSet<JournalEntryEntity> JournalEntries { get; set; }
         public DbSet<JournalLineEntity> JournalLines { get; set; }
         public DbSet<CustomerEntity> Customers { get; set; }
+        public DbSet<SupplierEntity> Suppliers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -8,10 +8,10 @@
 - Export Excel memakai NPOI; PDF dependency DinkToPdf sudah terpasang.
 
 ## Fitur Utama
-- Master: `ChartOfAccount`, `Customer`, `User`, `Role`, `Menu`, `RoleMenu`.
+- Master: `ChartOfAccount`, `Customer`, `Supplier`, `User`, `Role`, `Menu`, `RoleMenu`.
 - Transaksi: `JournalEntry` dengan status `Draft`, `Posted`, `Reversed`.
 - Laporan: `GeneralLedger`, `TrialBalance`, `FinancialStatement` untuk income statement, balance sheet, cash flow.
-- Seeder otomatis berjalan saat startup: roles, users, chart of accounts, customers, menus.
+- Seeder otomatis berjalan saat startup: roles, users, chart of accounts, customers, suppliers, menus.
 - Auth memakai cookie login di `/Account/Login`.
 
 ## Arsitektur
@@ -25,9 +25,8 @@
 ## Catatan Penting
 - `Program.cs` menjalankan `Database.MigrateAsync()` otomatis saat aplikasi start.
 - User seed default: `admin / Admin123!` dan `accountant / Accountant123!`.
-- Ada beberapa namespace sisa template `KomatsuERP` di service/model laporan.
-- `AccountService.ValidateUser` saat ini belum memverifikasi password hash, hanya cek username aktif.
-- Claim login memakai `ClaimTypes.Name`, `ClaimTypes.Email`, `ClaimTypes.Role`, tapi `CurrentUserService` mencari claim literal `UserId`, `UserName`, `Email`, `RoleName`; ini berpotensi bikin current user kosong.
+- Auth/login sudah memverifikasi password hash dengan BCrypt dan claim login sudah selaras dengan `CurrentUserService`.
+- Namespace sisa template `KomatsuERP` sudah dirapikan ke `AccuFlow`.
 
 ## Pola Pengembangan
 - Ikuti pola existing: Controller tipis, logic di Service, model request/view di `Models`.
@@ -39,11 +38,11 @@
 
 ### Sudah Ada
 - Core app: ASP.NET Core 8 MVC, EF Core SQL Server, migration otomatis, DI, layout Metronic, cookie auth.
-- Master data: `Role`, `User`, `Menu`, `RoleMenu`, `ChartOfAccount`, `Customer`.
+- Master data: `Role`, `User`, `Menu`, `RoleMenu`, `ChartOfAccount`, `Customer`, `Supplier`.
 - Accounting core: `JournalEntry`, `JournalLine`, posting, reversal, soft delete.
 - Report accounting: `GeneralLedger`, `TrialBalance`, `FinancialStatement` dengan income statement, balance sheet, cash flow.
-- Export Excel: chart of accounts, customer, journal entry, general ledger, trial balance, financial statements.
-- Seeder: roles, users, chart of accounts, customers, menus.
+- Export Excel: chart of accounts, customer, supplier, journal entry, general ledger, trial balance, financial statements.
+- Seeder: roles, users, chart of accounts, customers, suppliers, menus.
 - Build status: `dotnet build AccuFlow.sln` berhasil compile, masih ada warning nullability.
 
 ### Belum Ada / Belum Selesai
@@ -51,7 +50,6 @@
 - Purchase Order belum ada entity/controller/service/view; hanya disebut di TODO sample seed.
 - Payment/Receipt belum ada modul.
 - Inventory/Stock Management/Stock Opname/Stock Card belum ada modul.
-- Supplier module belum ada; menu Supplier sudah dihapus dari seed dan auto-disabled jika sudah terlanjur ada di database.
 - Aging Report belum ada.
 - Approval workflow belum ada backend; hanya ada partial view `_HistoryApprovalModal.cshtml` dan sisa JS invoice approval.
 - PDF generation belum dipakai walaupun package `DinkToPdf` sudah terpasang.
@@ -74,4 +72,4 @@
 2. Selesai - Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan ganti credential Hangfire hardcoded dengan role auth dari konfigurasi.
 3. Selesai - Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
 4. Selesai - Bersihkan sisa template: hapus JS lama `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
-5. Tambah modul bisnis bertahap: mulai dari Supplier, lalu Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.
+5. Berjalan - Tambah modul bisnis bertahap: Supplier master sudah dibuat, lanjut Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.

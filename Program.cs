@@ -63,6 +63,7 @@ using (var scope = app.Services.CreateScope())
     await AccuFlow.Entities.Seeders.Seeder.SeedUsers(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedChartOfAccounts(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedCustomers(appDbContext, logger);
+    await AccuFlow.Entities.Seeders.Seeder.SeedSuppliers(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedMenu(appDbContext, logger);
 }
 
