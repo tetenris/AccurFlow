@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AccuFlow.Controllers
 {
-    // [Authorize(Roles = "Administrator")] // Commented out for development
+    [Authorize(Roles = "Administrator")]
     public class SeedController : BaseController
     {
         private readonly AppDbContext _dbContext;

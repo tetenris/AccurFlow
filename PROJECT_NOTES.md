@@ -57,12 +57,10 @@
 - PDF generation belum dipakai walaupun package `DinkToPdf` sudah terpasang.
 
 ### Masalah Teknis Penting
-- Login belum validasi password: `Services/AccountService.cs` hanya cek username aktif, password diabaikan.
-- Claim login tidak lengkap: `Controllers/AccountController.cs` tidak membuat claim `UserId`, `UserName`, `Email`, `RoleName`, sementara `CurrentUserService` membacanya dari nama claim itu.
-- Middleware auth kurang lengkap: `Program.cs` memanggil `UseAuthorization()` tapi tidak ada `UseAuthentication()`.
+- Auth/login sudah diperbaiki: `UseAuthentication`, validasi BCrypt, claim user lengkap, dan parsing `Guid` di `CurrentUserService`.
 - Namespace masih campur `AccuFlow` dan `KomatsuERP`, terutama laporan dan role menu.
-- `SeedController` tidak diproteksi karena `[Authorize]` dikomentari, riskan jika masuk production.
-- Hangfire dashboard memakai credential hardcoded `admin/admin123`.
+- `SeedController` sudah diproteksi dengan role `Administrator`.
+- Hangfire dashboard sudah memakai auth role berbasis cookie login; role wajib diatur lewat `Hangfire:Dashboard:RequiredRole`.
 
 ### Prioritas Lanjutan
 1. Bereskan auth dulu: `UseAuthentication`, validasi BCrypt, claim user lengkap, proteksi seed/hangfire.
@@ -72,8 +70,8 @@
 5. Tambahkan modul transaksi non-jurnal secara bertahap, lalu integrasikan otomatis ke journal entry.
 
 ## Urutan Perbaikan Fondasi
-1. Perbaiki auth/login: tambah `UseAuthentication`, validasi BCrypt, claim user lengkap, dan pastikan `CurrentUserService` terbaca benar.
-2. Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan pindahkan credential Hangfire dari hardcoded ke konfigurasi.
+1. Selesai - Perbaiki auth/login: tambah `UseAuthentication`, validasi BCrypt, claim user lengkap, dan pastikan `CurrentUserService` terbaca benar.
+2. Selesai - Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan ganti credential Hangfire hardcoded dengan role auth dari konfigurasi.
 3. Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
 4. Bersihkan sisa template: hapus/abaikan JS lama seperti `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
 5. Tambah modul bisnis bertahap: mulai dari Supplier, lalu Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.
