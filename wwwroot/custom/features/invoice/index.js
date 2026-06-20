@@ -102,8 +102,10 @@ function showDetail(id) {
                 <div class="col-md-12"><strong>Notes:</strong> ${data.notes || '-'}</div>
             </div>
             <table class="table table-sm"><thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th></tr></thead><tbody>${lines}</tbody></table>
-            <div class="text-end fw-bold">Total: ${formatCurrency(data.totalAmount)}</div>`);
+            <div class="text-end fw-bold mb-5">Total: ${formatCurrency(data.totalAmount)}</div>
+            ${attachmentSection('Invoice', data.invoiceId)}`);
         $('#invoice_detail_modal').modal('show');
+        loadAttachments('Invoice', data.invoiceId);
     });
 }
 
@@ -167,4 +169,55 @@ function formatCurrency(amount) {
 
 function postDocument(url, id, table) {
     $.ajax({ url, type: 'POST', contentType: 'application/json', data: JSON.stringify(id), success: () => table.ajax.reload() });
+}
+
+function attachmentSection(documentType, documentId) {
+    return `
+        <div class="separator my-5"></div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0">Attachments</h6>
+            <div class="d-flex gap-2">
+                <input type="file" class="form-control form-control-sm" id="attachment-file" />
+                <button class="btn btn-sm btn-primary" onclick="uploadAttachment('${documentType}', '${documentId}')">Upload</button>
+            </div>
+        </div>
+        <div id="attachment-list"></div>`;
+}
+
+function loadAttachments(documentType, documentId) {
+    $.get(`/DocumentAttachment/GetByDocument?documentType=${documentType}&documentId=${documentId}`, data => {
+        const rows = (data || []).map(file => `
+            <tr>
+                <td>${file.fileName}</td>
+                <td>${formatFileSize(file.fileSize)}</td>
+                <td>${new Date(file.createdAt).toLocaleString('en-GB')}</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-light-primary" href="/DocumentAttachment/Download?id=${file.documentAttachmentId}">Download</a>
+                    <button class="btn btn-sm btn-light-danger" onclick="deleteAttachment('${file.documentAttachmentId}', '${documentType}', '${documentId}')">Delete</button>
+                </td>
+            </tr>`).join('');
+        $('#attachment-list').html(`<table class="table table-sm"><thead><tr><th>File</th><th>Size</th><th>Uploaded</th><th></th></tr></thead><tbody>${rows || '<tr><td colspan="4" class="text-center text-muted">No attachments</td></tr>'}</tbody></table>`);
+    });
+}
+
+function uploadAttachment(documentType, documentId) {
+    const fileInput = $('#attachment-file')[0];
+    if (!fileInput.files.length) return alert('Choose a file first');
+    const formData = new FormData();
+    formData.append('documentType', documentType);
+    formData.append('documentId', documentId);
+    formData.append('file', fileInput.files[0]);
+    $.ajax({ url: '/DocumentAttachment/Upload', type: 'POST', data: formData, processData: false, contentType: false, success: () => loadAttachments(documentType, documentId), error: xhr => alert(xhr.responseJSON?.message || 'Failed to upload attachment') });
+}
+
+function deleteAttachment(id, documentType, documentId) {
+    if (!confirm('Delete this attachment?')) return;
+    $.ajax({ url: '/DocumentAttachment/Delete', type: 'DELETE', contentType: 'application/json', data: JSON.stringify(id), success: () => loadAttachments(documentType, documentId), error: xhr => alert(xhr.responseJSON?.message || 'Failed to delete attachment') });
+}
+
+function formatFileSize(size) {
+    if (!size) return '0 B';
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }

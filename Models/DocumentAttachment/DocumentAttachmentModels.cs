@@ -19,4 +19,11 @@ namespace AccuFlow.Models.DocumentAttachment
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    public class UploadDocumentAttachmentRequest
+    {
+        public string DocumentType { get; set; } = string.Empty;
+        public Guid DocumentId { get; set; }
+        public string? Description { get; set; }
+    }
 }
