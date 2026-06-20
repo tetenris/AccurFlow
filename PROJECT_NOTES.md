@@ -98,3 +98,19 @@
 3. Selesai - Attachment fisik: upload, download, delete file, dan storage configurable untuk Invoice, Payment, dan Purchase Order.
 4. Selesai - PDF/print: print-ready page untuk invoice, payment receipt, dan purchase order. Export PDF native belum memakai DinkToPdf; browser print dapat Save as PDF.
 5. Smoke test runtime setelah transaksi inti dan dokumen siap.
+
+## Temuan Role dan Permission
+- Permission saat ini sudah dipakai untuk filter sidebar/menu berdasarkan `RoleMenus.CanView`.
+- Backend mayoritas masih hanya `[Authorize]`, belum enforce `CanView`, `CanAdd`, `CanEdit`, `CanDelete`, `CanPost`, atau `CanReverse`.
+- `RoleController.Create` perlu return `roleId` agar permission role baru bisa langsung tersimpan dari UI.
+- `RoleMenuSeed` baru menyediakan admin permissions, tapi belum dipanggil otomatis saat startup/seeding.
+- Parent menu hanya muncul jika parent punya `CanView`; perlu dibuat muncul otomatis jika ada child yang punya `CanView`.
+- Action permission belum lengkap/sinkron: ada action seperti `cancel`, `approve`, `convert`, tapi `RoleMenuEntity` baru punya view/add/edit/delete/post/reverse.
+- `RoleEntity.Permissions` JSON belum dipakai untuk enforcement sehingga sementara redundant.
+
+## Rencana Perbaikan Role dan Permission
+1. Selesai - Tambah permission filter/service untuk enforce `RoleMenus` di backend.
+2. Selesai - Mapping action controller ke permission: `Index/Get/Datatable/Print=View`, `Create/Upload=Add`, `Edit=Edit`, `Delete=Delete`, `Post/Approve/Convert/Cancel=Post`, `Reverse=Reverse`.
+3. Selesai - Fix create role return `roleId`, lalu sync permission admin saat seeding.
+4. Selesai - Perbaiki sidebar agar parent menu tetap muncul jika ada child yang boleh dilihat.
+5. Sembunyikan tombol UI berdasarkan permission setelah backend enforcement siap.

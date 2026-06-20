@@ -190,6 +190,45 @@ namespace AccuFlow.Entities.Seeders
 
         }
 
+        public static async Task SeedRoleMenus(AppDbContext dbContext, ILogger logger)
+        {
+            logger.LogInformation("Seeding Role Menu permissions...");
+
+            var adminPermissions = RoleMenuSeed.GetDefaultAdminPermissions();
+            var existingPermissions = await dbContext.RoleMenus
+                .Where(x => x.RoleId == Guid.Parse("00000000-0000-0000-0000-000000000001"))
+                .ToListAsync();
+
+            var updatedCount = 0;
+            foreach (var permission in adminPermissions)
+            {
+                var existing = existingPermissions.FirstOrDefault(x => x.MenuId == permission.MenuId);
+                if (existing == null)
+                {
+                    dbContext.RoleMenus.Add(permission);
+                    updatedCount++;
+                    continue;
+                }
+
+                existing.CanView = true;
+                existing.CanAdd = true;
+                existing.CanEdit = true;
+                existing.CanDelete = true;
+                existing.CanPost = true;
+                existing.CanReverse = true;
+                existing.IsDeleted = false;
+                existing.DeletedAt = null;
+                existing.DeletedBy = null;
+                updatedCount++;
+            }
+
+            if (updatedCount > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Synced {updatedCount} admin role menu permissions");
+            }
+        }
+
         public static async Task SeedAll(AppDbContext dbContext, ILogger logger, string environmentName)
         {
             logger.LogInformation($"Starting SeedAll in {environmentName} environment...");
@@ -201,6 +240,7 @@ namespace AccuFlow.Entities.Seeders
             await SeedSuppliers(dbContext, logger);
             await SeedBusinessModules(dbContext, logger);
             await SeedMenu(dbContext, logger);
+            await SeedRoleMenus(dbContext, logger);
             
             // Only seed sample transactions in Development or Staging
             if (environmentName.Equals("Development", StringComparison.OrdinalIgnoreCase) || 

@@ -183,7 +183,7 @@ namespace AccuFlow.Entities.Seeders
                     Icon = "",
                     Name = "Invoices",
                     Controller = "Invoice",
-                    Action = @"[""view"",""add"",""post"",""cancel""]",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 5
                 },
 
@@ -194,7 +194,7 @@ namespace AccuFlow.Entities.Seeders
                     Icon = "",
                     Name = "Payments & Receipts",
                     Controller = "Payment",
-                    Action = @"[""view"",""add"",""post""]",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 6
                 },
 
@@ -227,7 +227,7 @@ namespace AccuFlow.Entities.Seeders
                     Icon = "",
                     Name = "Purchase Orders",
                     Controller = "PurchaseOrder",
-                    Action = @"[""view"",""add"",""approve"",""convert""]",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 1
                 },
 
@@ -271,7 +271,7 @@ namespace AccuFlow.Entities.Seeders
                     Icon = @"<i class=""ki-duotone ki-shield-tick fs-2""><span class=""path1""></span><span class=""path2""></span></i>",
                     Name = "Approvals",
                     Controller = "Approval",
-                    Action = @"[""view"",""approve"",""reject""]",
+                    Action = @"[""view"",""post""]",
                     Sequence = 8
                 }
             };

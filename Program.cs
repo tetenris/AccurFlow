@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<PermissionAuthorizationFilter>();
+});
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthentication("Cookies")
@@ -66,6 +69,7 @@ using (var scope = app.Services.CreateScope())
     await AccuFlow.Entities.Seeders.Seeder.SeedSuppliers(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedBusinessModules(appDbContext, logger);
     await AccuFlow.Entities.Seeders.Seeder.SeedMenu(appDbContext, logger);
+    await AccuFlow.Entities.Seeders.Seeder.SeedRoleMenus(appDbContext, logger);
 }
 
 app.UseHangfireDashboardWithAuth(builder.Configuration);

@@ -9,6 +9,7 @@ namespace AccuFlow.Infrastructures
             // Register infrastructure services
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<PermissionAuthorizationFilter>();
             
             // Register base services
             services.AddScoped<IBaseService, BaseService>();

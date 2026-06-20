@@ -42,8 +42,8 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _roleService.Create(request, _currentUserService.UserId);
-                return Ok(new { success = true, message = "Role created successfully" });
+                var roleId = await _roleService.Create(request, _currentUserService.UserId);
+                return Ok(new { success = true, message = "Role created successfully", roleId });
             }
             catch (Exception ex)
             {

@@ -14,7 +14,7 @@ namespace AccuFlow.Services
     {
         Task<BaseDatatableResponse> Datatable(DataTableRoleRequest request);
         Task<RoleViewModel?> GetById(Guid roleId);
-        Task Create(CreateRoleRequest request, Guid userId);
+        Task<Guid> Create(CreateRoleRequest request, Guid userId);
         Task Edit(EditRoleRequest request, Guid userId);
         Task Delete(Guid roleId);
         List<SelectListItem> GetRoleDropdown();
@@ -111,7 +111,7 @@ namespace AccuFlow.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task Create(CreateRoleRequest request, Guid userId)
+        public async Task<Guid> Create(CreateRoleRequest request, Guid userId)
         {
             // Check if role type already exists
             var existingRole = await _dbContext.Set<RoleEntity>()
@@ -137,6 +137,8 @@ namespace AccuFlow.Services
 
             _dbContext.Set<RoleEntity>().Add(role);
             await _dbContext.SaveChangesAsync();
+
+            return role.RoleId;
         }
 
         public async Task Edit(EditRoleRequest request, Guid userId)

@@ -31,7 +31,8 @@ namespace AccuFlow.Controllers
                 "Customers",
                 "Suppliers",
                 "BusinessModules",
-                "Menu"
+                "Menu",
+                "RoleMenus"
             };
             
             // Add sample transactions seeder only in Development or Staging
@@ -95,6 +96,9 @@ namespace AccuFlow.Controllers
                             break;
                         case "menu":
                             await Seeder.SeedMenu(_dbContext, _logger);
+                            break;
+                        case "rolemenus":
+                            await Seeder.SeedRoleMenus(_dbContext, _logger);
                             break;
                         case "sampletransactions":
                             // Only allow in Development or Staging

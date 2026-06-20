@@ -81,11 +81,19 @@ namespace AccuFlow.Services
                 return new List<MenuViewModel>();
             }
 
-            // Filter menus based on permissions - only show menus with CanView = true
+            // Filter menus based on permissions - show menus with CanView and include their parents
             var allowedMenuIds = roleMenuPermissions
                 .Where(rm => rm.CanView)
                 .Select(rm => rm.MenuId)
                 .ToList();
+
+            var parentMenuIds = allMenus
+                .Where(m => allowedMenuIds.Contains(m.MenuId) && m.MenuParentId.HasValue)
+                .Select(m => m.MenuParentId!.Value)
+                .Distinct()
+                .ToList();
+
+            allowedMenuIds.AddRange(parentMenuIds.Where(id => !allowedMenuIds.Contains(id)));
             
             var allowedMenus = allMenus.Where(m => allowedMenuIds.Contains(m.MenuId)).ToList();
 
