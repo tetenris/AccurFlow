@@ -1,4 +1,4 @@
-namespace KomatsuERP.Models.TrialBalance;
+namespace AccuFlow.Models.TrialBalance;
 
 public class TrialBalanceViewModel
 {

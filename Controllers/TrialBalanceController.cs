@@ -1,10 +1,10 @@
 using AccuFlow.Controllers;
-using KomatsuERP.Models.TrialBalance;
-using KomatsuERP.Services;
+using AccuFlow.Models.TrialBalance;
+using AccuFlow.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace KomatsuERP.Controllers;
+namespace AccuFlow.Controllers;
 
 [Authorize]
 public class TrialBalanceController : BaseController

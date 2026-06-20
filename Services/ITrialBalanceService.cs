@@ -1,7 +1,7 @@
 using AccuFlow.Services;
-using KomatsuERP.Models.TrialBalance;
+using AccuFlow.Models.TrialBalance;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public interface ITrialBalanceService : IBaseService
 {

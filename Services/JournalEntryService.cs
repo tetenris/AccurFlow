@@ -3,7 +3,6 @@ using AccuFlow.Entities.Entity;
 using AccuFlow.Infrastructures;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.JournalEntry;
-using KomatsuERP.Models.JournalEntry;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 

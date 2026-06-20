@@ -5,7 +5,7 @@ using AccuFlow.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public class RoleMenuService : BaseService, IRoleMenuService
 {

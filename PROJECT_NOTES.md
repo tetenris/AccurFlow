@@ -58,7 +58,7 @@
 
 ### Masalah Teknis Penting
 - Auth/login sudah diperbaiki: `UseAuthentication`, validasi BCrypt, claim user lengkap, dan parsing `Guid` di `CurrentUserService`.
-- Namespace masih campur `AccuFlow` dan `KomatsuERP`, terutama laporan dan role menu.
+- Namespace sisa `KomatsuERP` sudah dirapikan ke `AccuFlow`.
 - `SeedController` sudah diproteksi dengan role `Administrator`.
 - Hangfire dashboard sudah memakai auth role berbasis cookie login; role wajib diatur lewat `Hangfire:Dashboard:RequiredRole`.
 
@@ -72,6 +72,6 @@
 ## Urutan Perbaikan Fondasi
 1. Selesai - Perbaiki auth/login: tambah `UseAuthentication`, validasi BCrypt, claim user lengkap, dan pastikan `CurrentUserService` terbaca benar.
 2. Selesai - Amankan akses berisiko: aktifkan authorize di `SeedController`, batasi ke Administrator, dan ganti credential Hangfire hardcoded dengan role auth dari konfigurasi.
-3. Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
+3. Selesai - Rapikan namespace: ganti sisa `KomatsuERP` ke `AccuFlow`.
 4. Bersihkan sisa template: hapus/abaikan JS lama seperti `invoiceriview`, `registerunit`, `budgettransferunit`, dan pastikan menu tidak mengarah ke modul kosong.
 5. Tambah modul bisnis bertahap: mulai dari Supplier, lalu Invoice/Billing, Payment/Receipt, Purchase Order, Inventory, dan Aging Report.

@@ -1,7 +1,7 @@
 using AccuFlow.Services;
-using KomatsuERP.Models.FinancialStatement;
+using AccuFlow.Models.FinancialStatement;
 
-namespace KomatsuERP.Services;
+namespace AccuFlow.Services;
 
 public interface IFinancialStatementService : IBaseService
 {
