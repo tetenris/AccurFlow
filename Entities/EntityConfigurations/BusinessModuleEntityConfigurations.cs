@@ -190,6 +190,111 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class SalesQuotationEntityConfiguration : IEntityTypeConfiguration<SalesQuotationEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesQuotationEntity> builder)
+        {
+            builder.ToTable("SalesQuotations");
+            builder.HasKey(e => e.SalesQuotationId);
+            builder.Property(e => e.QuotationNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.QuotationNumber).IsUnique();
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.SalesQuotation).HasForeignKey(e => e.SalesQuotationId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class SalesQuotationLineEntityConfiguration : IEntityTypeConfiguration<SalesQuotationLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesQuotationLineEntity> builder)
+        {
+            builder.ToTable("SalesQuotationLines");
+            builder.HasKey(e => e.SalesQuotationLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class SalesOrderEntityConfiguration : IEntityTypeConfiguration<SalesOrderEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesOrderEntity> builder)
+        {
+            builder.ToTable("SalesOrders");
+            builder.HasKey(e => e.SalesOrderId);
+            builder.Property(e => e.OrderNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.OrderNumber).IsUnique();
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Quotation).WithMany().HasForeignKey(e => e.QuotationId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.SalesOrder).HasForeignKey(e => e.SalesOrderId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class SalesOrderLineEntityConfiguration : IEntityTypeConfiguration<SalesOrderLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesOrderLineEntity> builder)
+        {
+            builder.ToTable("SalesOrderLines");
+            builder.HasKey(e => e.SalesOrderLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class DeliveryOrderEntityConfiguration : IEntityTypeConfiguration<DeliveryOrderEntity>
+    {
+        public void Configure(EntityTypeBuilder<DeliveryOrderEntity> builder)
+        {
+            builder.ToTable("DeliveryOrders");
+            builder.HasKey(e => e.DeliveryOrderId);
+            builder.Property(e => e.DeliveryNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.DeliveryNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.SalesOrder).WithMany().HasForeignKey(e => e.SalesOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Invoice).WithMany().HasForeignKey(e => e.InvoiceId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.DeliveryOrder).HasForeignKey(e => e.DeliveryOrderId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class DeliveryOrderLineEntityConfiguration : IEntityTypeConfiguration<DeliveryOrderLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<DeliveryOrderLineEntity> builder)
+        {
+            builder.ToTable("DeliveryOrderLines");
+            builder.HasKey(e => e.DeliveryOrderLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.SalesOrderLine).WithMany().HasForeignKey(e => e.SalesOrderLineId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class ItemEntityConfiguration : IEntityTypeConfiguration<ItemEntity>
     {
         public void Configure(EntityTypeBuilder<ItemEntity> builder)

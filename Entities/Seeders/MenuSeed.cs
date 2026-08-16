@@ -222,13 +222,57 @@ namespace AccuFlow.Entities.Seeders
 
                 new MenuEntity
                 {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000031"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-cart fs-2""><span class=""path1""></span><span class=""path2""></span></i>",
+                    Name = "Sales",
+                    Controller = "",
+                    Action = @"[]",
+                    Sequence = 6
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000032"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000031"),
+                    Icon = "",
+                    Name = "Sales Quotation",
+                    Controller = "SalesQuotation",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 1
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000033"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000031"),
+                    Icon = "",
+                    Name = "Sales Order",
+                    Controller = "SalesOrder",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 2
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000034"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000031"),
+                    Icon = "",
+                    Name = "Delivery Order",
+                    Controller = "DeliveryOrder",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 3
+                },
+
+                new MenuEntity
+                {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
                     MenuParentId = null,
                     Icon = @"<i class=""ki-duotone ki-delivery fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
                     Name = "Purchasing",
                     Controller = "",
                     Action = @"[]",
-                    Sequence = 6
+                    Sequence = 7
                 },
 
                 new MenuEntity
@@ -261,7 +305,7 @@ namespace AccuFlow.Entities.Seeders
                     Name = "Inventory",
                     Controller = "",
                     Action = @"[]",
-                    Sequence = 7
+                    Sequence = 8
                 },
 
                 new MenuEntity
@@ -294,7 +338,7 @@ namespace AccuFlow.Entities.Seeders
                     Name = "Approvals",
                     Controller = "Approval",
                     Action = @"[""view"",""post""]",
-                    Sequence = 8
+                    Sequence = 9
                 },
 
                 new MenuEntity
@@ -305,7 +349,7 @@ namespace AccuFlow.Entities.Seeders
                     Name = "Kas & Bank",
                     Controller = "",
                     Action = @"[]",
-                    Sequence = 9
+                    Sequence = 10
                 },
 
                 new MenuEntity
