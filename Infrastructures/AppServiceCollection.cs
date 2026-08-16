@@ -30,6 +30,7 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+            services.AddScoped<IGoodsReceiptService, GoodsReceiptService>();
             services.AddScoped<ICashBankService, CashBankService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IStockOpnameService, StockOpnameService>();

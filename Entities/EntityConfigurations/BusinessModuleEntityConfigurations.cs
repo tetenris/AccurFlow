@@ -112,6 +112,44 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class GoodsReceiptEntityConfiguration : IEntityTypeConfiguration<GoodsReceiptEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReceiptEntity> builder)
+        {
+            builder.ToTable("GoodsReceipts");
+            builder.HasKey(e => e.GoodsReceiptId);
+            builder.Property(e => e.GoodsReceiptNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.GoodsReceiptNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.PurchaseOrder).WithMany().HasForeignKey(e => e.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Supplier).WithMany().HasForeignKey(e => e.SupplierId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.GoodsReceipt).HasForeignKey(e => e.GoodsReceiptId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class GoodsReceiptLineEntityConfiguration : IEntityTypeConfiguration<GoodsReceiptLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReceiptLineEntity> builder)
+        {
+            builder.ToTable("GoodsReceiptLines");
+            builder.HasKey(e => e.GoodsReceiptLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.PurchaseOrderLine).WithMany().HasForeignKey(e => e.PurchaseOrderLineId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class ItemEntityConfiguration : IEntityTypeConfiguration<ItemEntity>
     {
         public void Configure(EntityTypeBuilder<ItemEntity> builder)

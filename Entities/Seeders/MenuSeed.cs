@@ -233,6 +233,17 @@ namespace AccuFlow.Entities.Seeders
 
                 new MenuEntity
                 {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000029"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
+                    Icon = "",
+                    Name = "Goods Received",
+                    Controller = "GoodsReceipt",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 2
+                },
+
+                new MenuEntity
+                {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
                     MenuParentId = null,
                     Icon = @"<i class=""ki-duotone ki-package fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
