@@ -43,6 +43,7 @@
 - Accounting core: `JournalEntry`, `JournalLine`, posting, reversal, soft delete.
 - Report accounting: `GeneralLedger`, `TrialBalance`, `FinancialStatement` dengan income statement, balance sheet, cash flow.
 - Export Excel: chart of accounts, customer, supplier, journal entry, general ledger, trial balance, financial statements.
+- Alur penjualan: `SalesQuotation` (draft/approve), `SalesOrder` (draft/approve, dari quote), `DeliveryOrder` (draft/post, kurangi stok, convert ke invoice).
 - Seeder: roles, users, chart of accounts, customers, suppliers, menus.
 - Build status: `dotnet build AccuFlow.sln` berhasil compile, masih ada warning nullability.
 
@@ -85,6 +86,7 @@
 - Document Attachment: entity dan service datatable dasar; upload/download file fisik belum diimplementasikan.
 - Tax Management: entity dan seed PPN 11%; UI CRUD tax belum dibuat.
 - Kas & Bank: modul lengkap dengan menu `Cash & Bank Accounts` (daftar akun + saldo), `Cash Bank Transfers` (create/edit/delete draft, post auto-jurnal DR akun tujuan / CR akun asal), dan `Bank Reconciliation` (load statement dari journal, flag Cleared/Float, validasi balance saat post). Kolom `AccountUsage` (1=Cash, 2=Bank) ditambahkan di Chart of Accounts via migration `20260816043832_AddCashBankModule`; seed menandai `1-10100` Cash dan `1-10200` Cash in Bank.
+- Sales Quotation / Sales Order / Delivery Order: alur penjualan bertahap. Menu `Penjualan > Sales Quotation` (CRUD draft, approve → jadi sumber SO), `Penjualan > Sales Order` (CRUD draft, approve, line otomatis dari quotation ter-approved), `Penjualan > Delivery Order` (CRUD draft, post kurangi stok via `StockMovement` "Sales Delivery", convert ke sales invoice `SI-`). Migrasi `20260816224729_AddSalesFlowModule`; menu parent Sales (seq 6), sequence menu lain digeser (Inventory 8, Approvals 9, Kas & Bank 10).
 
 ## Status Hardening Transaksi
 - Invoice post sekarang membuat dan mem-posting jurnal otomatis untuk sales invoice dan purchase invoice.
