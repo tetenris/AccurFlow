@@ -12,6 +12,7 @@ namespace AccuFlow.Entities.Entity
         public string Unit { get; set; } = "PCS";
         public decimal SalesPrice { get; set; }
         public decimal PurchasePrice { get; set; }
+        public decimal ReorderPoint { get; set; }
         public Guid? InventoryAccountId { get; set; }
         public Guid? SalesAccountId { get; set; }
         public Guid? CostOfGoodsSoldAccountId { get; set; }

@@ -27,6 +27,12 @@ namespace AccuFlow.Controllers
             return View();
         }
 
+        public IActionResult StockMinimum()
+        {
+            ViewData["Title"] = "Stock Minimum";
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> DatatableItems([FromBody] DataTableItemRequest request) => Json(await _inventoryService.DatatableItems(request));
 
@@ -49,5 +55,22 @@ namespace AccuFlow.Controllers
 
         [HttpPost]
         public async Task<IActionResult> StockCardDatatable([FromBody] DataTableStockMovementRequest request) => Json(await _inventoryService.StockCard(request));
+
+        [HttpPost]
+        public async Task<IActionResult> StockMinimumDatatable([FromBody] DataTableStockMinimumRequest request) => Json(await _inventoryService.StockMinimum(request));
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateReorderPoint([FromBody] UpdateReorderPointRequest request)
+        {
+            try
+            {
+                await _inventoryService.UpdateReorderPoint(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Reorder point updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

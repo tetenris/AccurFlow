@@ -20,6 +20,7 @@ namespace AccuFlow.Models.Inventory
         public string Unit { get; set; } = string.Empty;
         public decimal SalesPrice { get; set; }
         public decimal PurchasePrice { get; set; }
+        public decimal ReorderPoint { get; set; }
         public bool IsActive { get; set; }
     }
 
@@ -34,6 +35,7 @@ namespace AccuFlow.Models.Inventory
         public string Unit { get; set; } = "PCS";
         public decimal SalesPrice { get; set; }
         public decimal PurchasePrice { get; set; }
+        public decimal ReorderPoint { get; set; }
         public Guid? InventoryAccountId { get; set; }
         public Guid? SalesAccountId { get; set; }
         public Guid? CostOfGoodsSoldAccountId { get; set; }
@@ -99,6 +101,28 @@ namespace AccuFlow.Models.Inventory
         public Guid? WarehouseId { get; set; }
         public DateTime? DateFrom { get; set; }
         public DateTime? DateTo { get; set; }
+    }
+
+    public class DataTableStockMinimumRequest : BaseDatatableRequest
+    {
+        public bool BelowOnly { get; set; }
+    }
+
+    public class StockMinimumViewModel
+    {
+        public Guid ItemId { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
+        public decimal ReorderPoint { get; set; }
+        public decimal CurrentStock { get; set; }
+        public bool IsBelow { get; set; }
+    }
+
+    public class UpdateReorderPointRequest
+    {
+        public Guid ItemId { get; set; }
+        public decimal ReorderPoint { get; set; }
     }
 
     public class StockMovementViewModel

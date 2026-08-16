@@ -15,6 +15,8 @@ namespace AccuFlow.Services
         Task<List<ItemViewModel>> GetActiveItems();
         Task CreateItem(CreateItemRequest request, Guid userId);
         Task<BaseDatatableResponse> StockCard(DataTableStockMovementRequest request);
+        Task<BaseDatatableResponse> StockMinimum(DataTableStockMinimumRequest request);
+        Task UpdateReorderPoint(UpdateReorderPointRequest request, Guid userId);
     }
 
     public class InventoryService : BaseService, IInventoryService
@@ -44,6 +46,7 @@ namespace AccuFlow.Services
                     Unit = x.Unit,
                     SalesPrice = x.SalesPrice,
                     PurchasePrice = x.PurchasePrice,
+                    ReorderPoint = x.ReorderPoint,
                     IsActive = x.IsActive
                 }).ToListAsync();
             return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
@@ -63,6 +66,7 @@ namespace AccuFlow.Services
                 Unit = request.Unit,
                 SalesPrice = request.SalesPrice,
                 PurchasePrice = request.PurchasePrice,
+                ReorderPoint = request.ReorderPoint,
                 InventoryAccountId = request.InventoryAccountId,
                 SalesAccountId = request.SalesAccountId,
                 CostOfGoodsSoldAccountId = request.CostOfGoodsSoldAccountId,
@@ -116,6 +120,50 @@ namespace AccuFlow.Services
                     UnitCost = x.UnitCost
                 }).ToListAsync();
             return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task<BaseDatatableResponse> StockMinimum(DataTableStockMinimumRequest request)
+        {
+            var items = await _dbContext.Items
+                .Where(x => !x.IsDeleted && x.ItemType == "Inventory")
+                .Select(x => new { x.ItemId, x.ItemCode, x.ItemName, x.Unit, x.ReorderPoint })
+                .ToListAsync();
+            var stock = await _dbContext.StockMovements
+                .Where(x => !x.IsDeleted)
+                .GroupBy(x => x.ItemId)
+                .Select(g => new { ItemId = g.Key, Quantity = g.Sum(x => x.QuantityIn - x.QuantityOut) })
+                .ToListAsync();
+            var stockMap = stock.ToDictionary(x => x.ItemId, x => x.Quantity);
+            var rows = items.Select(x => new StockMinimumViewModel
+            {
+                ItemId = x.ItemId,
+                ItemCode = x.ItemCode,
+                ItemName = x.ItemName,
+                Unit = x.Unit,
+                ReorderPoint = x.ReorderPoint,
+                CurrentStock = stockMap.ContainsKey(x.ItemId) ? stockMap[x.ItemId] : 0,
+                IsBelow = (stockMap.ContainsKey(x.ItemId) ? stockMap[x.ItemId] : 0) < x.ReorderPoint
+            }).ToList();
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.ToLower();
+                rows = rows.Where(x => x.ItemCode.ToLower().Contains(search) || x.ItemName.ToLower().Contains(search)).ToList();
+            }
+            if (request.BelowOnly) rows = rows.Where(x => x.IsBelow).ToList();
+            var total = rows.Count;
+            var data = rows.OrderByDescending(x => x.IsBelow).ThenBy(x => x.ItemCode).Skip((request.Page - 1) * request.Size).Take(request.Size).ToList();
+            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task UpdateReorderPoint(UpdateReorderPointRequest request, Guid userId)
+        {
+            var item = await _dbContext.Items.FirstOrDefaultAsync(x => x.ItemId == request.ItemId && !x.IsDeleted);
+            if (item == null) throw new Exception("Item not found");
+            if (request.ReorderPoint < 0) throw new Exception("Reorder point cannot be negative");
+            item.ReorderPoint = request.ReorderPoint;
+            item.UpdatedAt = DateTime.UtcNow;
+            item.UpdatedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
         }
     }
 

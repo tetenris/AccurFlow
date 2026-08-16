@@ -344,6 +344,7 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.Description).HasMaxLength(1000);
             builder.Property(e => e.SalesPrice).HasPrecision(18, 2);
             builder.Property(e => e.PurchasePrice).HasPrecision(18, 2);
+            builder.Property(e => e.ReorderPoint).HasPrecision(18, 2);
             builder.HasIndex(e => e.ItemCode).IsUnique();
             builder.HasOne(e => e.ItemGroup).WithMany().HasForeignKey(e => e.ItemGroupId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.InventoryAccount).WithMany().HasForeignKey(e => e.InventoryAccountId).OnDelete(DeleteBehavior.Restrict);

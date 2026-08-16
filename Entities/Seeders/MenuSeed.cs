@@ -438,6 +438,17 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "StockTransfer",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 6
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000039"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Stock Minimum",
+                    Controller = "StockMinimum",
+                    Action = @"[""view""]",
+                    Sequence = 7
                 }
             };
         }
