@@ -345,9 +345,36 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.SalesPrice).HasPrecision(18, 2);
             builder.Property(e => e.PurchasePrice).HasPrecision(18, 2);
             builder.HasIndex(e => e.ItemCode).IsUnique();
+            builder.HasOne(e => e.ItemGroup).WithMany().HasForeignKey(e => e.ItemGroupId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.InventoryAccount).WithMany().HasForeignKey(e => e.InventoryAccountId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.SalesAccount).WithMany().HasForeignKey(e => e.SalesAccountId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.CostOfGoodsSoldAccount).WithMany().HasForeignKey(e => e.CostOfGoodsSoldAccountId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class ItemGroupEntityConfiguration : IEntityTypeConfiguration<ItemGroupEntity>
+    {
+        public void Configure(EntityTypeBuilder<ItemGroupEntity> builder)
+        {
+            builder.ToTable("ItemGroups");
+            builder.HasKey(e => e.ItemGroupId);
+            builder.Property(e => e.GroupCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.GroupName).IsRequired().HasMaxLength(255);
+            builder.Property(e => e.Description).HasMaxLength(500);
+            builder.HasIndex(e => e.GroupCode).IsUnique();
+        }
+    }
+
+    public class UnitEntityConfiguration : IEntityTypeConfiguration<UnitEntity>
+    {
+        public void Configure(EntityTypeBuilder<UnitEntity> builder)
+        {
+            builder.ToTable("Units");
+            builder.HasKey(e => e.UnitId);
+            builder.Property(e => e.UnitCode).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.UnitName).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Description).HasMaxLength(500);
+            builder.HasIndex(e => e.UnitCode).IsUnique();
         }
     }
 

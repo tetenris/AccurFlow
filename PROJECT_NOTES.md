@@ -45,6 +45,7 @@
 - Export Excel: chart of accounts, customer, supplier, journal entry, general ledger, trial balance, financial statements.
 - Alur penjualan: `SalesQuotation` (draft/approve), `SalesOrder` (draft/approve, dari quote), `DeliveryOrder` (draft/post, kurangi stok, convert ke invoice).
 - Alur pembelian: `PurchaseRequest` (draft/approve, convert ke PO sesuai supplier & tanggal).
+- Master inventory: `ItemGroup` (group/jenis barang) & `Unit` (satuan) dengan CRUD + seed; `Item` ber-relasi ke group.
 - Seeder: roles, users, chart of accounts, customers, suppliers, menus.
 - Build status: `dotnet build AccuFlow.sln` berhasil compile, masih ada warning nullability.
 
@@ -89,6 +90,7 @@
 - Kas & Bank: modul lengkap dengan menu `Cash & Bank Accounts` (daftar akun + saldo), `Cash Bank Transfers` (create/edit/delete draft, post auto-jurnal DR akun tujuan / CR akun asal), dan `Bank Reconciliation` (load statement dari journal, flag Cleared/Float, validasi balance saat post). Kolom `AccountUsage` (1=Cash, 2=Bank) ditambahkan di Chart of Accounts via migration `20260816043832_AddCashBankModule`; seed menandai `1-10100` Cash dan `1-10200` Cash in Bank.
 - Sales Quotation / Sales Order / Delivery Order: alur penjualan bertahap. Menu `Penjualan > Sales Quotation` (CRUD draft, approve → jadi sumber SO), `Penjualan > Sales Order` (CRUD draft, approve, line otomatis dari quotation ter-approved), `Penjualan > Delivery Order` (CRUD draft, post kurangi stok via `StockMovement` "Sales Delivery", convert ke sales invoice `SI-`). Migrasi `20260816224729_AddSalesFlowModule`; menu parent Sales (seq 6), sequence menu lain digeser (Inventory 8, Approvals 9, Kas & Bank 10).
 - Purchase Request: permintaan pembelian sebelum PO. Menu `Purchasing > Purchase Request` (CRUD draft, approve, convert ke Purchase Order Draft dengan pilih supplier + tanggal; line otomatis tersalin, nomor `PR-` & `PO-`). Migrasi `20260816230406_AddPurchaseRequestModule`; menu parent Purchasing (seq 7), anak diurutkan Purchase Request (1), Purchase Orders (2), Goods Received (3).
+- Group/Jenis Barang & Satuan: menu `Inventory > Item Groups` & `Inventory > Units` (CRUD + seed group General/Raw Material/Finished Goods/Spare Part; unit PCS/BOX/SET/KG/L). `ItemEntity` mendapat `ItemGroupId` (FK) dan kolom group tampil di daftar Inventory. Migrasi `20260816231519_AddItemGroupUnitModule`; menu anak Inventory berurutan Items (1), Stock Card (2), Stock Opname (3), Item Groups (4), Units (5).
 
 ## Status Hardening Transaksi
 - Invoice post sekarang membuat dan mem-posting jurnal otomatis untuk sales invoice dan purchase invoice.

@@ -38,6 +38,8 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IDeliveryOrderService, DeliveryOrderService>();
             services.AddScoped<ICashBankService, CashBankService>();
             services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IItemGroupService, ItemGroupService>();
+            services.AddScoped<IItemUnitService, ItemUnitService>();
             services.AddScoped<IStockOpnameService, StockOpnameService>();
             services.AddScoped<IAgingReportService, AgingReportService>();
             services.AddScoped<IApprovalService, ApprovalService>();

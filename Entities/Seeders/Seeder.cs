@@ -186,6 +186,26 @@ namespace AccuFlow.Entities.Seeders
                 await dbContext.SaveChangesAsync();
                 logger.LogInformation($"Seeded {newTaxes.Count} taxes");
             }
+
+            var itemGroups = BusinessModuleSeed.GetItemGroupSeedData();
+            var existingGroupIds = await dbContext.ItemGroups.Select(x => x.ItemGroupId).ToListAsync();
+            var newGroups = itemGroups.Where(x => !existingGroupIds.Contains(x.ItemGroupId)).ToList();
+            if (newGroups.Any())
+            {
+                dbContext.ItemGroups.AddRange(newGroups);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newGroups.Count} item groups");
+            }
+
+            var units = BusinessModuleSeed.GetUnitSeedData();
+            var existingUnitIds = await dbContext.Units.Select(x => x.UnitId).ToListAsync();
+            var newUnits = units.Where(x => !existingUnitIds.Contains(x.UnitId)).ToList();
+            if (newUnits.Any())
+            {
+                dbContext.Units.AddRange(newUnits);
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Seeded {newUnits.Count} units");
+            }
         }
 
         public static async Task SeedSampleTransactions(AppDbContext dbContext, ILogger logger)

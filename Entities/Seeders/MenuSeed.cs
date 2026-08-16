@@ -405,6 +405,28 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "StockOpname",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 3
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000036"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Item Groups",
+                    Controller = "ItemGroup",
+                    Action = @"[""view"",""add"",""edit"",""delete""]",
+                    Sequence = 4
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000037"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Units",
+                    Controller = "ItemUnit",
+                    Action = @"[""view"",""add"",""edit"",""delete""]",
+                    Sequence = 5
                 }
             };
         }

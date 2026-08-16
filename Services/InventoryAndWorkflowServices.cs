@@ -23,7 +23,7 @@ namespace AccuFlow.Services
 
         public async Task<BaseDatatableResponse> DatatableItems(DataTableItemRequest request)
         {
-            var query = _dbContext.Items.Where(x => !x.IsDeleted);
+            var query = _dbContext.Items.Include(x => x.ItemGroup).Where(x => !x.IsDeleted);
             if (!string.IsNullOrWhiteSpace(request.ItemType)) query = query.Where(x => x.ItemType == request.ItemType);
             if (request.IsActive.HasValue) query = query.Where(x => x.IsActive == request.IsActive.Value);
             if (!string.IsNullOrWhiteSpace(request.Search))
@@ -39,6 +39,8 @@ namespace AccuFlow.Services
                     ItemCode = x.ItemCode,
                     ItemName = x.ItemName,
                     ItemType = x.ItemType,
+                    ItemGroupId = x.ItemGroupId,
+                    ItemGroupName = x.ItemGroup != null ? x.ItemGroup.GroupName : null,
                     Unit = x.Unit,
                     SalesPrice = x.SalesPrice,
                     PurchasePrice = x.PurchasePrice,
@@ -57,6 +59,7 @@ namespace AccuFlow.Services
                 ItemCode = request.ItemCode,
                 ItemName = request.ItemName,
                 ItemType = request.ItemType,
+                ItemGroupId = request.ItemGroupId,
                 Unit = request.Unit,
                 SalesPrice = request.SalesPrice,
                 PurchasePrice = request.PurchasePrice,
@@ -73,6 +76,7 @@ namespace AccuFlow.Services
         public async Task<List<ItemViewModel>> GetActiveItems()
         {
             return await _dbContext.Items
+                .Include(x => x.ItemGroup)
                 .Where(x => x.IsActive && !x.IsDeleted)
                 .OrderBy(x => x.ItemCode)
                 .Select(x => new ItemViewModel
@@ -81,6 +85,8 @@ namespace AccuFlow.Services
                     ItemCode = x.ItemCode,
                     ItemName = x.ItemName,
                     ItemType = x.ItemType,
+                    ItemGroupId = x.ItemGroupId,
+                    ItemGroupName = x.ItemGroup != null ? x.ItemGroup.GroupName : null,
                     Unit = x.Unit,
                     SalesPrice = x.SalesPrice,
                     PurchasePrice = x.PurchasePrice,
@@ -352,6 +358,217 @@ namespace AccuFlow.Services
             return Path.IsPathRooted(configuredPath)
                 ? configuredPath
                 : Path.Combine(_environment.ContentRootPath, configuredPath);
+        }
+    }
+
+    public interface IItemGroupService : IBaseService
+    {
+        Task<BaseDatatableResponse> Datatable(DataTableItemGroupRequest request);
+        Task<ItemGroupViewModel?> GetById(Guid id);
+        Task<List<ItemGroupViewModel>> GetActiveGroups();
+        Task Create(CreateItemGroupRequest request, Guid userId);
+        Task Update(UpdateItemGroupRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
+    }
+
+    public class ItemGroupService : BaseService, IItemGroupService
+    {
+        public ItemGroupService(AppDbContext dbContext) : base(dbContext) { }
+
+        public async Task<BaseDatatableResponse> Datatable(DataTableItemGroupRequest request)
+        {
+            var query = _dbContext.ItemGroups.Where(x => !x.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.ToLower();
+                query = query.Where(x => x.GroupCode.ToLower().Contains(search) || x.GroupName.ToLower().Contains(search));
+            }
+            var total = await query.CountAsync();
+            var data = await query.OrderBy(x => x.GroupCode).Skip((request.Page - 1) * request.Size).Take(request.Size)
+                .Select(x => new ItemGroupViewModel
+                {
+                    ItemGroupId = x.ItemGroupId,
+                    GroupCode = x.GroupCode,
+                    GroupName = x.GroupName,
+                    Description = x.Description,
+                    IsActive = x.IsActive,
+                    ItemCount = _dbContext.Items.Count(i => i.ItemGroupId == x.ItemGroupId && !i.IsDeleted)
+                }).ToListAsync();
+            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task<ItemGroupViewModel?> GetById(Guid id)
+        {
+            return await _dbContext.ItemGroups
+                .Where(x => x.ItemGroupId == id && !x.IsDeleted)
+                .Select(x => new ItemGroupViewModel
+                {
+                    ItemGroupId = x.ItemGroupId,
+                    GroupCode = x.GroupCode,
+                    GroupName = x.GroupName,
+                    Description = x.Description,
+                    IsActive = x.IsActive,
+                    ItemCount = _dbContext.Items.Count(i => i.ItemGroupId == x.ItemGroupId && !i.IsDeleted)
+                }).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<ItemGroupViewModel>> GetActiveGroups()
+        {
+            return await _dbContext.ItemGroups
+                .Where(x => x.IsActive && !x.IsDeleted)
+                .OrderBy(x => x.GroupCode)
+                .Select(x => new ItemGroupViewModel
+                {
+                    ItemGroupId = x.ItemGroupId,
+                    GroupCode = x.GroupCode,
+                    GroupName = x.GroupName,
+                    Description = x.Description,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+        }
+
+        public async Task Create(CreateItemGroupRequest request, Guid userId)
+        {
+            var exists = await _dbContext.ItemGroups.AnyAsync(x => x.GroupCode == request.GroupCode && !x.IsDeleted);
+            if (exists) throw new Exception("Group code already exists");
+            _dbContext.ItemGroups.Add(new ItemGroupEntity
+            {
+                ItemGroupId = Guid.NewGuid(),
+                GroupCode = request.GroupCode,
+                GroupName = request.GroupName,
+                Description = request.Description,
+                IsActive = true,
+                CreatedBy = userId.ToString()
+            });
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Update(UpdateItemGroupRequest request, Guid userId)
+        {
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.ItemGroupId == request.ItemGroupId && !x.IsDeleted);
+            if (group == null) throw new Exception("Item group not found");
+            group.GroupCode = request.GroupCode;
+            group.GroupName = request.GroupName;
+            group.Description = request.Description;
+            group.IsActive = request.IsActive;
+            group.UpdatedAt = DateTime.UtcNow;
+            group.UpdatedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var group = await _dbContext.ItemGroups.FirstOrDefaultAsync(x => x.ItemGroupId == id && !x.IsDeleted);
+            if (group == null) throw new Exception("Item group not found");
+            if (await _dbContext.Items.AnyAsync(x => x.ItemGroupId == id && !x.IsDeleted)) throw new Exception("Item group is used by items and cannot be deleted");
+            group.IsDeleted = true;
+            group.DeletedAt = DateTime.UtcNow;
+            group.DeletedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    public interface IItemUnitService : IBaseService
+    {
+        Task<BaseDatatableResponse> Datatable(DataTableUnitRequest request);
+        Task<UnitViewModel?> GetById(Guid id);
+        Task<List<UnitViewModel>> GetActiveUnits();
+        Task Create(CreateUnitRequest request, Guid userId);
+        Task Update(UpdateUnitRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
+    }
+
+    public class ItemUnitService : BaseService, IItemUnitService
+    {
+        public ItemUnitService(AppDbContext dbContext) : base(dbContext) { }
+
+        public async Task<BaseDatatableResponse> Datatable(DataTableUnitRequest request)
+        {
+            var query = _dbContext.Units.Where(x => !x.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.ToLower();
+                query = query.Where(x => x.UnitCode.ToLower().Contains(search) || x.UnitName.ToLower().Contains(search));
+            }
+            var total = await query.CountAsync();
+            var data = await query.OrderBy(x => x.UnitCode).Skip((request.Page - 1) * request.Size).Take(request.Size)
+                .Select(x => new UnitViewModel
+                {
+                    UnitId = x.UnitId,
+                    UnitCode = x.UnitCode,
+                    UnitName = x.UnitName,
+                    Description = x.Description,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task<UnitViewModel?> GetById(Guid id)
+        {
+            return await _dbContext.Units
+                .Where(x => x.UnitId == id && !x.IsDeleted)
+                .Select(x => new UnitViewModel
+                {
+                    UnitId = x.UnitId,
+                    UnitCode = x.UnitCode,
+                    UnitName = x.UnitName,
+                    Description = x.Description,
+                    IsActive = x.IsActive
+                }).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<UnitViewModel>> GetActiveUnits()
+        {
+            return await _dbContext.Units
+                .Where(x => x.IsActive && !x.IsDeleted)
+                .OrderBy(x => x.UnitCode)
+                .Select(x => new UnitViewModel
+                {
+                    UnitId = x.UnitId,
+                    UnitCode = x.UnitCode,
+                    UnitName = x.UnitName,
+                    Description = x.Description,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+        }
+
+        public async Task Create(CreateUnitRequest request, Guid userId)
+        {
+            var exists = await _dbContext.Units.AnyAsync(x => x.UnitCode == request.UnitCode && !x.IsDeleted);
+            if (exists) throw new Exception("Unit code already exists");
+            _dbContext.Units.Add(new UnitEntity
+            {
+                UnitId = Guid.NewGuid(),
+                UnitCode = request.UnitCode,
+                UnitName = request.UnitName,
+                Description = request.Description,
+                IsActive = true,
+                CreatedBy = userId.ToString()
+            });
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Update(UpdateUnitRequest request, Guid userId)
+        {
+            var unit = await _dbContext.Units.FirstOrDefaultAsync(x => x.UnitId == request.UnitId && !x.IsDeleted);
+            if (unit == null) throw new Exception("Unit not found");
+            unit.UnitCode = request.UnitCode;
+            unit.UnitName = request.UnitName;
+            unit.Description = request.Description;
+            unit.IsActive = request.IsActive;
+            unit.UpdatedAt = DateTime.UtcNow;
+            unit.UpdatedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var unit = await _dbContext.Units.FirstOrDefaultAsync(x => x.UnitId == id && !x.IsDeleted);
+            if (unit == null) throw new Exception("Unit not found");
+            unit.IsDeleted = true;
+            unit.DeletedAt = DateTime.UtcNow;
+            unit.DeletedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
