@@ -317,6 +317,17 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "CashBank",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 3
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000028"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Stock Opname",
+                    Controller = "StockOpname",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 3
                 }
             };
         }
