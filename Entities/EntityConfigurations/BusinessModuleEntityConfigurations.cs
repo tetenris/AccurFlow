@@ -408,6 +408,34 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class StockTransferEntityConfiguration : IEntityTypeConfiguration<StockTransferEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockTransferEntity> builder)
+        {
+            builder.ToTable("StockTransfers");
+            builder.HasKey(e => e.StockTransferId);
+            builder.Property(e => e.StockTransferNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.StockTransferNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.FromWarehouse).WithMany().HasForeignKey(e => e.FromWarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.ToWarehouse).WithMany().HasForeignKey(e => e.ToWarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.StockTransfer).HasForeignKey(e => e.StockTransferId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class StockTransferLineEntityConfiguration : IEntityTypeConfiguration<StockTransferLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockTransferLineEntity> builder)
+        {
+            builder.ToTable("StockTransferLines");
+            builder.HasKey(e => e.StockTransferLineId);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class StockOpnameEntityConfiguration : IEntityTypeConfiguration<StockOpnameEntity>
     {
         public void Configure(EntityTypeBuilder<StockOpnameEntity> builder)

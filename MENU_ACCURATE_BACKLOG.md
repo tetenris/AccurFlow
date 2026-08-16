@@ -116,6 +116,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 29 | Penjualan > Delivery Order | DeliveryOrder | draft/post (kurangi stok), convert ke sales invoice |
 | 30 | Inventory > Item Groups | ItemGroup | CRUD group/jenis barang, pakai di item |
 | 31 | Inventory > Units | ItemUnit | CRUD satuan (PCS/BOX/SET, dll.) |
+| 32 | Inventory > Stock Transfer | StockTransfer | mutasi stok antar gudang, draft/edit/post |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -137,7 +138,7 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 - **[7] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
 - **[8] Serial Number / Batch** — pelacakan stok per unit.
 - **[9] Payroll / HRM** — penggajian.
-- **[10] Produksi / Manufacturing** — BOM & job order.
+- **[9] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +149,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 31 item terhubung; total backlog berjumlah 10 item berurutan.*
+*Status pembandingan: menu saat ini 32 item terhubung; total backlog berjumlah 9 item berurutan.*

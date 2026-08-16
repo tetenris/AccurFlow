@@ -43,6 +43,8 @@ namespace AccuFlow.Entities.Context
         public DbSet<UnitEntity> Units { get; set; }
         public DbSet<WarehouseEntity> Warehouses { get; set; }
         public DbSet<StockMovementEntity> StockMovements { get; set; }
+        public DbSet<StockTransferEntity> StockTransfers { get; set; }
+        public DbSet<StockTransferLineEntity> StockTransferLines { get; set; }
         public DbSet<StockOpnameEntity> StockOpnames { get; set; }
         public DbSet<StockOpnameLineEntity> StockOpnameLines { get; set; }
         public DbSet<CashBankTransferEntity> CashBankTransfers { get; set; }

@@ -427,6 +427,17 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "ItemUnit",
                     Action = @"[""view"",""add"",""edit"",""delete""]",
                     Sequence = 5
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000038"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Stock Transfer",
+                    Controller = "StockTransfer",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 6
                 }
             };
         }
