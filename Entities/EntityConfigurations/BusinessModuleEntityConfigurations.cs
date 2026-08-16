@@ -150,6 +150,46 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class GoodsReturnEntityConfiguration : IEntityTypeConfiguration<GoodsReturnEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReturnEntity> builder)
+        {
+            builder.ToTable("GoodsReturns");
+            builder.HasKey(e => e.GoodsReturnId);
+            builder.Property(e => e.GoodsReturnNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.ReturnType).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.GoodsReturnNumber).IsUnique();
+            builder.HasIndex(e => new { e.ReturnType, e.Status, e.IsDeleted });
+            builder.HasOne(e => e.Invoice).WithMany().HasForeignKey(e => e.InvoiceId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Supplier).WithMany().HasForeignKey(e => e.SupplierId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.GoodsReturn).HasForeignKey(e => e.GoodsReturnId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class GoodsReturnLineEntityConfiguration : IEntityTypeConfiguration<GoodsReturnLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReturnLineEntity> builder)
+        {
+            builder.ToTable("GoodsReturnLines");
+            builder.HasKey(e => e.GoodsReturnLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.InvoiceLine).WithMany().HasForeignKey(e => e.InvoiceLineId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class ItemEntityConfiguration : IEntityTypeConfiguration<ItemEntity>
     {
         public void Configure(EntityTypeBuilder<ItemEntity> builder)

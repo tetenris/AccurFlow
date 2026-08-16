@@ -28,6 +28,8 @@ namespace AccuFlow.Entities.Context
         public DbSet<PurchaseOrderLineEntity> PurchaseOrderLines { get; set; }
         public DbSet<GoodsReceiptEntity> GoodsReceipts { get; set; }
         public DbSet<GoodsReceiptLineEntity> GoodsReceiptLines { get; set; }
+        public DbSet<GoodsReturnEntity> GoodsReturns { get; set; }
+        public DbSet<GoodsReturnLineEntity> GoodsReturnLines { get; set; }
         public DbSet<ItemEntity> Items { get; set; }
         public DbSet<WarehouseEntity> Warehouses { get; set; }
         public DbSet<StockMovementEntity> StockMovements { get; set; }
