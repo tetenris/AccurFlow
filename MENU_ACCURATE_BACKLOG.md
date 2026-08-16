@@ -105,6 +105,9 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 18 | Approvals | Approval | submit/approve/reject |
 | 19 | Document Attachment (via modul) | DocumentAttachment | upload/download/delete |
 | 20 | Inventory > Stock Opname | StockOpname | CRUD + post (input hasil, selisih, stock adjustment) |
+| 21 | Kas & Bank > Cash & Bank Accounts | CashBank | list akun + saldo |
+| 22 | Kas & Bank > Cash Bank Transfers | CashBank | draft/edit/post antar akun |
+| 23 | Kas & Bank > Bank Reconciliation | CashBank | draft/edit/post |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -117,22 +120,21 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] Modul Kas & Bank** — akun kas/bank, transfer kas/bank antar akun, rekonsiliasi bank, mutasi kas & bank. (kritikal, belum ada sama sekali)
-- **[2] Penerimaan Barang (GRN)** — menerima barang dari PO, otomatis update stok & jurnal persediaan.
-- **[3] Retur Penjualan & Pembelian** — retur mengurangi piutang/utang dan stok.
-- **[4] Sales Quotation / Sales Order / Delivery Order** — alur penjualan bertahap (quote → order → kirim → invoice).
-- **[5] Purchase Request** — permintaan pembelian sebelum dibuatkan PO.
-- **[6] Group/ Jenis Barang & Satuan** — pengelompokan item agar laporan lebih detail.
-- **[7] Stock Transfer / Mutasi antar gudang** — pindah stok antar warehouse.
-- **[8] Stok Minimum / Reorder Point** — notifikasi stok rendah.
-- **[9] Daftar Piutang & Daftar Utang per customer/supplier** — selain aging, tampilkan list piutang/utang detail.
-- **[10] CRUD Pajak (tarif & pemakaian di invoice) + pelaporan PPN sederhana** — entity & seed PPN 11% sudah ada, tinggal UI.
-- **[11] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
-- **[12] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
-- **[13] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
-- **[14] Serial Number / Batch** — pelacakan stok per unit.
-- **[15] Payroll / HRM** — penggajian.
-- **[16] Produksi / Manufacturing** — BOM & job order.
+- **[1] Penerimaan Barang (GRN)** — menerima barang dari PO, otomatis update stok & jurnal persediaan.
+- **[2] Retur Penjualan & Pembelian** — retur mengurangi piutang/utang dan stok.
+- **[3] Sales Quotation / Sales Order / Delivery Order** — alur penjualan bertahap (quote → order → kirim → invoice).
+- **[4] Purchase Request** — permintaan pembelian sebelum dibuatkan PO.
+- **[5] Group/ Jenis Barang & Satuan** — pengelompokan item agar laporan lebih detail.
+- **[6] Stock Transfer / Mutasi antar gudang** — pindah stok antar warehouse.
+- **[7] Stok Minimum / Reorder Point** — notifikasi stok rendah.
+- **[8] Daftar Piutang & Daftar Utang per customer/supplier** — selain aging, tampilkan list piutang/utang detail.
+- **[9] CRUD Pajak (tarif & pemakaian di invoice) + pelaporan PPN sederhana** — entity & seed PPN 11% sudah ada, tinggal UI.
+- **[10] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
+- **[11] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
+- **[12] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
+- **[13] Serial Number / Batch** — pelacakan stok per unit.
+- **[14] Payroll / HRM** — penggajian.
+- **[15] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -143,4 +145,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 20 item terhubung; total backlog berjumlah 16 item berurutan.*
+*Status pembandingan: menu saat ini 23 item terhubung; total backlog berjumlah 15 item berurutan.*
