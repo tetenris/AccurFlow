@@ -119,6 +119,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 32 | Inventory > Stock Transfer | StockTransfer | mutasi stok antar gudang, draft/edit/post |
 | 33 | Inventory > Stock Minimum | StockMinimum | reorder point, notifikasi stok di bawah minimum |
 | 34 | Accounting > Receivable & Payable | ReceivablePayable | daftar detail piutang/utang per customer/supplier |
+| 35 | Accounting > Taxes | Tax | CRUD pajak (PPN 11%) + tab laporan PPN keluaran/masukan |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -131,13 +132,12 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] CRUD Pajak (tarif & pemakaian di invoice) + pelaporan PPN sederhana** — entity & seed PPN 11% sudah ada, tinggal UI.
-- **[2] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
-- **[3] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
-- **[4] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
-- **[5] Serial Number / Batch** — pelacakan stok per unit.
-- **[6] Payroll / HRM** — penggajian.
-- **[7] Produksi / Manufacturing** — BOM & job order.
+- **[1] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
+- **[2] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
+- **[3] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
+- **[4] Serial Number / Batch** — pelacakan stok per unit.
+- **[5] Payroll / HRM** — penggajian.
+- **[6] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +148,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 34 item terhubung; total backlog berjumlah 7 item berurutan.*
+*Status pembandingan: menu saat ini 35 item terhubung; total backlog berjumlah 6 item berurutan.*

@@ -44,6 +44,7 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IStockTransferService, StockTransferService>();
             services.AddScoped<IAgingReportService, AgingReportService>();
             services.AddScoped<IReceivablePayableService, ReceivablePayableService>();
+            services.AddScoped<ITaxService, TaxService>();
             services.AddScoped<IApprovalService, ApprovalService>();
             services.AddScoped<IDocumentAttachmentService, DocumentAttachmentService>();
 

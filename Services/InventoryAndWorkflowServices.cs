@@ -6,6 +6,7 @@ using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.DocumentAttachment;
 using AccuFlow.Models.Inventory;
 using AccuFlow.Models.ReceivablePayable;
+using AccuFlow.Models.Tax;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFlow.Services
@@ -651,6 +652,129 @@ namespace AccuFlow.Services
             unit.IsDeleted = true;
             unit.DeletedAt = DateTime.UtcNow;
             unit.DeletedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    public interface ITaxService : IBaseService
+    {
+        Task<BaseDatatableResponse> Datatable(DataTableTaxRequest request);
+        Task<TaxViewModel?> GetById(Guid id);
+        Task<BaseDatatableResponse> VatReport(VatReportRequest request);
+        Task Create(CreateTaxRequest request, Guid userId);
+        Task Update(UpdateTaxRequest request, Guid userId);
+        Task Delete(Guid id, Guid userId);
+    }
+
+    public class TaxService : BaseService, ITaxService
+    {
+        public TaxService(AppDbContext dbContext) : base(dbContext) { }
+
+        public async Task<BaseDatatableResponse> Datatable(DataTableTaxRequest request)
+        {
+            var query = _dbContext.Taxes.Where(x => !x.IsDeleted);
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.ToLower();
+                query = query.Where(x => x.TaxCode.ToLower().Contains(search) || x.TaxName.ToLower().Contains(search));
+            }
+            var total = await query.CountAsync();
+            var data = await query.OrderBy(x => x.TaxCode).Skip((request.Page - 1) * request.Size).Take(request.Size)
+                .Select(x => new TaxViewModel
+                {
+                    TaxId = x.TaxId,
+                    TaxCode = x.TaxCode,
+                    TaxName = x.TaxName,
+                    Rate = x.Rate,
+                    TaxType = x.TaxType,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
+        }
+
+        public async Task<TaxViewModel?> GetById(Guid id)
+        {
+            return await _dbContext.Taxes
+                .Where(x => x.TaxId == id && !x.IsDeleted)
+                .Select(x => new TaxViewModel
+                {
+                    TaxId = x.TaxId,
+                    TaxCode = x.TaxCode,
+                    TaxName = x.TaxName,
+                    Rate = x.Rate,
+                    TaxType = x.TaxType,
+                    IsActive = x.IsActive
+                }).FirstOrDefaultAsync();
+        }
+
+        public async Task<BaseDatatableResponse> VatReport(VatReportRequest request)
+        {
+            var invoices = await _dbContext.Invoices
+                .Include(x => x.Customer).Include(x => x.Supplier)
+                .Where(x => !x.IsDeleted && x.Status == "Posted"
+                    && x.TaxAmount != 0
+                    && x.InvoiceDate.Date >= request.FromDate.Date && x.InvoiceDate.Date <= request.ToDate.Date)
+                .ToListAsync();
+            var lines = invoices.Select(x =>
+            {
+                var dpp = x.TotalAmount - x.TaxAmount;
+                return new VatReportLine
+                {
+                    InvoiceNumber = x.InvoiceNumber,
+                    InvoiceType = x.InvoiceType,
+                    PartnerName = x.Customer != null ? x.Customer.CustomerName : x.Supplier != null ? x.Supplier.SupplierName : "-",
+                    InvoiceDate = x.InvoiceDate,
+                    Dpp = dpp,
+                    Vat = x.TaxAmount,
+                    TotalAmount = x.TotalAmount
+                };
+            }).ToList();
+            var summary = new VatReportSummary
+            {
+                OutputVat = lines.Where(x => x.InvoiceType == "Sales").Sum(x => x.Vat),
+                InputVat = lines.Where(x => x.InvoiceType == "Purchase").Sum(x => x.Vat)
+            };
+            return new BaseDatatableResponse { Draw = 1, RecordsTotal = lines.Count, RecordsFiltered = lines.Count, Data = new { lines, summary } };
+        }
+
+        public async Task Create(CreateTaxRequest request, Guid userId)
+        {
+            var exists = await _dbContext.Taxes.AnyAsync(x => x.TaxCode == request.TaxCode && !x.IsDeleted);
+            if (exists) throw new Exception("Tax code already exists");
+            _dbContext.Taxes.Add(new TaxEntity
+            {
+                TaxId = Guid.NewGuid(),
+                TaxCode = request.TaxCode,
+                TaxName = request.TaxName,
+                Rate = request.Rate,
+                TaxType = request.TaxType,
+                IsActive = true,
+                CreatedBy = userId.ToString()
+            });
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Update(UpdateTaxRequest request, Guid userId)
+        {
+            var tax = await _dbContext.Taxes.FirstOrDefaultAsync(x => x.TaxId == request.TaxId && !x.IsDeleted);
+            if (tax == null) throw new Exception("Tax not found");
+            tax.TaxCode = request.TaxCode;
+            tax.TaxName = request.TaxName;
+            tax.Rate = request.Rate;
+            tax.TaxType = request.TaxType;
+            tax.IsActive = request.IsActive;
+            tax.UpdatedAt = DateTime.UtcNow;
+            tax.UpdatedBy = userId.ToString();
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task Delete(Guid id, Guid userId)
+        {
+            var tax = await _dbContext.Taxes.FirstOrDefaultAsync(x => x.TaxId == id && !x.IsDeleted);
+            if (tax == null) throw new Exception("Tax not found");
+            tax.IsDeleted = true;
+            tax.DeletedAt = DateTime.UtcNow;
+            tax.DeletedBy = userId.ToString();
             await _dbContext.SaveChangesAsync();
         }
     }
