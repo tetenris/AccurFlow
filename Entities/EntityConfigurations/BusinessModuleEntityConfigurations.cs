@@ -97,6 +97,42 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class PurchaseRequestEntityConfiguration : IEntityTypeConfiguration<PurchaseRequestEntity>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseRequestEntity> builder)
+        {
+            builder.ToTable("PurchaseRequests");
+            builder.HasKey(e => e.PurchaseRequestId);
+            builder.Property(e => e.PurchaseRequestNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.RequestedBy).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Department).HasMaxLength(100);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.PurchaseRequestNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.PurchaseOrder).WithMany().HasForeignKey(e => e.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.PurchaseRequest).HasForeignKey(e => e.PurchaseRequestId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class PurchaseRequestLineEntityConfiguration : IEntityTypeConfiguration<PurchaseRequestLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseRequestLineEntity> builder)
+        {
+            builder.ToTable("PurchaseRequestLines");
+            builder.HasKey(e => e.PurchaseRequestLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class PurchaseOrderLineEntityConfiguration : IEntityTypeConfiguration<PurchaseOrderLineEntity>
     {
         public void Configure(EntityTypeBuilder<PurchaseOrderLineEntity> builder)

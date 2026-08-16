@@ -26,6 +26,8 @@ namespace AccuFlow.Entities.Context
         public DbSet<PaymentAllocationEntity> PaymentAllocations { get; set; }
         public DbSet<PurchaseOrderEntity> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderLineEntity> PurchaseOrderLines { get; set; }
+        public DbSet<PurchaseRequestEntity> PurchaseRequests { get; set; }
+        public DbSet<PurchaseRequestLineEntity> PurchaseRequestLines { get; set; }
         public DbSet<GoodsReceiptEntity> GoodsReceipts { get; set; }
         public DbSet<GoodsReceiptLineEntity> GoodsReceiptLines { get; set; }
         public DbSet<GoodsReturnEntity> GoodsReturns { get; set; }

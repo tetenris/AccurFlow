@@ -277,13 +277,24 @@ namespace AccuFlow.Entities.Seeders
 
                 new MenuEntity
                 {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000035"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
+                    Icon = "",
+                    Name = "Purchase Request",
+                    Controller = "PurchaseRequest",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 1
+                },
+
+                new MenuEntity
+                {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000019"),
                     MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000018"),
                     Icon = "",
                     Name = "Purchase Orders",
                     Controller = "PurchaseOrder",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
-                    Sequence = 1
+                    Sequence = 2
                 },
 
                 new MenuEntity
@@ -294,7 +305,7 @@ namespace AccuFlow.Entities.Seeders
                     Name = "Goods Received",
                     Controller = "GoodsReceipt",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
-                    Sequence = 2
+                    Sequence = 3
                 },
 
                 new MenuEntity

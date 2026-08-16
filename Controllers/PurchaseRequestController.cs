@@ -1,0 +1,100 @@
+using AccuFlow.Models.PurchaseRequest;
+using AccuFlow.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AccuFlow.Controllers
+{
+    [Authorize]
+    public class PurchaseRequestController : BaseController
+    {
+        private readonly IPurchaseRequestService _purchaseRequestService;
+
+        public PurchaseRequestController(IPurchaseRequestService purchaseRequestService) : base(purchaseRequestService)
+        {
+            _purchaseRequestService = purchaseRequestService;
+        }
+
+        public IActionResult Index()
+        {
+            ViewData["Title"] = "Purchase Request";
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Datatable([FromBody] DataTablePurchaseRequestRequest request) => Json(await _purchaseRequestService.Datatable(request));
+
+        [HttpGet]
+        public async Task<IActionResult> GetById(Guid id) => Json(await _purchaseRequestService.GetById(id));
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreatePurchaseRequestRequest request)
+        {
+            try
+            {
+                await _purchaseRequestService.Create(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase request created successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromBody] UpdatePurchaseRequestRequest request)
+        {
+            try
+            {
+                await _purchaseRequestService.Update(request, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase request updated successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Approve([FromBody] Guid id)
+        {
+            try
+            {
+                await _purchaseRequestService.Approve(id, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase request approved successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConvertToPurchaseOrder([FromBody] ConvertPurchaseRequestRequest request)
+        {
+            try
+            {
+                var poId = await _purchaseRequestService.ConvertToPurchaseOrder(request.PurchaseRequestId, request.SupplierId, request.ExpectedDate, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase order created from purchase request", purchaseOrderId = poId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] Guid id)
+        {
+            try
+            {
+                await _purchaseRequestService.Delete(id, _currentUserService!.UserId);
+                return Ok(new { success = true, message = "Purchase request deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+    }
+}
