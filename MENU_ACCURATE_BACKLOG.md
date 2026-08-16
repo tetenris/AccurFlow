@@ -118,6 +118,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 31 | Inventory > Units | ItemUnit | CRUD satuan (PCS/BOX/SET, dll.) |
 | 32 | Inventory > Stock Transfer | StockTransfer | mutasi stok antar gudang, draft/edit/post |
 | 33 | Inventory > Stock Minimum | StockMinimum | reorder point, notifikasi stok di bawah minimum |
+| 34 | Accounting > Receivable & Payable | ReceivablePayable | daftar detail piutang/utang per customer/supplier |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -130,14 +131,13 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] Daftar Piutang & Daftar Utang per customer/supplier** — selain aging, tampilkan list piutang/utang detail.
-- **[2] CRUD Pajak (tarif & pemakaian di invoice) + pelaporan PPN sederhana** — entity & seed PPN 11% sudah ada, tinggal UI.
-- **[3] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
-- **[4] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
-- **[5] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
-- **[6] Serial Number / Batch** — pelacakan stok per unit.
-- **[7] Payroll / HRM** — penggajian.
-- **[8] Produksi / Manufacturing** — BOM & job order.
+- **[1] CRUD Pajak (tarif & pemakaian di invoice) + pelaporan PPN sederhana** — entity & seed PPN 11% sudah ada, tinggal UI.
+- **[2] Aktiva Tetap (Fixed Assets)** — daftar aktiva + penyusutan.
+- **[3] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
+- **[4] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
+- **[5] Serial Number / Batch** — pelacakan stok per unit.
+- **[6] Payroll / HRM** — penggajian.
+- **[7] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +148,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 33 item terhubung; total backlog berjumlah 8 item berurutan.*
+*Status pembandingan: menu saat ini 34 item terhubung; total backlog berjumlah 7 item berurutan.*
