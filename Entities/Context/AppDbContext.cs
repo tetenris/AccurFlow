@@ -31,6 +31,9 @@ namespace AccuFlow.Entities.Context
         public DbSet<StockMovementEntity> StockMovements { get; set; }
         public DbSet<StockOpnameEntity> StockOpnames { get; set; }
         public DbSet<StockOpnameLineEntity> StockOpnameLines { get; set; }
+        public DbSet<CashBankTransferEntity> CashBankTransfers { get; set; }
+        public DbSet<BankReconciliationEntity> BankReconciliations { get; set; }
+        public DbSet<BankReconciliationLineEntity> BankReconciliationLines { get; set; }
         public DbSet<ApprovalRequestEntity> ApprovalRequests { get; set; }
         public DbSet<ApprovalHistoryEntity> ApprovalHistories { get; set; }
         public DbSet<DocumentAttachmentEntity> DocumentAttachments { get; set; }

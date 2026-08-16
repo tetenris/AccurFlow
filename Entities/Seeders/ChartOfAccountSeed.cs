@@ -35,6 +35,7 @@ namespace AccuFlow.Entities.Seeders
                     IsActive = true,
                     NormalBalance = "Debit",
                     Level = 1,
+                    AccountUsage = 1, // Cash
                     CreatedBy = "system",
                     CreatedAt = DateTime.UtcNow
                 },
@@ -50,6 +51,7 @@ namespace AccuFlow.Entities.Seeders
                     IsActive = true,
                     NormalBalance = "Debit",
                     Level = 1,
+                    AccountUsage = 2, // Bank
                     CreatedBy = "system",
                     CreatedAt = DateTime.UtcNow
                 },

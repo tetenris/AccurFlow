@@ -16,6 +16,7 @@ namespace AccuFlow.Entities.Entity
         public string NormalBalance { get; set; } = "Debit";
         public string Currency { get; set; } = "IDR";
         public int Level { get; set; } = 0;
+        public int AccountUsage { get; set; } = 0; // 0 = General, 1 = Cash, 2 = Bank (see AccountUsage enum)
         
         // Navigation property for hierarchical structure
         public ChartOfAccountEntity? ParentAccount { get; set; }

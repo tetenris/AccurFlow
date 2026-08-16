@@ -10,6 +10,7 @@
 ## Fitur Utama
 - Master: `ChartOfAccount`, `Customer`, `Supplier`, `User`, `Role`, `Menu`, `RoleMenu`.
 - Transaksi: `JournalEntry` dengan status `Draft`, `Posted`, `Reversed`.
+- Kas & Bank: `CashBankTransfer` (transfer kas/bank, posting auto jurnal), `BankReconciliation` (rekonsiliasi bank dengan load statement dari journal).
 - Laporan: `GeneralLedger`, `TrialBalance`, `FinancialStatement` untuk income statement, balance sheet, cash flow.
 - Seeder otomatis berjalan saat startup: roles, users, chart of accounts, customers, suppliers, menus.
 - Auth memakai cookie login di `/Account/Login`.
@@ -83,6 +84,7 @@
 - Approval Workflow: approval request/history entity, service, controller, view list, approve/reject dasar.
 - Document Attachment: entity dan service datatable dasar; upload/download file fisik belum diimplementasikan.
 - Tax Management: entity dan seed PPN 11%; UI CRUD tax belum dibuat.
+- Kas & Bank: modul lengkap dengan menu `Cash & Bank Accounts` (daftar akun + saldo), `Cash Bank Transfers` (create/edit/delete draft, post auto-jurnal DR akun tujuan / CR akun asal), dan `Bank Reconciliation` (load statement dari journal, flag Cleared/Float, validasi balance saat post). Kolom `AccountUsage` (1=Cash, 2=Bank) ditambahkan di Chart of Accounts via migration `20260816043832_AddCashBankModule`; seed menandai `1-10100` Cash dan `1-10200` Cash in Bank.
 
 ## Status Hardening Transaksi
 - Invoice post sekarang membuat dan mem-posting jurnal otomatis untuk sales invoice dan purchase invoice.

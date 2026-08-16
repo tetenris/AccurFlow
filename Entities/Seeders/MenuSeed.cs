@@ -273,6 +273,50 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "Approval",
                     Action = @"[""view"",""post""]",
                     Sequence = 8
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000024"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-bank fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
+                    Name = "Kas & Bank",
+                    Controller = "",
+                    Action = @"[]",
+                    Sequence = 9
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000025"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000024"),
+                    Icon = "",
+                    Name = "Cash & Bank Accounts",
+                    Controller = "CashBank",
+                    Action = @"[""view"",""add"",""edit"",""delete""]",
+                    Sequence = 1
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000026"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000024"),
+                    Icon = "",
+                    Name = "Cash Bank Transfers",
+                    Controller = "CashBank",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 2
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000027"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000024"),
+                    Icon = "",
+                    Name = "Bank Reconciliation",
+                    Controller = "CashBank",
+                    Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
+                    Sequence = 3
                 }
             };
         }

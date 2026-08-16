@@ -119,27 +119,27 @@ namespace AccuFlow.Infrastructures
 
         private static string MapAction(string action)
         {
-            if (IsAny(action, "Index", "Datatable", "GetById", "GetRoleDropdown", "GetActiveRoles", "GetActiveCustomers", "GetActiveSuppliers", "GetActiveAccounts", "GetActiveItems", "GetOpenInvoices", "GetByDocument", "Download", "Print", "Generate", "ExportExcel", "StockCard", "StockCardDatatable", "GetRoleMenuPermissions", "GetHierarchy"))
+            if (IsAny(action, "Index", "Datatable", "GetById", "GetRoleDropdown", "GetActiveRoles", "GetActiveCustomers", "GetActiveSuppliers", "GetActiveAccounts", "GetActiveItems", "GetOpenInvoices", "GetByDocument", "Download", "Print", "Generate", "ExportExcel", "StockCard", "StockCardDatatable", "GetRoleMenuPermissions", "GetHierarchy", "Accounts", "Transfers", "Reconciliations", "GetCashAccounts", "GetBankAccounts", "GetBankStatement", "GetTransferDetail", "GetReconciliationDetail", "DatatableTransfers", "DatatableReconciliations"))
             {
                 return "view";
             }
 
-            if (IsAny(action, "Create", "CreateItem", "Upload", "Submit"))
+            if (IsAny(action, "Create", "CreateItem", "Upload", "Submit", "CreateTransfer", "CreateReconciliation"))
             {
                 return "add";
             }
 
-            if (IsAny(action, "Edit", "Update", "UpdateItem", "SaveRoleMenuPermissions", "FixRoleTypeData", "Unlock"))
+            if (IsAny(action, "Edit", "Update", "UpdateItem", "SaveRoleMenuPermissions", "FixRoleTypeData", "Unlock", "UpdateTransfer", "UpdateReconciliation"))
             {
                 return "edit";
             }
 
-            if (IsAny(action, "Delete", "DeleteItem"))
+            if (IsAny(action, "Delete", "DeleteItem", "DeleteTransfer", "DeleteReconciliation"))
             {
                 return "delete";
             }
 
-            if (IsAny(action, "Post", "Approve", "Reject", "Cancel", "ConvertToInvoice"))
+            if (IsAny(action, "Post", "Approve", "Reject", "Cancel", "ConvertToInvoice", "PostTransfer", "PostReconciliation"))
             {
                 return "post";
             }
