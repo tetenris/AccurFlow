@@ -54,6 +54,8 @@ namespace AccuFlow.Entities.Context
         public DbSet<ApprovalHistoryEntity> ApprovalHistories { get; set; }
         public DbSet<DocumentAttachmentEntity> DocumentAttachments { get; set; }
         public DbSet<TaxEntity> Taxes { get; set; }
+        public DbSet<FixedAssetEntity> FixedAssets { get; set; }
+        public DbSet<FixedAssetDepreciationEntity> FixedAssetDepreciations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

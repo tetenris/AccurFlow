@@ -523,4 +523,38 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.HasOne(e => e.Account).WithMany().HasForeignKey(e => e.AccountId).OnDelete(DeleteBehavior.Restrict);
         }
     }
+
+    public class FixedAssetEntityConfiguration : IEntityTypeConfiguration<FixedAssetEntity>
+    {
+        public void Configure(EntityTypeBuilder<FixedAssetEntity> builder)
+        {
+            builder.ToTable("FixedAssets");
+            builder.HasKey(e => e.AssetId);
+            builder.Property(e => e.AssetCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.AssetName).IsRequired().HasMaxLength(255);
+            builder.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.PurchaseCost).HasPrecision(18, 2);
+            builder.Property(e => e.SalvageValue).HasPrecision(18, 2);
+            builder.Property(e => e.AccumulatedDepreciation).HasPrecision(18, 2);
+            builder.Property(e => e.DepreciationMethod).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.AssetCode).IsUnique();
+            builder.HasOne(e => e.AssetAccount).WithMany().HasForeignKey(e => e.AssetAccountId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.AccumulatedDepreciationAccount).WithMany().HasForeignKey(e => e.AccumulatedDepreciationAccountId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.DepreciationExpenseAccount).WithMany().HasForeignKey(e => e.DepreciationExpenseAccountId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class FixedAssetDepreciationEntityConfiguration : IEntityTypeConfiguration<FixedAssetDepreciationEntity>
+    {
+        public void Configure(EntityTypeBuilder<FixedAssetDepreciationEntity> builder)
+        {
+            builder.ToTable("FixedAssetDepreciations");
+            builder.HasKey(e => e.DepreciationId);
+            builder.Property(e => e.Amount).HasPrecision(18, 2);
+            builder.HasOne(e => e.Asset).WithMany(x => x.Depreciations).HasForeignKey(e => e.AssetId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
+        }
+    }
 }
