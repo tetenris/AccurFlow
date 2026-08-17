@@ -281,10 +281,13 @@ Sudah ada di kode tapi belum jadi menu/UI:
 - Mapping action controller ke permission: `Index/Get/Datatable/Print=View`, `Create/Upload=Add`, `Edit=Edit`, `Delete=Delete`, `Post/Approve/Convert/Cancel=Post`, `Reverse=Reverse`.
 - Create role return `roleId` lalu sync permission admin saat seeding.
 - Sidebar: parent menu muncul otomatis jika ada child yang boleh dilihat.
+- **Edit role menjadi halaman penuh** (`Role/Edit?id=`), bukan modal: form role info + access control (permissions) di satu halaman; tombol list Edit & Manage Permissions mengarah ke halaman tersebut. Tombol Add tetap modal (mengaktifkan tipe enum yang belum dipakai). Data role type dipindah ke file JS bersama `role-type-data.js`.
+- **Role berbasis enum tetap**: dropdown role type diisi dari `RoleEnum` (11 tipe tetap); `RoleService.Create` menolak tipe yang sudah ada, Edit tidak mengizinkan ganti role type bila ada user aktif.
 
 ### 9.3 Super Administrator
 - Role `<b>Super Administrator</b>` adalah role teknis tertinggi, berbeda dari `Administrator`.
 - Dihapus dari Role Management & dropdown role (tidak bisa diedit/dihapus dari UI).
+- Di list role, baris Super Administrator hanya menampilkan View Detail & Audit Trail — tombol Edit dan Manage Permissions disembunyikan karena akses penuh.
 - User seed `admin` memakai role Super Administrator; user seed `administrator` memakai role Administrator.
 - `SeedController` & Hangfire dashboard dibatasi ke role Super Administrator.
 

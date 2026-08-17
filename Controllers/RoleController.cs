@@ -23,6 +23,20 @@ namespace AccuFlow.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var role = await _roleService.GetById(id);
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Title"] = $"Edit Role - {role.RoleName}";
+            ViewData["Back"] = "/Role/Index";
+            return View(role);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTableRoleRequest request)
         {
