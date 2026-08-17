@@ -231,6 +231,7 @@ Sudah ada di kode tapi belum jadi menu/UI:
 - Alur pembelian: `PurchaseRequest` (convert ke PO sesuai supplier & tanggal).
 - Master inventory: `ItemGroup` & `Unit` (CRUD + seed); `Item` ber-relasi ke group.
 - Seeder: roles, users, chart of accounts, customers, suppliers, menus.
+- Menu **Database Seeding** dihapus dari sidebar (dev-only, route `/Seed` tetap ada & dibatasi Super Administrator); `Seeder.SeedMenu` kini soft-delete menu yang tidak ada di seed.
 - Build status: `dotnet build AccuFlow.sln` berhasil compile (masih ada warning nullability).
 
 ### 8.2 Roadmap Bisnis (kronologi modul)
