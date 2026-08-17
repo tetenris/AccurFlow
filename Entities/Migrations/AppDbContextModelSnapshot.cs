@@ -140,6 +140,319 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("ApprovalRequests", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BankReconciliationEntity", b =>
+                {
+                    b.Property<Guid>("ReconciliationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("GlEndingBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid?>("PostedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("PostedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReconciliationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("StatementDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("StatementEndingBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ReconciliationId");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("ReconciliationNumber")
+                        .IsUnique();
+
+                    b.ToTable("BankReconciliations", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BankReconciliationLineEntity", b =>
+                {
+                    b.Property<Guid>("ReconciliationLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsCleared")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ReconciliationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TransactionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ReconciliationLineId");
+
+                    b.HasIndex("ReconciliationId");
+
+                    b.ToTable("BankReconciliationLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BillOfMaterialEntity", b =>
+                {
+                    b.Property<Guid>("BomId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BomNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FinishedItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BomId");
+
+                    b.HasIndex("BomNumber")
+                        .IsUnique();
+
+                    b.HasIndex("FinishedItemId");
+
+                    b.ToTable("BillOfMaterials", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BillOfMaterialLineEntity", b =>
+                {
+                    b.Property<Guid>("BomLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BomId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ComponentItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("QuantityPerUnit")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BomLineId");
+
+                    b.HasIndex("BomId");
+
+                    b.HasIndex("ComponentItemId");
+
+                    b.ToTable("BillOfMaterialLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.CashBankTransferEntity", b =>
+                {
+                    b.Property<Guid>("TransferId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("FromAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PostedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("PostedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("ToAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TransferNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("TransferId");
+
+                    b.HasIndex("FromAccountId");
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("ToAccountId");
+
+                    b.HasIndex("TransferNumber")
+                        .IsUnique();
+
+                    b.ToTable("CashBankTransfers", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
                 {
                     b.Property<Guid>("AccountId")
@@ -160,6 +473,9 @@ namespace AccuFlow.Entities.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("AccountUsage")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -370,6 +686,145 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Customers", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.DeliveryOrderEntity", b =>
+                {
+                    b.Property<Guid>("DeliveryOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeliveryNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid?>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("SalesOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeliveryOrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("DeliveryNumber")
+                        .IsUnique();
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.HasIndex("Status", "IsDeleted");
+
+                    b.ToTable("DeliveryOrders", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.DeliveryOrderLineEntity", b =>
+                {
+                    b.Property<Guid>("DeliveryOrderLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("DeliveryOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("SalesOrderLineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DeliveryOrderLineId");
+
+                    b.HasIndex("DeliveryOrderId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("SalesOrderLineId");
+
+                    b.ToTable("DeliveryOrderLines", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.DocumentAttachmentEntity", b =>
                 {
                     b.Property<Guid>("DocumentAttachmentId")
@@ -438,6 +893,547 @@ namespace AccuFlow.Entities.Migrations
                     b.HasIndex("DocumentType", "DocumentId");
 
                     b.ToTable("DocumentAttachments", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.EmployeeEntity", b =>
+                {
+                    b.Property<Guid>("EmployeeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BankAccountNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Department")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmployeeCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("HireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Position")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmployeeId");
+
+                    b.HasIndex("EmployeeCode")
+                        .IsUnique();
+
+                    b.ToTable("Employees", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.FixedAssetDepreciationEntity", b =>
+                {
+                    b.Property<Guid>("DepreciationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PeriodDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DepreciationId");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("JournalId");
+
+                    b.ToTable("FixedAssetDepreciations", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.FixedAssetEntity", b =>
+                {
+                    b.Property<Guid>("AssetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AccumulatedDepreciation")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("AccumulatedDepreciationAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AssetAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AssetCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("AssetName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DepreciationExpenseAccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepreciationMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastDepreciationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("PurchaseCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("SalvageValue")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsefulLifeMonths")
+                        .HasColumnType("int");
+
+                    b.HasKey("AssetId");
+
+                    b.HasIndex("AccumulatedDepreciationAccountId");
+
+                    b.HasIndex("AssetAccountId");
+
+                    b.HasIndex("AssetCode")
+                        .IsUnique();
+
+                    b.HasIndex("DepreciationExpenseAccountId");
+
+                    b.ToTable("FixedAssets", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReceiptEntity", b =>
+                {
+                    b.Property<Guid>("GoodsReceiptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoodsReceiptNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("PurchaseOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReceiptDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GoodsReceiptId");
+
+                    b.HasIndex("GoodsReceiptNumber")
+                        .IsUnique();
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("Status", "IsDeleted");
+
+                    b.ToTable("GoodsReceipts", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReceiptLineEntity", b =>
+                {
+                    b.Property<Guid>("GoodsReceiptLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("GoodsReceiptId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PurchaseOrderLineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GoodsReceiptLineId");
+
+                    b.HasIndex("GoodsReceiptId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseOrderLineId");
+
+                    b.ToTable("GoodsReceiptLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReturnEntity", b =>
+                {
+                    b.Property<Guid>("GoodsReturnId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GoodsReturnNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReturnType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("SupplierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("GoodsReturnId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("GoodsReturnNumber")
+                        .IsUnique();
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("ReturnType", "Status", "IsDeleted");
+
+                    b.ToTable("GoodsReturns", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReturnLineEntity", b =>
+                {
+                    b.Property<Guid>("GoodsReturnLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("GoodsReturnId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InvoiceLineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GoodsReturnLineId");
+
+                    b.HasIndex("GoodsReturnId");
+
+                    b.HasIndex("InvoiceLineId");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("GoodsReturnLines", (string)null);
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.InvoiceEntity", b =>
@@ -651,6 +1647,9 @@ namespace AccuFlow.Entities.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<Guid?>("ItemGroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -662,6 +1661,10 @@ namespace AccuFlow.Entities.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("PurchasePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ReorderPoint")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -692,9 +1695,64 @@ namespace AccuFlow.Entities.Migrations
                     b.HasIndex("ItemCode")
                         .IsUnique();
 
+                    b.HasIndex("ItemGroupId");
+
                     b.HasIndex("SalesAccountId");
 
                     b.ToTable("Items", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ItemGroupEntity", b =>
+                {
+                    b.Property<Guid>("ItemGroupId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("GroupCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("GroupName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ItemGroupId");
+
+                    b.HasIndex("GroupCode")
+                        .IsUnique();
+
+                    b.ToTable("ItemGroups", (string)null);
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.JournalEntryEntity", b =>
@@ -734,6 +1792,13 @@ namespace AccuFlow.Entities.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("JournalType")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasDefaultValue("General");
 
                     b.Property<Guid?>("OriginalJournalId")
                         .HasColumnType("uniqueidentifier");
@@ -1043,6 +2108,273 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Payments", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PayrollEntity", b =>
+                {
+                    b.Property<Guid>("PayrollId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("PayrollDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PayrollNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("PeriodMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PeriodYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("TotalAllowances")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalDeductions")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalNetSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PayrollId");
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("PayrollNumber")
+                        .IsUnique();
+
+                    b.HasIndex("PeriodMonth", "PeriodYear");
+
+                    b.ToTable("Payrolls", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PayrollLineEntity", b =>
+                {
+                    b.Property<Guid>("PayrollLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Allowances")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BasicSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Deductions")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("NetSalary")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PayrollId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PayrollLineId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("PayrollId");
+
+                    b.ToTable("PayrollLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ProductionOrderEntity", b =>
+                {
+                    b.Property<Guid>("ProductionOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BomId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FinishedItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("JournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("ProductionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProductionOrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ProductionOrderId");
+
+                    b.HasIndex("BomId");
+
+                    b.HasIndex("FinishedItemId");
+
+                    b.HasIndex("JournalId");
+
+                    b.HasIndex("ProductionOrderNumber")
+                        .IsUnique();
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("Status", "IsDeleted");
+
+                    b.ToTable("ProductionOrders", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ProductionOrderLineEntity", b =>
+                {
+                    b.Property<Guid>("ProductionOrderLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ComponentItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ProductionOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("QuantityRequired")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProductionOrderLineId");
+
+                    b.HasIndex("ComponentItemId");
+
+                    b.HasIndex("ProductionOrderId");
+
+                    b.ToTable("ProductionOrderLines", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseOrderEntity", b =>
                 {
                     b.Property<Guid>("PurchaseOrderId")
@@ -1185,6 +2517,154 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("PurchaseOrderLines", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseRequestEntity", b =>
+                {
+                    b.Property<Guid>("PurchaseRequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Department")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid?>("PurchaseOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PurchaseRequestNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("RequestDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RequestedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("RequiredDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PurchaseRequestId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.HasIndex("PurchaseRequestNumber")
+                        .IsUnique();
+
+                    b.HasIndex("Status", "IsDeleted");
+
+                    b.ToTable("PurchaseRequests", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseRequestLineEntity", b =>
+                {
+                    b.Property<Guid>("PurchaseRequestLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PurchaseRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PurchaseRequestLineId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("PurchaseRequestId");
+
+                    b.ToTable("PurchaseRequestLines", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.RoleEntity", b =>
                 {
                     b.Property<Guid>("RoleId")
@@ -1299,6 +2779,364 @@ namespace AccuFlow.Entities.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("RoleMenus", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesOrderEntity", b =>
+                {
+                    b.Property<Guid>("SalesOrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ExpectedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid?>("QuotationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SalesOrderId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique();
+
+                    b.HasIndex("QuotationId");
+
+                    b.ToTable("SalesOrders", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesOrderLineEntity", b =>
+                {
+                    b.Property<Guid>("SalesOrderLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("SalesOrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SalesOrderLineId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("SalesOrderLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesQuotationEntity", b =>
+                {
+                    b.Property<Guid>("SalesQuotationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("QuotationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("QuotationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ValidUntil")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("SalesQuotationId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("QuotationNumber")
+                        .IsUnique();
+
+                    b.ToTable("SalesQuotations", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesQuotationLineEntity", b =>
+                {
+                    b.Property<Guid>("SalesQuotationLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("DiscountAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("LineTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("SalesQuotationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SalesQuotationLineId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("SalesQuotationId");
+
+                    b.ToTable("SalesQuotationLines", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockBatchEntity", b =>
+                {
+                    b.Property<Guid>("StockBatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("RemainingQuantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("StockBatchId");
+
+                    b.HasIndex("BatchNumber");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("StockBatches", (string)null);
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.StockMovementEntity", b =>
@@ -1493,6 +3331,118 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("StockOpnameLines", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockTransferEntity", b =>
+                {
+                    b.Property<Guid>("StockTransferId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("FromWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("StockTransferNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid>("ToWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("TransferDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("StockTransferId");
+
+                    b.HasIndex("FromWarehouseId");
+
+                    b.HasIndex("StockTransferNumber")
+                        .IsUnique();
+
+                    b.HasIndex("ToWarehouseId");
+
+                    b.HasIndex("Status", "IsDeleted");
+
+                    b.ToTable("StockTransfers", (string)null);
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockTransferLineEntity", b =>
+                {
+                    b.Property<Guid>("StockTransferLineId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("StockTransferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("StockTransferLineId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("StockTransferId");
+
+                    b.ToTable("StockTransferLines", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.SupplierEntity", b =>
                 {
                     b.Property<Guid>("SupplierId")
@@ -1685,6 +3635,59 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Taxes", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.UnitEntity", b =>
+                {
+                    b.Property<Guid>("UnitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UnitCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("UnitName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UnitId");
+
+                    b.HasIndex("UnitCode")
+                        .IsUnique();
+
+                    b.ToTable("Units", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.UserEntity", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -1824,6 +3827,53 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Warehouses", (string)null);
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.YearEndClosingEntity", b =>
+                {
+                    b.Property<Guid>("ClosingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ClosingDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ClosingJournalId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FiscalYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ClosingId");
+
+                    b.HasIndex("ClosingJournalId");
+
+                    b.HasIndex("FiscalYear")
+                        .IsUnique();
+
+                    b.ToTable("YearEndClosings", (string)null);
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.ApprovalHistoryEntity", b =>
                 {
                     b.HasOne("AccuFlow.Entities.Entity.ApprovalRequestEntity", "ApprovalRequest")
@@ -1861,6 +3911,84 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("RequestedByUser");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BankReconciliationEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BankReconciliationLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.BankReconciliationEntity", "Reconciliation")
+                        .WithMany("Lines")
+                        .HasForeignKey("ReconciliationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Reconciliation");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BillOfMaterialEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "FinishedItem")
+                        .WithMany()
+                        .HasForeignKey("FinishedItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FinishedItem");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BillOfMaterialLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.BillOfMaterialEntity", "Bom")
+                        .WithMany("Lines")
+                        .HasForeignKey("BomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "ComponentItem")
+                        .WithMany()
+                        .HasForeignKey("ComponentItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Bom");
+
+                    b.Navigation("ComponentItem");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.CashBankTransferEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "FromAccount")
+                        .WithMany()
+                        .HasForeignKey("FromAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "ToAccount")
+                        .WithMany()
+                        .HasForeignKey("ToAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromAccount");
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("ToAccount");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
                 {
                     b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "ParentAccount")
@@ -1869,6 +3997,226 @@ namespace AccuFlow.Entities.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentAccount");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.DeliveryOrderEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.CustomerEntity", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.InvoiceEntity", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.SalesOrderEntity", "SalesOrder")
+                        .WithMany()
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.DeliveryOrderLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.DeliveryOrderEntity", "DeliveryOrder")
+                        .WithMany("Lines")
+                        .HasForeignKey("DeliveryOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.SalesOrderLineEntity", "SalesOrderLine")
+                        .WithMany()
+                        .HasForeignKey("SalesOrderLineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("DeliveryOrder");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("SalesOrderLine");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.FixedAssetDepreciationEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.FixedAssetEntity", "Asset")
+                        .WithMany("Depreciations")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("JournalEntry");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.FixedAssetEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "AccumulatedDepreciationAccount")
+                        .WithMany()
+                        .HasForeignKey("AccumulatedDepreciationAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "AssetAccount")
+                        .WithMany()
+                        .HasForeignKey("AssetAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "DepreciationExpenseAccount")
+                        .WithMany()
+                        .HasForeignKey("DepreciationExpenseAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AccumulatedDepreciationAccount");
+
+                    b.Navigation("AssetAccount");
+
+                    b.Navigation("DepreciationExpenseAccount");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReceiptEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.PurchaseOrderEntity", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.SupplierEntity", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.WarehouseEntity", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("PurchaseOrder");
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReceiptLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.GoodsReceiptEntity", "GoodsReceipt")
+                        .WithMany("Lines")
+                        .HasForeignKey("GoodsReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.PurchaseOrderLineEntity", "PurchaseOrderLine")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderLineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GoodsReceipt");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("PurchaseOrderLine");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReturnEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.CustomerEntity", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.InvoiceEntity", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.SupplierEntity", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.WarehouseEntity", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("Supplier");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReturnLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.GoodsReturnEntity", "GoodsReturn")
+                        .WithMany("Lines")
+                        .HasForeignKey("GoodsReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.InvoiceLineEntity", "InvoiceLine")
+                        .WithMany()
+                        .HasForeignKey("InvoiceLineId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GoodsReturn");
+
+                    b.Navigation("InvoiceLine");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.InvoiceEntity", b =>
@@ -1932,6 +4280,11 @@ namespace AccuFlow.Entities.Migrations
                         .HasForeignKey("InventoryAccountId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("AccuFlow.Entities.Entity.ItemGroupEntity", "ItemGroup")
+                        .WithMany()
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "SalesAccount")
                         .WithMany()
                         .HasForeignKey("SalesAccountId")
@@ -1940,6 +4293,8 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("CostOfGoodsSoldAccount");
 
                     b.Navigation("InventoryAccount");
+
+                    b.Navigation("ItemGroup");
 
                     b.Navigation("SalesAccount");
                 });
@@ -2063,6 +4418,87 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PayrollEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("JournalEntry");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PayrollLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.EmployeeEntity", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.PayrollEntity", "Payroll")
+                        .WithMany("Lines")
+                        .HasForeignKey("PayrollId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Payroll");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ProductionOrderEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.BillOfMaterialEntity", "Bom")
+                        .WithMany()
+                        .HasForeignKey("BomId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "FinishedItem")
+                        .WithMany()
+                        .HasForeignKey("FinishedItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                        .WithMany()
+                        .HasForeignKey("JournalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("AccuFlow.Entities.Entity.WarehouseEntity", "Warehouse")
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Bom");
+
+                    b.Navigation("FinishedItem");
+
+                    b.Navigation("JournalEntry");
+
+                    b.Navigation("Warehouse");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ProductionOrderLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "ComponentItem")
+                        .WithMany()
+                        .HasForeignKey("ComponentItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.ProductionOrderEntity", "ProductionOrder")
+                        .WithMany("Lines")
+                        .HasForeignKey("ProductionOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ComponentItem");
+
+                    b.Navigation("ProductionOrder");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseOrderEntity", b =>
                 {
                     b.HasOne("AccuFlow.Entities.Entity.InvoiceEntity", "PurchaseInvoice")
@@ -2099,6 +4535,34 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("PurchaseOrder");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseRequestEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.PurchaseOrderEntity", "PurchaseOrder")
+                        .WithMany()
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PurchaseOrder");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseRequestLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.PurchaseRequestEntity", "PurchaseRequest")
+                        .WithMany("Lines")
+                        .HasForeignKey("PurchaseRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("PurchaseRequest");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.RoleMenuEntity", b =>
                 {
                     b.HasOne("AccuFlow.Entities.Entity.MenuEntity", "Menu")
@@ -2116,6 +4580,82 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Menu");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesOrderEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.CustomerEntity", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.SalesQuotationEntity", "Quotation")
+                        .WithMany()
+                        .HasForeignKey("QuotationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Quotation");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesOrderLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.SalesOrderEntity", "SalesOrder")
+                        .WithMany("Lines")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesQuotationEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.CustomerEntity", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesQuotationLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("AccuFlow.Entities.Entity.SalesQuotationEntity", "SalesQuotation")
+                        .WithMany("Lines")
+                        .HasForeignKey("SalesQuotationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("SalesQuotation");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockBatchEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.StockMovementEntity", b =>
@@ -2167,6 +4707,44 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("StockOpname");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockTransferEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.WarehouseEntity", "FromWarehouse")
+                        .WithMany()
+                        .HasForeignKey("FromWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.WarehouseEntity", "ToWarehouse")
+                        .WithMany()
+                        .HasForeignKey("ToWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromWarehouse");
+
+                    b.Navigation("ToWarehouse");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockTransferLineEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.ItemEntity", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AccuFlow.Entities.Entity.StockTransferEntity", "StockTransfer")
+                        .WithMany("Lines")
+                        .HasForeignKey("StockTransferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("StockTransfer");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.TaxEntity", b =>
                 {
                     b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "Account")
@@ -2188,14 +4766,54 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.YearEndClosingEntity", b =>
+                {
+                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "ClosingJournal")
+                        .WithMany()
+                        .HasForeignKey("ClosingJournalId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ClosingJournal");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.ApprovalRequestEntity", b =>
                 {
                     b.Navigation("Histories");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BankReconciliationEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.BillOfMaterialEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
                 {
                     b.Navigation("ChildAccounts");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.DeliveryOrderEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.FixedAssetEntity", b =>
+                {
+                    b.Navigation("Depreciations");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReceiptEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.GoodsReturnEntity", b =>
+                {
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("AccuFlow.Entities.Entity.InvoiceEntity", b =>
@@ -2220,12 +4838,42 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Allocations");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PayrollEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.ProductionOrderEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseOrderEntity", b =>
                 {
                     b.Navigation("Lines");
                 });
 
+            modelBuilder.Entity("AccuFlow.Entities.Entity.PurchaseRequestEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesOrderEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.SalesQuotationEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
             modelBuilder.Entity("AccuFlow.Entities.Entity.StockOpnameEntity", b =>
+                {
+                    b.Navigation("Lines");
+                });
+
+            modelBuilder.Entity("AccuFlow.Entities.Entity.StockTransferEntity", b =>
                 {
                     b.Navigation("Lines");
                 });

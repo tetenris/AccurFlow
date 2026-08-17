@@ -35,6 +35,7 @@ namespace AccuFlow.Entities.Seeders
                     IsActive = true,
                     NormalBalance = "Debit",
                     Level = 1,
+                    AccountUsage = 1, // Cash
                     CreatedBy = "system",
                     CreatedAt = DateTime.UtcNow
                 },
@@ -50,6 +51,7 @@ namespace AccuFlow.Entities.Seeders
                     IsActive = true,
                     NormalBalance = "Debit",
                     Level = 1,
+                    AccountUsage = 2, // Bank
                     CreatedBy = "system",
                     CreatedAt = DateTime.UtcNow
                 },
@@ -121,6 +123,21 @@ namespace AccuFlow.Entities.Seeders
                     AccountName = "Tax Payable",
                     AccountType = "Liability",
                     Description = "Taxes owed to government",
+                    ParentAccountId = Guid.Parse("20000000-0000-0000-0000-000000000001"),
+                    IsHeader = false,
+                    IsActive = true,
+                    NormalBalance = "Credit",
+                    Level = 1,
+                    CreatedBy = "system",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ChartOfAccountEntity
+                {
+                    AccountId = Guid.Parse("20000000-0000-0000-0000-000000000020"),
+                    AccountCode = "2-10300",
+                    AccountName = "Payroll Payable",
+                    AccountType = "Liability",
+                    Description = "Accrued employee salaries payable",
                     ParentAccountId = Guid.Parse("20000000-0000-0000-0000-000000000001"),
                     IsHeader = false,
                     IsActive = true,
@@ -412,6 +429,51 @@ namespace AccuFlow.Entities.Seeders
                     AccountType = "Other Expense",
                     Description = "Loss from currency exchange differences",
                     ParentAccountId = Guid.Parse("70000000-0000-0000-0000-000000000001"),
+                    IsHeader = false,
+                    IsActive = true,
+                    NormalBalance = "Debit",
+                    Level = 1,
+                    CreatedBy = "system",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ChartOfAccountEntity
+                {
+                    AccountId = Guid.Parse("10000000-0000-0000-0000-000000000006"),
+                    AccountCode = "1-10500",
+                    AccountName = "Fixed Assets",
+                    AccountType = "Asset",
+                    Description = "Property, plant and equipment owned by the company",
+                    ParentAccountId = Guid.Parse("10000000-0000-0000-0000-000000000001"),
+                    IsHeader = false,
+                    IsActive = true,
+                    NormalBalance = "Debit",
+                    Level = 1,
+                    CreatedBy = "system",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ChartOfAccountEntity
+                {
+                    AccountId = Guid.Parse("10000000-0000-0000-0000-000000000007"),
+                    AccountCode = "1-10600",
+                    AccountName = "Accumulated Depreciation",
+                    AccountType = "Asset",
+                    Description = "Accumulated depreciation on fixed assets (contra asset)",
+                    ParentAccountId = Guid.Parse("10000000-0000-0000-0000-000000000001"),
+                    IsHeader = false,
+                    IsActive = true,
+                    NormalBalance = "Credit",
+                    Level = 1,
+                    CreatedBy = "system",
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ChartOfAccountEntity
+                {
+                    AccountId = Guid.Parse("50000000-0000-0000-0000-000000000006"),
+                    AccountCode = "5-10500",
+                    AccountName = "Depreciation Expense",
+                    AccountType = "Expense",
+                    Description = "Depreciation charged on fixed assets",
+                    ParentAccountId = Guid.Parse("50000000-0000-0000-0000-000000000001"),
                     IsHeader = false,
                     IsActive = true,
                     NormalBalance = "Debit",

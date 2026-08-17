@@ -160,9 +160,9 @@ namespace AccuFlow.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GenerateNumber(DateTime journalDate)
+        public async Task<IActionResult> GenerateNumber(DateTime journalDate, string? journalType = null)
         {
-            var number = await _journalEntryService.GenerateJournalNumberAsync(journalDate);
+            var number = await _journalEntryService.GenerateJournalNumberAsync(journalDate, journalType);
             return Json(new { number });
         }
 

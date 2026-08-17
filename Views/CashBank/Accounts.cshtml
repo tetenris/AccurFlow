@@ -1,0 +1,63 @@
+@model List<AccuFlow.Models.CashBank.BankAccountViewModel>
+@{
+    ViewData["Title"] = "Cash & Bank Accounts";
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <h5 class="mb-0">Cash & Bank Accounts</h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <a class="btn btn-primary" asp-controller="ChartOfAccount" asp-action="Index">Manage COA</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Code</th>
+                        <th>Account Name</th>
+                        <th>Usage</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var index = 1;
+                        var totalBalance = 0m;
+                    }
+                    @foreach (var account in Model)
+                    {
+                        totalBalance += account.Balance;
+                        <tr>
+                            <td>@index</td>
+                            <td>@account.AccountCode</td>
+                            <td>@account.AccountName</td>
+                            <td>
+                                @if (account.Usage == 1)
+                                {
+                                    <span class="badge badge-light-success">Cash</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-light-primary">Bank</span>
+                                }
+                            </td>
+                            <td class="text-end">@string.Format("{0:N2}", account.Balance)</td>
+                        </tr>
+                        index++;
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="4" class="text-end">Total Balance</td>
+                        <td class="text-end">@string.Format("{0:N2}", totalBalance)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

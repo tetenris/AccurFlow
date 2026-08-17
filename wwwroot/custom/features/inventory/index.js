@@ -13,6 +13,7 @@ $(document).ready(function () {
             { data: 'itemCode' },
             { data: 'itemName' },
             { data: 'itemType' },
+            { data: 'itemGroupName', render: data => data || '-' },
             { data: 'unit' },
             { data: 'salesPrice', render: formatCurrency },
             { data: 'purchasePrice', render: formatCurrency },

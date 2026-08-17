@@ -97,6 +97,42 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class PurchaseRequestEntityConfiguration : IEntityTypeConfiguration<PurchaseRequestEntity>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseRequestEntity> builder)
+        {
+            builder.ToTable("PurchaseRequests");
+            builder.HasKey(e => e.PurchaseRequestId);
+            builder.Property(e => e.PurchaseRequestNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.RequestedBy).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Department).HasMaxLength(100);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.PurchaseRequestNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.PurchaseOrder).WithMany().HasForeignKey(e => e.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.PurchaseRequest).HasForeignKey(e => e.PurchaseRequestId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class PurchaseRequestLineEntityConfiguration : IEntityTypeConfiguration<PurchaseRequestLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<PurchaseRequestLineEntity> builder)
+        {
+            builder.ToTable("PurchaseRequestLines");
+            builder.HasKey(e => e.PurchaseRequestLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class PurchaseOrderLineEntityConfiguration : IEntityTypeConfiguration<PurchaseOrderLineEntity>
     {
         public void Configure(EntityTypeBuilder<PurchaseOrderLineEntity> builder)
@@ -108,6 +144,189 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
             builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
             builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class GoodsReceiptEntityConfiguration : IEntityTypeConfiguration<GoodsReceiptEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReceiptEntity> builder)
+        {
+            builder.ToTable("GoodsReceipts");
+            builder.HasKey(e => e.GoodsReceiptId);
+            builder.Property(e => e.GoodsReceiptNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.GoodsReceiptNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.PurchaseOrder).WithMany().HasForeignKey(e => e.PurchaseOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Supplier).WithMany().HasForeignKey(e => e.SupplierId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.GoodsReceipt).HasForeignKey(e => e.GoodsReceiptId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class GoodsReceiptLineEntityConfiguration : IEntityTypeConfiguration<GoodsReceiptLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReceiptLineEntity> builder)
+        {
+            builder.ToTable("GoodsReceiptLines");
+            builder.HasKey(e => e.GoodsReceiptLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.PurchaseOrderLine).WithMany().HasForeignKey(e => e.PurchaseOrderLineId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class GoodsReturnEntityConfiguration : IEntityTypeConfiguration<GoodsReturnEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReturnEntity> builder)
+        {
+            builder.ToTable("GoodsReturns");
+            builder.HasKey(e => e.GoodsReturnId);
+            builder.Property(e => e.GoodsReturnNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.ReturnType).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.GoodsReturnNumber).IsUnique();
+            builder.HasIndex(e => new { e.ReturnType, e.Status, e.IsDeleted });
+            builder.HasOne(e => e.Invoice).WithMany().HasForeignKey(e => e.InvoiceId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Supplier).WithMany().HasForeignKey(e => e.SupplierId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.GoodsReturn).HasForeignKey(e => e.GoodsReturnId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class GoodsReturnLineEntityConfiguration : IEntityTypeConfiguration<GoodsReturnLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<GoodsReturnLineEntity> builder)
+        {
+            builder.ToTable("GoodsReturnLines");
+            builder.HasKey(e => e.GoodsReturnLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.InvoiceLine).WithMany().HasForeignKey(e => e.InvoiceLineId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class SalesQuotationEntityConfiguration : IEntityTypeConfiguration<SalesQuotationEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesQuotationEntity> builder)
+        {
+            builder.ToTable("SalesQuotations");
+            builder.HasKey(e => e.SalesQuotationId);
+            builder.Property(e => e.QuotationNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.QuotationNumber).IsUnique();
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.SalesQuotation).HasForeignKey(e => e.SalesQuotationId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class SalesQuotationLineEntityConfiguration : IEntityTypeConfiguration<SalesQuotationLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesQuotationLineEntity> builder)
+        {
+            builder.ToTable("SalesQuotationLines");
+            builder.HasKey(e => e.SalesQuotationLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class SalesOrderEntityConfiguration : IEntityTypeConfiguration<SalesOrderEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesOrderEntity> builder)
+        {
+            builder.ToTable("SalesOrders");
+            builder.HasKey(e => e.SalesOrderId);
+            builder.Property(e => e.OrderNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.SubTotal).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.OrderNumber).IsUnique();
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Quotation).WithMany().HasForeignKey(e => e.QuotationId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.SalesOrder).HasForeignKey(e => e.SalesOrderId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class SalesOrderLineEntityConfiguration : IEntityTypeConfiguration<SalesOrderLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<SalesOrderLineEntity> builder)
+        {
+            builder.ToTable("SalesOrderLines");
+            builder.HasKey(e => e.SalesOrderLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.DiscountAmount).HasPrecision(18, 2);
+            builder.Property(e => e.TaxAmount).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class DeliveryOrderEntityConfiguration : IEntityTypeConfiguration<DeliveryOrderEntity>
+    {
+        public void Configure(EntityTypeBuilder<DeliveryOrderEntity> builder)
+        {
+            builder.ToTable("DeliveryOrders");
+            builder.HasKey(e => e.DeliveryOrderId);
+            builder.Property(e => e.DeliveryNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.TotalAmount).HasPrecision(18, 2);
+            builder.HasIndex(e => e.DeliveryNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.SalesOrder).WithMany().HasForeignKey(e => e.SalesOrderId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Customer).WithMany().HasForeignKey(e => e.CustomerId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Invoice).WithMany().HasForeignKey(e => e.InvoiceId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.DeliveryOrder).HasForeignKey(e => e.DeliveryOrderId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class DeliveryOrderLineEntityConfiguration : IEntityTypeConfiguration<DeliveryOrderLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<DeliveryOrderLineEntity> builder)
+        {
+            builder.ToTable("DeliveryOrderLines");
+            builder.HasKey(e => e.DeliveryOrderLineId);
+            builder.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.UnitPrice).HasPrecision(18, 2);
+            builder.Property(e => e.LineTotal).HasPrecision(18, 2);
+            builder.HasOne(e => e.SalesOrderLine).WithMany().HasForeignKey(e => e.SalesOrderLineId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
         }
     }
@@ -125,10 +344,38 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.Description).HasMaxLength(1000);
             builder.Property(e => e.SalesPrice).HasPrecision(18, 2);
             builder.Property(e => e.PurchasePrice).HasPrecision(18, 2);
+            builder.Property(e => e.ReorderPoint).HasPrecision(18, 2);
             builder.HasIndex(e => e.ItemCode).IsUnique();
+            builder.HasOne(e => e.ItemGroup).WithMany().HasForeignKey(e => e.ItemGroupId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.InventoryAccount).WithMany().HasForeignKey(e => e.InventoryAccountId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.SalesAccount).WithMany().HasForeignKey(e => e.SalesAccountId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.CostOfGoodsSoldAccount).WithMany().HasForeignKey(e => e.CostOfGoodsSoldAccountId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class ItemGroupEntityConfiguration : IEntityTypeConfiguration<ItemGroupEntity>
+    {
+        public void Configure(EntityTypeBuilder<ItemGroupEntity> builder)
+        {
+            builder.ToTable("ItemGroups");
+            builder.HasKey(e => e.ItemGroupId);
+            builder.Property(e => e.GroupCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.GroupName).IsRequired().HasMaxLength(255);
+            builder.Property(e => e.Description).HasMaxLength(500);
+            builder.HasIndex(e => e.GroupCode).IsUnique();
+        }
+    }
+
+    public class UnitEntityConfiguration : IEntityTypeConfiguration<UnitEntity>
+    {
+        public void Configure(EntityTypeBuilder<UnitEntity> builder)
+        {
+            builder.ToTable("Units");
+            builder.HasKey(e => e.UnitId);
+            builder.Property(e => e.UnitCode).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.UnitName).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Description).HasMaxLength(500);
+            builder.HasIndex(e => e.UnitCode).IsUnique();
         }
     }
 
@@ -159,6 +406,50 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.Notes).HasMaxLength(1000);
             builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class StockBatchEntityConfiguration : IEntityTypeConfiguration<StockBatchEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockBatchEntity> builder)
+        {
+            builder.ToTable("StockBatches");
+            builder.HasKey(e => e.StockBatchId);
+            builder.Property(e => e.BatchNumber).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.RemainingQuantity).HasPrecision(18, 4);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.ItemId);
+            builder.HasIndex(e => e.BatchNumber);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class StockTransferEntityConfiguration : IEntityTypeConfiguration<StockTransferEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockTransferEntity> builder)
+        {
+            builder.ToTable("StockTransfers");
+            builder.HasKey(e => e.StockTransferId);
+            builder.Property(e => e.StockTransferNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.StockTransferNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.FromWarehouse).WithMany().HasForeignKey(e => e.FromWarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.ToWarehouse).WithMany().HasForeignKey(e => e.ToWarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.StockTransfer).HasForeignKey(e => e.StockTransferId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class StockTransferLineEntityConfiguration : IEntityTypeConfiguration<StockTransferLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockTransferLineEntity> builder)
+        {
+            builder.ToTable("StockTransferLines");
+            builder.HasKey(e => e.StockTransferLineId);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 
@@ -246,6 +537,157 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.Property(e => e.Rate).HasPrecision(9, 4);
             builder.HasIndex(e => e.TaxCode).IsUnique();
             builder.HasOne(e => e.Account).WithMany().HasForeignKey(e => e.AccountId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class FixedAssetEntityConfiguration : IEntityTypeConfiguration<FixedAssetEntity>
+    {
+        public void Configure(EntityTypeBuilder<FixedAssetEntity> builder)
+        {
+            builder.ToTable("FixedAssets");
+            builder.HasKey(e => e.AssetId);
+            builder.Property(e => e.AssetCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.AssetName).IsRequired().HasMaxLength(255);
+            builder.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.PurchaseCost).HasPrecision(18, 2);
+            builder.Property(e => e.SalvageValue).HasPrecision(18, 2);
+            builder.Property(e => e.AccumulatedDepreciation).HasPrecision(18, 2);
+            builder.Property(e => e.DepreciationMethod).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.AssetCode).IsUnique();
+            builder.HasOne(e => e.AssetAccount).WithMany().HasForeignKey(e => e.AssetAccountId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.AccumulatedDepreciationAccount).WithMany().HasForeignKey(e => e.AccumulatedDepreciationAccountId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.DepreciationExpenseAccount).WithMany().HasForeignKey(e => e.DepreciationExpenseAccountId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class FixedAssetDepreciationEntityConfiguration : IEntityTypeConfiguration<FixedAssetDepreciationEntity>
+    {
+        public void Configure(EntityTypeBuilder<FixedAssetDepreciationEntity> builder)
+        {
+            builder.ToTable("FixedAssetDepreciations");
+            builder.HasKey(e => e.DepreciationId);
+            builder.Property(e => e.Amount).HasPrecision(18, 2);
+            builder.HasOne(e => e.Asset).WithMany(x => x.Depreciations).HasForeignKey(e => e.AssetId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
+        }
+    }
+
+    public class YearEndClosingEntityConfiguration : IEntityTypeConfiguration<YearEndClosingEntity>
+    {
+        public void Configure(EntityTypeBuilder<YearEndClosingEntity> builder)
+        {
+            builder.ToTable("YearEndClosings");
+            builder.HasKey(e => e.ClosingId);
+            builder.HasIndex(e => e.FiscalYear).IsUnique();
+            builder.HasOne(e => e.ClosingJournal).WithMany().HasForeignKey(e => e.ClosingJournalId).OnDelete(DeleteBehavior.SetNull);
+        }
+    }
+
+    public class EmployeeEntityConfiguration : IEntityTypeConfiguration<EmployeeEntity>
+    {
+        public void Configure(EntityTypeBuilder<EmployeeEntity> builder)
+        {
+            builder.ToTable("Employees");
+            builder.HasKey(e => e.EmployeeId);
+            builder.Property(e => e.EmployeeCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.FullName).IsRequired().HasMaxLength(200);
+            builder.Property(e => e.Position).HasMaxLength(100);
+            builder.Property(e => e.Department).HasMaxLength(100);
+            builder.Property(e => e.BasicSalary).HasPrecision(18, 2);
+            builder.Property(e => e.BankAccountNumber).HasMaxLength(50);
+            builder.HasIndex(e => e.EmployeeCode).IsUnique();
+        }
+    }
+
+    public class PayrollEntityConfiguration : IEntityTypeConfiguration<PayrollEntity>
+    {
+        public void Configure(EntityTypeBuilder<PayrollEntity> builder)
+        {
+            builder.ToTable("Payrolls");
+            builder.HasKey(e => e.PayrollId);
+            builder.Property(e => e.PayrollNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.TotalAllowances).HasPrecision(18, 2);
+            builder.Property(e => e.TotalDeductions).HasPrecision(18, 2);
+            builder.Property(e => e.TotalNetSalary).HasPrecision(18, 2);
+            builder.HasIndex(e => e.PayrollNumber).IsUnique();
+            builder.HasIndex(e => new { e.PeriodMonth, e.PeriodYear });
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
+            builder.HasMany(e => e.Lines).WithOne(e => e.Payroll).HasForeignKey(e => e.PayrollId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class PayrollLineEntityConfiguration : IEntityTypeConfiguration<PayrollLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<PayrollLineEntity> builder)
+        {
+            builder.ToTable("PayrollLines");
+            builder.HasKey(e => e.PayrollLineId);
+            builder.Property(e => e.BasicSalary).HasPrecision(18, 2);
+            builder.Property(e => e.Allowances).HasPrecision(18, 2);
+            builder.Property(e => e.Deductions).HasPrecision(18, 2);
+            builder.Property(e => e.NetSalary).HasPrecision(18, 2);
+            builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class BillOfMaterialEntityConfiguration : IEntityTypeConfiguration<BillOfMaterialEntity>
+    {
+        public void Configure(EntityTypeBuilder<BillOfMaterialEntity> builder)
+        {
+            builder.ToTable("BillOfMaterials");
+            builder.HasKey(e => e.BomId);
+            builder.Property(e => e.BomNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.BomNumber).IsUnique();
+            builder.HasOne(e => e.FinishedItem).WithMany().HasForeignKey(e => e.FinishedItemId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasMany(e => e.Lines).WithOne(e => e.Bom).HasForeignKey(e => e.BomId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class BillOfMaterialLineEntityConfiguration : IEntityTypeConfiguration<BillOfMaterialLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<BillOfMaterialLineEntity> builder)
+        {
+            builder.ToTable("BillOfMaterialLines");
+            builder.HasKey(e => e.BomLineId);
+            builder.Property(e => e.QuantityPerUnit).HasPrecision(18, 4);
+            builder.HasOne(e => e.ComponentItem).WithMany().HasForeignKey(e => e.ComponentItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
+    public class ProductionOrderEntityConfiguration : IEntityTypeConfiguration<ProductionOrderEntity>
+    {
+        public void Configure(EntityTypeBuilder<ProductionOrderEntity> builder)
+        {
+            builder.ToTable("ProductionOrders");
+            builder.HasKey(e => e.ProductionOrderId);
+            builder.Property(e => e.ProductionOrderNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.ProductionOrderNumber).IsUnique();
+            builder.HasIndex(e => new { e.Status, e.IsDeleted });
+            builder.HasOne(e => e.Bom).WithMany().HasForeignKey(e => e.BomId).OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(e => e.FinishedItem).WithMany().HasForeignKey(e => e.FinishedItemId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
+            builder.HasMany(e => e.Lines).WithOne(e => e.ProductionOrder).HasForeignKey(e => e.ProductionOrderId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class ProductionOrderLineEntityConfiguration : IEntityTypeConfiguration<ProductionOrderLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<ProductionOrderLineEntity> builder)
+        {
+            builder.ToTable("ProductionOrderLines");
+            builder.HasKey(e => e.ProductionOrderLineId);
+            builder.Property(e => e.QuantityRequired).HasPrecision(18, 4);
+            builder.Property(e => e.UnitCost).HasPrecision(18, 2);
+            builder.HasOne(e => e.ComponentItem).WithMany().HasForeignKey(e => e.ComponentItemId).OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
