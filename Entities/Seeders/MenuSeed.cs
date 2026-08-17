@@ -504,6 +504,17 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "StockMinimum",
                     Action = @"[""view""]",
                     Sequence = 7
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000045"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000020"),
+                    Icon = "",
+                    Name = "Serial Number / Batch",
+                    Controller = "SerialBatch",
+                    Action = @"[""view"",""add"",""delete"",""post""]",
+                    Sequence = 8
                 }
             };
         }

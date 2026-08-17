@@ -409,6 +409,22 @@ namespace AccuFlow.Entities.EntityConfigurations
         }
     }
 
+    public class StockBatchEntityConfiguration : IEntityTypeConfiguration<StockBatchEntity>
+    {
+        public void Configure(EntityTypeBuilder<StockBatchEntity> builder)
+        {
+            builder.ToTable("StockBatches");
+            builder.HasKey(e => e.StockBatchId);
+            builder.Property(e => e.BatchNumber).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Quantity).HasPrecision(18, 4);
+            builder.Property(e => e.RemainingQuantity).HasPrecision(18, 4);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.HasIndex(e => e.ItemId);
+            builder.HasIndex(e => e.BatchNumber);
+            builder.HasOne(e => e.Item).WithMany().HasForeignKey(e => e.ItemId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+
     public class StockTransferEntityConfiguration : IEntityTypeConfiguration<StockTransferEntity>
     {
         public void Configure(EntityTypeBuilder<StockTransferEntity> builder)
