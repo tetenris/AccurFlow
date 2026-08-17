@@ -31,7 +31,7 @@ namespace AccuFlow.Services
         Task<List<string>> ValidateJournalAsync(CreateJournalEntryRequest request);
 
         // Utility
-        Task<string> GenerateJournalNumberAsync(DateTime journalDate);
+        Task<string> GenerateJournalNumberAsync(DateTime journalDate, string? journalType = null);
         Task<List<JournalEntryViewModel>> GetByAccountAsync(Guid accountId);
         Task<List<JournalEntryViewModel>> GetByDateRangeAsync(DateTime dateFrom, DateTime dateTo);
 
@@ -72,6 +72,11 @@ namespace AccuFlow.Services
                 query = query.Where(x => x.Status == request.Status);
             }
 
+            if (!string.IsNullOrEmpty(request.JournalType))
+            {
+                query = query.Where(x => x.JournalType == request.JournalType);
+            }
+
             if (request.AccountId.HasValue)
             {
                 query = query.Where(x => x.JournalLines.Any(l => l.AccountId == request.AccountId.Value && !l.IsDeleted));
@@ -106,6 +111,7 @@ namespace AccuFlow.Services
                     JournalNumber = x.JournalNumber,
                     JournalDate = x.JournalDate,
                     Description = x.Description,
+                    JournalType = x.JournalType ?? "General",
                     Status = x.Status,
                     TotalDebit = x.TotalDebit,
                     TotalCredit = x.TotalCredit,
@@ -151,6 +157,7 @@ namespace AccuFlow.Services
                 JournalNumber = journal.JournalNumber,
                 JournalDate = journal.JournalDate,
                 Description = journal.Description,
+                JournalType = journal.JournalType ?? "General",
                 Status = journal.Status,
                 TotalDebit = journal.TotalDebit,
                 TotalCredit = journal.TotalCredit,
@@ -205,7 +212,7 @@ namespace AccuFlow.Services
             }
 
             // Generate journal number
-            var journalNumber = await GenerateJournalNumberAsync(request.JournalDate);
+            var journalNumber = await GenerateJournalNumberAsync(request.JournalDate, request.JournalType);
 
             // Calculate totals
             var totalDebit = request.JournalLines.Sum(x => x.DebitAmount);
@@ -218,6 +225,7 @@ namespace AccuFlow.Services
                 JournalNumber = journalNumber,
                 JournalDate = request.JournalDate,
                 Description = request.Description,
+                JournalType = string.IsNullOrEmpty(request.JournalType) ? "General" : request.JournalType,
                 Status = "Draft",
                 TotalDebit = totalDebit,
                 TotalCredit = totalCredit,
@@ -392,7 +400,7 @@ namespace AccuFlow.Services
             }
 
             // Generate reversal journal number
-            var reversalNumber = await GenerateJournalNumberAsync(request.ReversalDate);
+            var reversalNumber = await GenerateJournalNumberAsync(request.ReversalDate, journal.JournalType);
 
             // Create reversal journal
             var reversalJournal = new JournalEntryEntity
@@ -552,10 +560,17 @@ namespace AccuFlow.Services
             return errors;
         }
 
-        public async Task<string> GenerateJournalNumberAsync(DateTime journalDate)
+        public async Task<string> GenerateJournalNumberAsync(DateTime journalDate, string? journalType = null)
         {
             var datePrefix = journalDate.ToString("yyyyMMdd");
-            var prefix = $"JE-{datePrefix}-";
+            var type = string.IsNullOrEmpty(journalType) ? "General" : journalType;
+            var typeCode = type switch
+            {
+                "Adjustment" => "JA",
+                "Memo" => "JM",
+                _ => "JE"
+            };
+            var prefix = $"{typeCode}-{datePrefix}-";
 
             var lastJournal = await _dbContext.Set<JournalEntryEntity>()
                 .Where(x => x.JournalNumber.StartsWith(prefix))

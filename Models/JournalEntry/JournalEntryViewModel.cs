@@ -6,6 +6,7 @@ namespace AccuFlow.Models.JournalEntry
         public string JournalNumber { get; set; } = string.Empty;
         public DateTime JournalDate { get; set; }
         public string Description { get; set; } = string.Empty;
+        public string JournalType { get; set; } = "General";
         public string Status { get; set; } = string.Empty;
         public decimal TotalDebit { get; set; }
         public decimal TotalCredit { get; set; }

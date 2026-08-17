@@ -24,6 +24,10 @@ namespace AccuFlow.Entities.Entity
         [MaxLength(20)]
         public string Status { get; set; } = "Draft"; // Draft, Posted, Reversed
 
+        [Required]
+        [MaxLength(30)]
+        public string JournalType { get; set; } = "General"; // General, Adjustment, Memo
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalDebit { get; set; }
 

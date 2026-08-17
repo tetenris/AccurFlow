@@ -51,6 +51,7 @@ namespace AccuFlow.Entities.EntityConfigurations
 
             // Default values
             builder.Property(x => x.Status).HasDefaultValue("Draft");
+            builder.Property(x => x.JournalType).HasDefaultValue("General");
             builder.Property(x => x.IsDeleted).HasDefaultValue(false);
             builder.Property(x => x.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
         }

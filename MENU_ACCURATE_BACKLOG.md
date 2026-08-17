@@ -122,6 +122,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 35 | Accounting > Taxes | Tax | CRUD pajak (PPN 11%) + tab laporan PPN keluaran/masukan |
 | 36 | Accounting > Fixed Assets | FixedAsset | daftar aktiva tetap + penyusutan (jurnal otomatis) |
 | 37 | Accounting > Year-End Closing | YearEndClosing | tutup tahun fiskal: preview saldo P&L → jurnal otomatis ke Retained Earnings |
+| 38 | Accounting > Jurnal Memo / Penyesuaian | MemoJournal | jurnal manual berjenis Memo (JM-) / Adjustment (JA-) |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -134,10 +135,9 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
-- **[2] Serial Number / Batch** — pelacakan stok per unit.
-- **[3] Payroll / HRM** — penggajian.
-- **[4] Produksi / Manufacturing** — BOM & job order.
+- **[1] Serial Number / Batch** — pelacakan stok per unit.
+- **[2] Payroll / HRM** — penggajian.
+- **[3] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +148,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 37 item terhubung; total backlog berjumlah 4 item berurutan.*
+*Status pembandingan: menu saat ini 38 item terhubung; total backlog berjumlah 3 item berurutan.*
