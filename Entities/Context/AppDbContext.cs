@@ -60,6 +60,10 @@ namespace AccuFlow.Entities.Context
         public DbSet<EmployeeEntity> Employees { get; set; }
         public DbSet<PayrollEntity> Payrolls { get; set; }
         public DbSet<PayrollLineEntity> PayrollLines { get; set; }
+        public DbSet<BillOfMaterialEntity> BillOfMaterials { get; set; }
+        public DbSet<BillOfMaterialLineEntity> BillOfMaterialLines { get; set; }
+        public DbSet<ProductionOrderEntity> ProductionOrders { get; set; }
+        public DbSet<ProductionOrderLineEntity> ProductionOrderLines { get; set; }
         public DbSet<YearEndClosingEntity> YearEndClosings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

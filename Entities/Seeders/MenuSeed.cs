@@ -537,6 +537,28 @@ namespace AccuFlow.Entities.Seeders
                     Controller = "Payroll",
                     Action = @"[""view"",""add"",""edit"",""delete"",""post""]",
                     Sequence = 1
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000048"),
+                    MenuParentId = null,
+                    Icon = @"<i class=""ki-duotone ki-buildings-2 fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
+                    Name = "Produksi",
+                    Controller = "",
+                    Action = @"[]",
+                    Sequence = 12
+                },
+
+                new MenuEntity
+                {
+                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000049"),
+                    MenuParentId = Guid.Parse("00000000-0000-0000-0000-000000000048"),
+                    Icon = "",
+                    Name = "Production",
+                    Controller = "Production",
+                    Action = @"[""view"",""add"",""delete"",""post""]",
+                    Sequence = 1
                 }
             };
         }

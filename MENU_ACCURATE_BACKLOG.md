@@ -125,6 +125,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 38 | Accounting > Jurnal Memo / Penyesuaian | MemoJournal | jurnal manual berjenis Memo (JM-) / Adjustment (JA-) |
 | 39 | Inventory > Serial Number / Batch | SerialBatch | register batch/lot/serial per item, konsumsi, sisa stok batch |
 | 40 | HRM / Payroll > Payroll | Payroll | master karyawan + penggajian (draft → post jurnal gaji otomatis) |
+| 41 | Produksi > Production | Production | Bill of Material + Production Order (konsumsi komponen, output barang jadi) |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -135,9 +136,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 ## 3. Yang Belum Ada (Backlog)
 
-Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
-
-- **[1] Produksi / Manufacturing** — BOM & job order.
+Backlog sudah habis — semua modul referensi Accurate telah diimplementasikan. Sisa pengembangan berikutnya (opsional/penyempurnaan) bisa mengikuti prioritas operasional, misalnya: purchase invoice & supplier payment terpisah, retur pola Accurate penuh, laporan kas/bank, payroll dengan tunjangan/potongan per karyawan, bill of material multi-level, dan integration stock batch ke transaksi.
 
 ---
 
@@ -148,4 +147,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 40 item terhubung; total backlog berjumlah 1 item berurutan.*
+*Status pembandingan: menu saat ini 41 item terhubung; seluruh backlog berjumlah 0 (selesai).*
