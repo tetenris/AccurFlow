@@ -56,6 +56,7 @@ namespace AccuFlow.Entities.Context
         public DbSet<TaxEntity> Taxes { get; set; }
         public DbSet<FixedAssetEntity> FixedAssets { get; set; }
         public DbSet<FixedAssetDepreciationEntity> FixedAssetDepreciations { get; set; }
+        public DbSet<YearEndClosingEntity> YearEndClosings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

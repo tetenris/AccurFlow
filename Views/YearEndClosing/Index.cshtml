@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "Year-End Closing";
+}
+
+<div class="row g-6">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Tutup Tahun Fiskal</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-5">
+                    <div class="col-md-4">
+                        <label>Fiscal Year</label>
+                        <input type="number" class="form-control" id="fiscal-year" value="@DateTime.Today.Year" min="2000" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button class="btn btn-primary" id="btn-preview">Preview</button>
+                    </div>
+                </div>
+                <div id="preview-summary" class="row mb-5 g-4" style="display:none;">
+                    <div class="col-md-4">
+                        <div class="border rounded p-4">
+                            <span class="text-muted fw-bold">Total Revenue</span>
+                            <h4 id="preview-revenue">Rp 0</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-4">
+                            <span class="text-muted fw-bold">Total Expense</span>
+                            <h4 id="preview-expense">Rp 0</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-4">
+                            <span class="text-muted fw-bold">Net Income</span>
+                            <h4 id="preview-net">Rp 0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div id="preview-content" style="display:none;">
+                    <h6 class="mb-3">Revenue/Income Accounts (ditutup)</h6>
+                    <div class="table-responsive mb-6">
+                        <table class="table table-sm table-row-bordered align-middle" id="preview-revenue-table">
+                            <thead>
+                                <tr>
+                                    <th>Account Code</th>
+                                    <th>Account Name</th>
+                                    <th class="text-end">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-revenue-body"></tbody>
+                        </table>
+                    </div>
+                    <h6 class="mb-3">Expense Accounts (ditutup)</h6>
+                    <div class="table-responsive mb-6">
+                        <table class="table table-sm table-row-bordered align-middle" id="preview-expense-table">
+                            <thead>
+                                <tr>
+                                    <th>Account Code</th>
+                                    <th>Account Name</th>
+                                    <th class="text-end">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-expense-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-danger" id="btn-close-year">Close Fiscal Year</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Riwayat Penutupan</h3>
+            </div>
+            <div class="card-body">
+                <table id="history_datatable" class="table table-striped table-row-bordered gy-5 gs-7 border rounded w-100">
+                    <thead>
+                        <tr>
+                            <th>Fiscal Year</th>
+                            <th>Closing Date</th>
+                            <th>Journal No</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/custom/features/yearendclosing/index.js"></script>
+}

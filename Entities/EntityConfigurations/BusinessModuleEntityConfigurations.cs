@@ -557,4 +557,15 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
         }
     }
+
+    public class YearEndClosingEntityConfiguration : IEntityTypeConfiguration<YearEndClosingEntity>
+    {
+        public void Configure(EntityTypeBuilder<YearEndClosingEntity> builder)
+        {
+            builder.ToTable("YearEndClosings");
+            builder.HasKey(e => e.ClosingId);
+            builder.HasIndex(e => e.FiscalYear).IsUnique();
+            builder.HasOne(e => e.ClosingJournal).WithMany().HasForeignKey(e => e.ClosingJournalId).OnDelete(DeleteBehavior.SetNull);
+        }
+    }
 }

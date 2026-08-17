@@ -121,6 +121,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 34 | Accounting > Receivable & Payable | ReceivablePayable | daftar detail piutang/utang per customer/supplier |
 | 35 | Accounting > Taxes | Tax | CRUD pajak (PPN 11%) + tab laporan PPN keluaran/masukan |
 | 36 | Accounting > Fixed Assets | FixedAsset | daftar aktiva tetap + penyusutan (jurnal otomatis) |
+| 37 | Accounting > Year-End Closing | YearEndClosing | tutup tahun fiskal: preview saldo P&L → jurnal otomatis ke Retained Earnings |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -133,11 +134,10 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] Tutup Tahun (Year-End Closing)** — proses akhir tahun akuntansi.
-- **[2] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
-- **[3] Serial Number / Batch** — pelacakan stok per unit.
-- **[4] Payroll / HRM** — penggajian.
-- **[5] Produksi / Manufacturing** — BOM & job order.
+- **[1] Jurnal Penyesuaian / Jurnal Memo** — jurnal khusus non-operative.
+- **[2] Serial Number / Batch** — pelacakan stok per unit.
+- **[3] Payroll / HRM** — penggajian.
+- **[4] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +148,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 36 item terhubung; total backlog berjumlah 5 item berurutan.*
+*Status pembandingan: menu saat ini 37 item terhubung; total backlog berjumlah 4 item berurutan.*
