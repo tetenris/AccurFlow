@@ -3,6 +3,8 @@ $(document).ready(function () {
     let isPermissionMode = false;
     let currentRoleId = null;
 
+    const roleTypeData = window.roleTypeData;
+
     // Load Role Dropdown
     function loadRoleDropdown() {
         return $.get('/Role/GetRoleDropdown', function (data) {
@@ -109,18 +111,24 @@ $(document).ready(function () {
                 searchable: false,
                 className: 'action-cell text-center',
                 render: function (data, type, row) {
-                    const permissionButton = row.roleType === 1 ? '' : `
+                    const isSuperAdmin = row.roleType === 1;
+                    const editButton = isSuperAdmin ? '' : `
+                            <button class="btn btn-sm btn-icon btn-light-warning btn-edit" data-id="${data}" title="Edit Role">
+                                <i class='fa fa-pen'></i>
+                            </button>`;
+                    const permissionButton = isSuperAdmin ? '' : `
                             <button class="btn btn-sm btn-icon btn-light-info btn-permission" data-id="${data}" title="Manage Permissions">
                                 <i class='fa fa-key'></i>
                             </button>`;
 
                     return `
                         <div class="d-flex gap-2 justify-content-center">
+                            ${editButton}
                             <button class="btn btn-sm btn-icon btn-light-primary btn-detail" data-id="${data}" title="View Detail">
                                 <i class='fa fa-eye'></i>
                             </button>
                             ${permissionButton}
-                            <button class="btn btn-sm btn-icon btn-light-warning btn-audit" 
+                            <button class="btn btn-sm btn-icon btn-light btn-audit" 
                                 data-id="${data}" 
                                 data-createdby="${row.createdBy}" 
                                 data-createdat="${row.createdAt}" 
@@ -142,21 +150,7 @@ $(document).ready(function () {
     });
 
     // Role Type mapping
-    const roleTypeData = {
-        '1': { name: 'Super Administrator', description: 'Technical full system access' },
-        '2': { name: 'Administrator', description: 'Full operational access' },
-        '3': { name: 'Manager', description: 'Management, report review, and approval access' },
-        '4': { name: 'Accountant', description: 'Accounting operations, journal, posting, and financial reports' },
-        '5': { name: 'Finance Staff', description: 'Finance operational access for invoice and payment preparation' },
-        '6': { name: 'AR Officer', description: 'Accounts receivable access for customer invoices, receipts, and AR aging' },
-        '7': { name: 'AP Officer', description: 'Accounts payable access for supplier invoices, payments, and AP aging' },
-        '8': { name: 'Purchasing', description: 'Purchasing access for suppliers and purchase orders' },
-        '9': { name: 'Sales', description: 'Sales access for customers and sales invoices' },
-        '10': { name: 'Warehouse', description: 'Inventory and warehouse operation access' },
-        '11': { name: 'Viewer', description: 'Read-only report and dashboard access' }
-    };
-
-    // Handle Role Type Change
+    // Role Type Change
     $('#role-type').on('change', function () {
         const selectedType = $(this).val();
 
@@ -194,135 +188,30 @@ $(document).ready(function () {
         $('#modal-role').modal('show');
     });
 
-    // Edit Role
-    $('#role_datatable').on('click', '.btn-edit', async function () {
+    // Add button to toolbar
+    var btnAdd = $('<a>', {
+        href: 'javascript:void(0)',
+        class: 'btn btn-outline btn-outline-primary',
+        type: 'button',
+        id: 'btn-add-role',
+        html: '<i class="fa fa-add"></i> Add New Role'
+    });
+    $('#toolbar-section-button').append(btnAdd);
+
+    // Edit Role (navigate to edit page)
+    $('#role_datatable').on('click', '.btn-edit', function () {
         const roleId = $(this).data('id');
-        isEditMode = true;
-        isPermissionMode = false;
-        currentRoleId = roleId;
-
-        try {
-            // Load dropdown first, then get role data
-            await loadRoleDropdown();
-            const response = await $.get(`/Role/GetById?id=${roleId}`);
-
-            $('#modal-role-title').text('Edit Role');
-            $('#role-id').val(response.roleId);
-
-            // Set role type - READONLY (tidak bisa diganti saat edit)
-            $('#role-type').val(String(response.roleType)).prop('disabled', true).addClass('bg-light');
-
-            // Trigger change untuk auto-fill name dan description (readonly)
-            $('#role-type').trigger('change');
-
-            // Show hint for edit mode
-            $('#role-type-hint').removeClass('d-none');
-
-            // Description can be edited
-            $('#role-description').val(response.description).prop('readonly', false);
-
-            // Status can be changed
-            $('#role-active').prop('checked', response.isActive).prop('disabled', false);
-            $('#btn-save-role').text('Save').removeClass('d-none');
-
-            // Load permissions for this role
-            loadMenuPermissions(roleId);
-
-            $('#modal-role').modal('show');
-        } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to load role data',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'btn btn-primary'
-                },
-                buttonsStyling: false
-            });
-        }
+        window.location.href = `/Role/Edit?id=${roleId}`;
     });
 
-    // Manage Role Permissions
-    $('#role_datatable').on('click', '.btn-permission', async function () {
+    // Manage Role Permissions (navigate to edit page)
+    $('#role_datatable').on('click', '.btn-permission', function () {
         const roleId = $(this).data('id');
-        isEditMode = false;
-        isPermissionMode = true;
-        currentRoleId = roleId;
-
-        try {
-            await loadRoleDropdown();
-            const response = await $.get(`/Role/GetById?id=${roleId}`);
-
-            $('#modal-role-title').text(`Role Permissions - ${response.roleName}`);
-            $('#role-id').val(response.roleId);
-            $('#role-type').val(String(response.roleType)).prop('disabled', true).addClass('bg-light');
-            $('#role-name').val(response.roleName).prop('readonly', true);
-            $('#role-description').val(response.description).prop('readonly', true);
-            $('#role-active').prop('checked', response.isActive).prop('disabled', true);
-            $('#role-type-hint').removeClass('d-none').html('<i class="fa fa-info-circle"></i> Role data is fixed; only permissions can be changed');
-            $('#btn-save-role').text('Save Permissions').removeClass('d-none');
-
-            loadMenuPermissions(roleId);
-            $('#modal-role').modal('show');
-        } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Failed to load role permissions',
-                icon: 'error',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'btn btn-primary'
-                },
-                buttonsStyling: false
-            });
-        }
+        window.location.href = `/Role/Edit?id=${roleId}`;
     });
 
-    // Save Role
+    // Save Role (Add mode only; Edit uses dedicated page)
     $('#btn-save-role').on('click', async function () {
-        if (isPermissionMode) {
-            try {
-                const permissions = collectPermissions();
-
-                await $.ajax({
-                    url: '/Role/SaveRoleMenuPermissions',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        roleId: currentRoleId,
-                        permissions: permissions
-                    })
-                });
-
-                Swal.fire({
-                    title: 'Success',
-                    text: 'Role permissions saved successfully',
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        confirmButton: 'btn btn-success'
-                    },
-                    buttonsStyling: false
-                });
-                $('#modal-role').modal('hide');
-                table.ajax.reload();
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error',
-                    text: error.responseJSON?.message || 'Failed to save permissions',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        confirmButton: 'btn btn-primary'
-                    },
-                    buttonsStyling: false
-                });
-            }
-
-            return;
-        }
-
         // Temporarily enable disabled fields to get their values
         $('#role-type').prop('disabled', false);
 

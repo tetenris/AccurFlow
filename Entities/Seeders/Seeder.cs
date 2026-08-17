@@ -260,6 +260,35 @@ namespace AccuFlow.Entities.Seeders
                 logger.LogInformation($"Updated {updatedMenus} existing menus");
             }
 
+            // Remove dev-only menus that are no longer listed in the seed (e.g. Database Seeding)
+            var removedMenus = 0;
+            var seedMenuIds = menus.Select(m => m.MenuId).ToHashSet();
+            var obsoleteMenus = await dbContext.Menus
+                .Where(m => !m.IsDeleted && !seedMenuIds.Contains(m.MenuId))
+                .ToListAsync();
+
+            foreach (var obsoleteMenu in obsoleteMenus)
+            {
+                var obsoleteRoleMenus = await dbContext.RoleMenus
+                    .Where(rm => rm.MenuId == obsoleteMenu.MenuId)
+                    .ToListAsync();
+
+                if (obsoleteRoleMenus.Any())
+                {
+                    dbContext.RoleMenus.RemoveRange(obsoleteRoleMenus);
+                }
+
+                obsoleteMenu.IsDeleted = true;
+                obsoleteMenu.DeletedAt = DateTime.UtcNow;
+                obsoleteMenu.DeletedBy = "system";
+                removedMenus++;
+            }
+
+            if (removedMenus > 0)
+            {
+                await dbContext.SaveChangesAsync();
+                logger.LogInformation($"Soft-deleted {removedMenus} obsolete menus");
+            }
         }
 
         public static async Task SeedRoleMenus(AppDbContext dbContext, ILogger logger)

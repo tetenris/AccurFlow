@@ -20,18 +20,8 @@ namespace AccuFlow.Entities.Seeders
                     Sequence = 1
                 },
                 
-                // Database Seeding
-                new MenuEntity
-                {
-                    MenuId = Guid.Parse("00000000-0000-0000-0000-000000000002"),
-                    MenuParentId = null,
-                    Icon = @"<i class=""ki-duotone ki-abstract-26 fs-2""><span class=""path1""></span><span class=""path2""></span></i>",
-                    Name = "Database Seeding",
-                    Controller = "Seed",
-                    Action = @"[""view""]",
-                    Sequence = 2
-                },
-                
+                // Database Seeding menu removed from UI (dev-only, accessed via /Seed route directly)
+
                 // User Management (Parent)
                 new MenuEntity
                 {
