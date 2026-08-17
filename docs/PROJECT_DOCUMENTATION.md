@@ -51,17 +51,7 @@ Seeder otomatis berjalan saat startup: roles, users, chart of accounts, customer
 
 Auth memakai cookie login di `/Account/Login` (BCrypt + claim selaras dengan `CurrentUserService`).
 
-### 3.2 Generate Project Structure (khusus template)
-
-(Jika membangun ulang dari template `KMSI.SuperApps.Ews`)
-
-```powershell
-.\GenerateAccuFlow.ps1
-cd D:\ASP.NET\2025\AKURAT\AccuFlow
-dotnet restore
-```
-
-Script akan membuat folder structure, `.csproj`, `appsettings.json`, `Program.cs`, dan copy Metronic template (wwwroot).
+> Project ini awalnya di-generate dari template `KMSI.SuperApps.Ews` via skrip scaffold sekali pakai (sudah dihapus); sekarang project berada langsung di root repository.
 
 ---
 
