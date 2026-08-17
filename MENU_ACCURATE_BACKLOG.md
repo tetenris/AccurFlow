@@ -124,6 +124,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 | 37 | Accounting > Year-End Closing | YearEndClosing | tutup tahun fiskal: preview saldo P&L → jurnal otomatis ke Retained Earnings |
 | 38 | Accounting > Jurnal Memo / Penyesuaian | MemoJournal | jurnal manual berjenis Memo (JM-) / Adjustment (JA-) |
 | 39 | Inventory > Serial Number / Batch | SerialBatch | register batch/lot/serial per item, konsumsi, sisa stok batch |
+| 40 | HRM / Payroll > Payroll | Payroll | master karyawan + penggajian (draft → post jurnal gaji otomatis) |
 
 ### Sudah ada di kode tapi belum jadi menu/UI:
 - Entity `Tax` + seed PPN 11%
@@ -136,8 +137,7 @@ Modul standar Accurate kurang lebih sebagai berikut:
 
 Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 
-- **[1] Payroll / HRM** — penggajian.
-- **[2] Produksi / Manufacturing** — BOM & job order.
+- **[1] Produksi / Manufacturing** — BOM & job order.
 
 ---
 
@@ -148,4 +148,4 @@ Dikerjakan berurutan dari 1 ke atas (pelan-pelan sesuai urutan).
 ---
 
 *Catatan dibuat: 2026-08-16 (diperbarui 2026-08-17)*
-*Status pembandingan: menu saat ini 39 item terhubung; total backlog berjumlah 2 item berurutan.*
+*Status pembandingan: menu saat ini 40 item terhubung; total backlog berjumlah 1 item berurutan.*

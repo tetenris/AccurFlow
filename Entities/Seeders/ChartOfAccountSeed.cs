@@ -131,6 +131,21 @@ namespace AccuFlow.Entities.Seeders
                     CreatedBy = "system",
                     CreatedAt = DateTime.UtcNow
                 },
+                new ChartOfAccountEntity
+                {
+                    AccountId = Guid.Parse("20000000-0000-0000-0000-000000000020"),
+                    AccountCode = "2-10300",
+                    AccountName = "Payroll Payable",
+                    AccountType = "Liability",
+                    Description = "Accrued employee salaries payable",
+                    ParentAccountId = Guid.Parse("20000000-0000-0000-0000-000000000001"),
+                    IsHeader = false,
+                    IsActive = true,
+                    NormalBalance = "Credit",
+                    Level = 1,
+                    CreatedBy = "system",
+                    CreatedAt = DateTime.UtcNow
+                },
 
                 // EQUITY
                 new ChartOfAccountEntity

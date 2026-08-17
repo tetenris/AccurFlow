@@ -584,4 +584,53 @@ namespace AccuFlow.Entities.EntityConfigurations
             builder.HasOne(e => e.ClosingJournal).WithMany().HasForeignKey(e => e.ClosingJournalId).OnDelete(DeleteBehavior.SetNull);
         }
     }
+
+    public class EmployeeEntityConfiguration : IEntityTypeConfiguration<EmployeeEntity>
+    {
+        public void Configure(EntityTypeBuilder<EmployeeEntity> builder)
+        {
+            builder.ToTable("Employees");
+            builder.HasKey(e => e.EmployeeId);
+            builder.Property(e => e.EmployeeCode).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.FullName).IsRequired().HasMaxLength(200);
+            builder.Property(e => e.Position).HasMaxLength(100);
+            builder.Property(e => e.Department).HasMaxLength(100);
+            builder.Property(e => e.BasicSalary).HasPrecision(18, 2);
+            builder.Property(e => e.BankAccountNumber).HasMaxLength(50);
+            builder.HasIndex(e => e.EmployeeCode).IsUnique();
+        }
+    }
+
+    public class PayrollEntityConfiguration : IEntityTypeConfiguration<PayrollEntity>
+    {
+        public void Configure(EntityTypeBuilder<PayrollEntity> builder)
+        {
+            builder.ToTable("Payrolls");
+            builder.HasKey(e => e.PayrollId);
+            builder.Property(e => e.PayrollNumber).IsRequired().HasMaxLength(50);
+            builder.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            builder.Property(e => e.Notes).HasMaxLength(1000);
+            builder.Property(e => e.TotalAllowances).HasPrecision(18, 2);
+            builder.Property(e => e.TotalDeductions).HasPrecision(18, 2);
+            builder.Property(e => e.TotalNetSalary).HasPrecision(18, 2);
+            builder.HasIndex(e => e.PayrollNumber).IsUnique();
+            builder.HasIndex(e => new { e.PeriodMonth, e.PeriodYear });
+            builder.HasOne(e => e.JournalEntry).WithMany().HasForeignKey(e => e.JournalId).OnDelete(DeleteBehavior.SetNull);
+            builder.HasMany(e => e.Lines).WithOne(e => e.Payroll).HasForeignKey(e => e.PayrollId).OnDelete(DeleteBehavior.Cascade);
+        }
+    }
+
+    public class PayrollLineEntityConfiguration : IEntityTypeConfiguration<PayrollLineEntity>
+    {
+        public void Configure(EntityTypeBuilder<PayrollLineEntity> builder)
+        {
+            builder.ToTable("PayrollLines");
+            builder.HasKey(e => e.PayrollLineId);
+            builder.Property(e => e.BasicSalary).HasPrecision(18, 2);
+            builder.Property(e => e.Allowances).HasPrecision(18, 2);
+            builder.Property(e => e.Deductions).HasPrecision(18, 2);
+            builder.Property(e => e.NetSalary).HasPrecision(18, 2);
+            builder.HasOne(e => e.Employee).WithMany().HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.Restrict);
+        }
+    }
 }
