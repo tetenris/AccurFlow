@@ -232,6 +232,7 @@ Sudah ada di kode tapi belum jadi menu/UI:
 - Master inventory: `ItemGroup` & `Unit` (CRUD + seed); `Item` ber-relasi ke group.
 - Seeder: roles, users, chart of accounts, customers, suppliers, menus.
 - Menu **Database Seeding** dihapus dari sidebar (dev-only, route `/Seed` tetap ada & dibatasi Super Administrator); `Seeder.SeedMenu` kini soft-delete menu yang tidak ada di seed.
+- Login & Forgot Password dirapikan **flat Metronic 8** (asset path dikoreksi dari `~/assets/...` yang tidak ada menjadi `~/theme/metronic/default/...`): login split-screen brand biru di kiri + form di kanan, forgot password kartu di tengah (modal), icon keenicon, alert Metronic. Logo app diganti ke `~/img/icon-grossery.png` dan diterapkan di login, forgot password, sidebar, sidebar simple, serta header mobile.
 - Build status: `dotnet build AccuFlow.sln` berhasil compile (masih ada warning nullability).
 
 ### 8.2 Roadmap Bisnis (kronologi modul)
