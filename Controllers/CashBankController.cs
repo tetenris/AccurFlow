@@ -1,3 +1,5 @@
+using AccuFlow.Application.Features.BankReconciliations.Commands;
+using AccuFlow.Application.Features.BankReconciliations.Queries;
 using AccuFlow.Application.Features.CashBankAccounts.Queries;
 using AccuFlow.Application.Features.CashBankTransfers.Commands;
 using AccuFlow.Application.Features.CashBankTransfers.Queries;
@@ -14,12 +16,10 @@ namespace AccuFlow.Controllers
     {
         private const int UsageCash = 1;
         private const int UsageBank = 2;
-        private readonly ICashBankService _cashBankService;
         private readonly ISender _mediator;
 
-        public CashBankController(ICashBankService cashBankService, ISender mediator, IBaseService baseService) : base(baseService)
+        public CashBankController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _cashBankService = cashBankService;
             _mediator = mediator;
         }
 
@@ -48,19 +48,19 @@ namespace AccuFlow.Controllers
         public async Task<IActionResult> GetBankAccounts() => Json(await _mediator.Send(new GetCashBankAccountsQuery(UsageBank)));
 
         [HttpGet]
-        public async Task<IActionResult> GetBankStatement(Guid accountId, DateTime asOfDate) => Json(await _cashBankService.GetBankStatementAsync(accountId, asOfDate));
+        public async Task<IActionResult> GetBankStatement(Guid accountId, DateTime asOfDate) => Json(await _mediator.Send(new GetBankStatementQuery(accountId, asOfDate)));
 
         [HttpPost]
         public async Task<IActionResult> DatatableTransfers([FromBody] DataTableTransferRequest request) => Json(await _mediator.Send(new GetTransferDatatableQuery(request)));
 
         [HttpPost]
-        public async Task<IActionResult> DatatableReconciliations([FromBody] DataTableReconciliationRequest request) => Json(await _cashBankService.GetReconciliationsAsync(request));
+        public async Task<IActionResult> DatatableReconciliations([FromBody] DataTableReconciliationRequest request) => Json(await _mediator.Send(new GetReconciliationDatatableQuery(request)));
 
         [HttpGet]
         public async Task<IActionResult> GetTransferDetail(Guid id) => Json(await _mediator.Send(new GetTransferDetailQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetReconciliationDetail(Guid id) => Json(await _cashBankService.GetReconciliationDetailAsync(id));
+        public async Task<IActionResult> GetReconciliationDetail(Guid id) => Json(await _mediator.Send(new GetReconciliationDetailQuery(id)));
 
         [HttpPost]
         public async Task<IActionResult> CreateTransfer([FromBody] CreateTransferRequest request)
@@ -123,7 +123,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.CreateReconciliationAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateReconciliationCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Reconciliation created successfully" });
             }
             catch (Exception ex)
@@ -137,7 +137,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.UpdateReconciliationAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateReconciliationCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Reconciliation updated successfully" });
             }
             catch (Exception ex)
@@ -151,7 +151,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.PostReconciliationAsync(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostReconciliationCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Reconciliation posted successfully" });
             }
             catch (Exception ex)
@@ -165,7 +165,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.DeleteReconciliationAsync(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteReconciliationCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Reconciliation deleted successfully" });
             }
             catch (Exception ex)

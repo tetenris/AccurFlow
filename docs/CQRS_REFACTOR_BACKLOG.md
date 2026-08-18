@@ -171,7 +171,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetTransferDatatableQuery` (filter Status/DateFrom/DateTo + search, paging), `GetTransferDetailQuery` (termasuk JournalNumber + CanEdit/CanDelete/CanPost)
   - Command: `CreateTransferCommand` (no. `TRF-{D5}`, validasi akun cash/bank), `UpdateTransferCommand`, `PostTransferCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand`), `DeleteTransferCommand`
   - Handler port 1:1 dari `CashBankService`. Method transfer dihapus dari interface & class service (kini hanya reconciliation); dependensi `IJournalEntryService` + using `Models.JournalEntry` dihapus. Build 0 error.
-- [ ] **B38. Kas & Bank > Bank Reconciliation** (User Manual §10.3) — `CashBank` → rekonsiliasi bank.
+- [x] **B38. Kas & Bank > Bank Reconciliation** (User Manual §10.3) — Selesai. `ICashBankService`/`CashBankService` (`Services/CashBankService.cs`) **DIHAPUS** beserta registrasi DI. `CashBankController` → MediatR penuh (`ISender`). Semua lewat `Application/Features/BankReconciliations`:
+  - Query: `GetReconciliationDatatableQuery` (filter Status + search, paging, LineCount/ClearedCount), `GetReconciliationDetailQuery` (detail + lines + CanEdit/CanDelete/CanPost), `GetBankStatementQuery` (mutasi GL posted s.d. tanggal)
+  - Command: `CreateReconciliationCommand` (no. `RCN-{D5}`), `UpdateReconciliationCommand` (soft-delete line lama), `PostReconciliationCommand` (cek keseimbangan GL + cleared − float = statement), `DeleteReconciliationCommand`
+  - Handler port 1:1 dari `CashBankService`. Build 0 error. Modul Kas & Bank (B36–B38) tuntas.
 - [ ] **B39. HRM / Payroll > Data Karyawan** (User Manual §11.1) — `Payroll` → master karyawan.
 - [ ] **B40. HRM / Payroll > Penggajian** (User Manual §11.2) — `Payroll` → buat + post payroll.
 - [ ] **B41. Produksi > Bill of Material (BOM)** (User Manual §12.1) — `Production` → BOM.
