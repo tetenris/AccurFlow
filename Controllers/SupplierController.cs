@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Suppliers.Commands;
+using AccuFlow.Application.Features.Suppliers.Queries;
 using AccuFlow.Models.Supplier;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class SupplierController : BaseController
     {
-        private readonly ISupplierService _supplierService;
+        private readonly ISender _mediator;
 
-        public SupplierController(ISupplierService supplierService) : base(supplierService)
+        public SupplierController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _supplierService = supplierService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -24,21 +27,21 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTableSupplierRequest request)
         {
-            var result = await _supplierService.Datatable(request);
+            var result = await _mediator.Send(new GetSupplierDatatableQuery(request));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _supplierService.GetById(id);
+            var result = await _mediator.Send(new GetSupplierByIdQuery(id));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetActiveSuppliers()
         {
-            var result = await _supplierService.GetActiveSuppliersAsync();
+            var result = await _mediator.Send(new GetSupplierActiveQuery());
             return Json(result);
         }
 
@@ -47,7 +50,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _supplierService.Create(request, _currentUserService.UserId);
+                await _mediator.Send(new CreateSupplierCommand(request, _currentUserService.UserId));
                 return Ok(new { success = true, message = "Supplier created successfully" });
             }
             catch (Exception ex)
@@ -61,7 +64,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _supplierService.Edit(request, _currentUserService.UserId);
+                await _mediator.Send(new UpdateSupplierCommand(request, _currentUserService.UserId));
                 return Ok(new { success = true, message = "Supplier updated successfully" });
             }
             catch (Exception ex)
@@ -76,7 +79,7 @@ namespace AccuFlow.Controllers
             try
             {
                 var userId = Guid.Parse(User.FindFirst("UserId")?.Value ?? Guid.Empty.ToString());
-                await _supplierService.Delete(id, userId);
+                await _mediator.Send(new DeleteSupplierCommand(id, userId));
                 return Ok(new { success = true, message = "Supplier deleted successfully" });
             }
             catch (Exception ex)
@@ -90,7 +93,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _supplierService.ToggleStatus(id, _currentUserService.UserId);
+                await _mediator.Send(new ToggleSupplierStatusCommand(id, _currentUserService.UserId));
                 return Ok(new { success = true, message = "Supplier status updated successfully" });
             }
             catch (Exception ex)
@@ -102,14 +105,14 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> ValidateCode(string code, Guid? excludeId)
         {
-            var isUnique = await _supplierService.IsCodeUniqueAsync(code, excludeId);
+            var isUnique = await _mediator.Send(new ValidateSupplierCodeQuery(code, excludeId));
             return Json(new { isUnique });
         }
 
         [HttpGet]
         public async Task<IActionResult> GenerateCode()
         {
-            var code = await _supplierService.GenerateSupplierCodeAsync();
+            var code = await _mediator.Send(new GenerateSupplierCodeQuery());
             return Json(new { code });
         }
 
@@ -118,7 +121,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var fileBytes = await _supplierService.ExportToExcelAsync(supplierType, isActive);
+                var fileBytes = await _mediator.Send(new ExportSupplierQuery(supplierType, isActive));
                 var fileName = $"Suppliers_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
                 return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }

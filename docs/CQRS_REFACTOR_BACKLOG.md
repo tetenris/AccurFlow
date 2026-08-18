@@ -59,7 +59,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CreateCustomerCommand`, `UpdateCustomerCommand`, `DeleteCustomerCommand`, `ToggleCustomerStatusCommand`
   - Query: `GetCustomerDatatableQuery` (search/filter/sort/paging + resolve nama user), `GetCustomerByIdQuery`, `GetCustomerActiveQuery`, `ValidateCustomerCodeQuery`, `GenerateCustomerCodeQuery`, `ExportCustomerQuery`
   - Handler port 1:1 dari `CustomerService`. Build 0 error.
-- [ ] **B7. Master > Suppliers** (User Manual §4.3) — `Supplier` → CRUD, ToggleStatus, Export.
+- [x] **B7. Master > Suppliers** (User Manual §4.3) — Selesai. `SupplierService` (`ISupplierService`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. `SupplierController` → MediatR (`ISender`). Semua lewat `Application/Features/Suppliers`:
+  - Command: `CreateSupplierCommand`, `UpdateSupplierCommand`, `DeleteSupplierCommand`, `ToggleSupplierStatusCommand`
+  - Query: `GetSupplierDatatableQuery` (search/filter/sort/paging + resolve nama user), `GetSupplierByIdQuery`, `GetSupplierActiveQuery`, `ValidateSupplierCodeQuery`, `GenerateSupplierCodeQuery` (prefix `SUPP-`), `ExportSupplierQuery`
+  - Handler port 1:1 dari `SupplierService`. Build 0 error.
 - [ ] **B8. Accounting > Journal Entry** (User Manual §5.1) — `JournalEntry` → draft/post/reverse.
 - [ ] **B9. Accounting > General Ledger** (User Manual §5.2) — `GeneralLedger` → summary + ledger.
 - [ ] **B10. Accounting > Trial Balance** (User Manual §5.3) — `TrialBalance` → generate + export.
