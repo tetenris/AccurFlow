@@ -118,7 +118,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetOrderDatatableQuery`, `GetOrderByIdQuery`, `GetOrderQuoteByIdQuery` (quote approved utk generate order); `GetApprovedQuotes` reuse `GetApprovedQuotesQuery` (SalesQuotations)
   - Command: `CreateOrderCommand` (nomor `SO-xxxxx`), `UpdateOrderCommand`, `DeleteOrderCommand`, `ApproveOrderCommand`
   - Handler port 1:1 dari `SalesOrderService`. Build 0 error.
-- [ ] **B23. Sales > Delivery Order** (User Manual §6.3) — `DeliveryOrder` → draft/post (kurangi stok), convert ke sales invoice.
+- [x] **B23. Sales > Delivery Order** (User Manual §6.3) — Selesai. `IDeliveryOrderService`/`DeliveryOrderService` (`Services/SalesFlowServices.cs`) **DIHAPUS** (file dihapus) beserta registrasi DI. `DeliveryOrderController` → MediatR. Semua lewat `Application/Features/DeliveryOrders`:
+  - Query: `GetDeliveryDatatableQuery`, `GetDeliveryByIdQuery`, `GetDeliveryOrdersQuery` (SO approved dgn sisa qty > 0), `GetDeliveryOrderLinesQuery`
+  - Command: `CreateDeliveryCommand` (nomor `DO-xxxxx`, validasi line milik SO approved), `UpdateDeliveryCommand`, `PostDeliveryCommand` (cek over-delivery + buat `StockMovement` keluar), `DeleteDeliveryCommand`, `ConvertDeliveryToInvoiceCommand` (auto buat invoice `SI-`)
+  - Handler port 1:1 dari `DeliveryOrderService`. Build 0 error.
 - [ ] **B24. Purchasing > Purchase Request** (User Manual §7.1) — `PurchaseRequest` → draft/approve, convert ke PO.
 - [ ] **B25. Purchasing > Purchase Orders** (User Manual §7.2) — `PurchaseOrder` → draft/approve/convert/print.
 - [ ] **B26. Purchasing > Goods Received / GRN** (User Manual §7.3) — `GoodsReceipt` → dari PO, update stok + jurnal.

@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.DeliveryOrders.Commands;
+using AccuFlow.Application.Features.DeliveryOrders.Queries;
 using AccuFlow.Models.Delivery;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class DeliveryOrderController : BaseController
     {
-        private readonly IDeliveryOrderService _deliveryOrderService;
+        private readonly ISender _mediator;
 
-        public DeliveryOrderController(IDeliveryOrderService deliveryOrderService) : base(deliveryOrderService)
+        public DeliveryOrderController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _deliveryOrderService = deliveryOrderService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,23 +25,23 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableDeliveryRequest request) => Json(await _deliveryOrderService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableDeliveryRequest request) => Json(await _mediator.Send(new GetDeliveryDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _deliveryOrderService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetDeliveryByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetOrders() => Json(await _deliveryOrderService.GetOrders());
+        public async Task<IActionResult> GetOrders() => Json(await _mediator.Send(new GetDeliveryOrdersQuery()));
 
         [HttpGet]
-        public async Task<IActionResult> GetOrderLines(Guid salesOrderId) => Json(await _deliveryOrderService.GetOrderLines(salesOrderId));
+        public async Task<IActionResult> GetOrderLines(Guid salesOrderId) => Json(await _mediator.Send(new GetDeliveryOrderLinesQuery(salesOrderId)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateDeliveryRequest request)
         {
             try
             {
-                await _deliveryOrderService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateDeliveryCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Delivery order created successfully" });
             }
             catch (Exception ex)
@@ -52,7 +55,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _deliveryOrderService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateDeliveryCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Delivery order updated successfully" });
             }
             catch (Exception ex)
@@ -66,7 +69,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _deliveryOrderService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostDeliveryCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Delivery order posted successfully" });
             }
             catch (Exception ex)
@@ -80,7 +83,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _deliveryOrderService.ConvertToInvoice(id, _currentUserService!.UserId);
+                await _mediator.Send(new ConvertDeliveryToInvoiceCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Delivery order converted to invoice successfully" });
             }
             catch (Exception ex)
@@ -94,7 +97,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _deliveryOrderService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteDeliveryCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Delivery order deleted successfully" });
             }
             catch (Exception ex)
