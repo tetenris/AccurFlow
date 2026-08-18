@@ -1,4 +1,4 @@
-﻿using AccuFlow.Entities.Context;
+﻿using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -375,4 +375,5 @@ namespace AccuFlow.Entities.Seeders
         }
     }
 }
+
 

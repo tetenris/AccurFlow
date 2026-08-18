@@ -1,5 +1,5 @@
 ﻿using AccuFlow.Entities;
-using AccuFlow.Entities.Context;
+using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
 using AccuFlow.Services;
 using AccuFlow.Models.GeneralLedger;
@@ -398,4 +398,5 @@ public class GeneralLedgerService : BaseService, IGeneralLedgerService
         };
     }
 }
+
 

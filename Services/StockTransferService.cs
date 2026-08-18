@@ -1,4 +1,4 @@
-﻿using AccuFlow.Entities.Context;
+﻿using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.StockTransfer;
@@ -242,3 +242,4 @@ namespace AccuFlow.Services
         }
     }
 }
+

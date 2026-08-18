@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using AccuFlow.Entities.Context;
+using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Extentions;
 using AccuFlow.Infrastructures;
 using AccuFlow.Application;
@@ -98,3 +98,4 @@ using (var scope = app.Services.CreateScope())
 app.UseHangfireDashboardWithAuth(builder.Configuration);
 
 app.Run();
+

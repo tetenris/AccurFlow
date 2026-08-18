@@ -1,4 +1,4 @@
-﻿using AccuFlow.Entities.Context;
+﻿using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
 using AccuFlow.Models.JournalEntry;
 using AccuFlow.Models.YearEndClosing;
@@ -164,3 +164,4 @@ namespace AccuFlow.Services
         }
     }
 }
+

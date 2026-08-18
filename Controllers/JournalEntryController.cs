@@ -12,12 +12,12 @@ namespace AccuFlow.Controllers
     {
         private readonly IJournalEntryService _journalEntryService;
         private readonly IChartOfAccountService _chartOfAccountService;
-        private readonly AccuFlow.Entities.Context.AppDbContext _dbContext;
+        private readonly AccuFlow.Infrastructure.Persistence.AppDbContext _dbContext;
 
         public JournalEntryController(
             IJournalEntryService journalEntryService,
             IChartOfAccountService chartOfAccountService,
-            AccuFlow.Entities.Context.AppDbContext dbContext,
+            AccuFlow.Infrastructure.Persistence.AppDbContext dbContext,
             IBaseService baseService) : base(baseService)
         {
             _journalEntryService = journalEntryService;
@@ -217,4 +217,5 @@ namespace AccuFlow.Controllers
         }
     }
 }
+
 
