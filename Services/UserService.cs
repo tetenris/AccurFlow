@@ -1,5 +1,5 @@
-using AccuFlow.Entities.Context;
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Entities.Context;
+using AccuFlow.Domain.Entities;
 using AccuFlow.Entities.Enums;
 using AccuFlow.Infrastructures;
 using AccuFlow.Models.BaseModel;
@@ -322,3 +322,4 @@ namespace AccuFlow.Services
         }
     }
 }
+

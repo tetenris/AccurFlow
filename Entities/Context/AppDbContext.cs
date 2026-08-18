@@ -1,5 +1,5 @@
-﻿using AccuFlow.Entities.Abstractions;
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Domain.Common;
+using AccuFlow.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFlow.Entities.Context
@@ -111,3 +111,4 @@ namespace AccuFlow.Entities.Context
         }
     }
 }
+

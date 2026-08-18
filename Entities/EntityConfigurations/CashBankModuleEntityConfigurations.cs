@@ -1,4 +1,4 @@
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

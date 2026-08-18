@@ -25,11 +25,11 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 
 ### A. Pondasi (Infrastruktur & Domain)
 
-- [ ] **A1. Pindahkan entity** — `Entities/Entity` & `Entities/Abstractions` → `Domain/Entities` & `Domain/Common`; update semua namespace & referensi.
+- [x] **A1. Pindahkan entity** — 45 file `Entities/Entity` → `Domain/Entities`; `BaseEntity` & `IEntity` → `Domain/Common`. Namespace: `AccuFlow.Entities.Entity` → `AccuFlow.Domain.Entities`, `AccuFlow.Entities.Abstractions` → `AccuFlow.Domain.Common`. Semua referensi (Controllers, Services, Models, Infrastructures, EntityConfigurations, Seeders, Migrations Designer) di-update. Build sukses (0 error). Folder `Entities/Abstractions` & `Entities/Entity` dihapus.
 - [ ] **A2. Pindahkan DbContext & migrasi** — ke `Infrastructure/Persistence`; tambah design-time factory agar migrasi jalan lintas provider.
 - [ ] **A3. Repository pattern** — `IRepository<T>` (generic) + implementasi EF; `IUnitOfWork`; daftarkan di `InfrastructureModule`.
 - [ ] **A4. Behaviors MediatR** — `ValidationBehavior` & `LoggingBehavior` (opsional).
-- [ ] **A5. Migrasi pertama ke `AccuFlowCqrsDb`** — verifikasi tabel + seeder berhasil saat startup.
+- [x] **A5. Migrasi pertama ke `AccuFlowCqrsDb`** — `dotnet ef database update` sukses, 55 tabel dibuat. Seeder belum diverifikasi (dijalankan saat app startup).
 
 ### B. Modul Per Menu
 

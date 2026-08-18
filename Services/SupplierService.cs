@@ -1,5 +1,5 @@
-using AccuFlow.Entities.Context;
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Entities.Context;
+using AccuFlow.Domain.Entities;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Supplier;
 using Microsoft.EntityFrameworkCore;
@@ -475,3 +475,4 @@ namespace AccuFlow.Services
         }
     }
 }
+

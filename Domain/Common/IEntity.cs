@@ -1,4 +1,4 @@
-namespace AccuFlow.Domain.Common
+﻿namespace AccuFlow.Domain.Common
 {
     public interface IEntity
     {

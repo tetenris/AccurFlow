@@ -1,5 +1,5 @@
-using AccuFlow.Entities.Context;
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Entities.Context;
+using AccuFlow.Domain.Entities;
 using AccuFlow.Models.AgingReport;
 using AccuFlow.Models.Approval;
 using AccuFlow.Models.BaseModel;
@@ -779,3 +779,4 @@ namespace AccuFlow.Services
         }
     }
 }
+

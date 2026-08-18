@@ -25,7 +25,7 @@ namespace AccuFlow.Entities.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,7 +87,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("ChartOfAccounts", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.RoleEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.RoleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -137,7 +137,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.UserEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,9 +200,9 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "ParentAccount")
+                    b.HasOne("AccuFlow.Domain.Entities.ChartOfAccountEntity", "ParentAccount")
                         .WithMany("ChildAccounts")
                         .HasForeignKey("ParentAccountId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -210,9 +210,9 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("ParentAccount");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.UserEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.UserEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.RoleEntity", "Role")
+                    b.HasOne("AccuFlow.Domain.Entities.RoleEntity", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -221,7 +221,7 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
                     b.Navigation("ChildAccounts");
                 });
@@ -229,3 +229,4 @@ namespace AccuFlow.Entities.Migrations
         }
     }
 }
+

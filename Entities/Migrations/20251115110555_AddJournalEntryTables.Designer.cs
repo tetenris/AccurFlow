@@ -25,7 +25,7 @@ namespace AccuFlow.Entities.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
                     b.Property<Guid>("AccountId")
                         .ValueGeneratedOnAdd()
@@ -126,7 +126,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("ChartOfAccounts", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.JournalEntryEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.JournalEntryEntity", b =>
                 {
                     b.Property<Guid>("JournalId")
                         .ValueGeneratedOnAdd()
@@ -221,7 +221,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("JournalEntries", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.JournalLineEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.JournalLineEntity", b =>
                 {
                     b.Property<Guid>("JournalLineId")
                         .ValueGeneratedOnAdd()
@@ -268,7 +268,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("JournalLines", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.MenuEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.MenuEntity", b =>
                 {
                     b.Property<Guid>("MenuId")
                         .ValueGeneratedOnAdd()
@@ -331,7 +331,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Menus", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.RoleEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.RoleEntity", b =>
                 {
                     b.Property<Guid>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -386,7 +386,7 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.UserEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
@@ -449,9 +449,9 @@ namespace AccuFlow.Entities.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "ParentAccount")
+                    b.HasOne("AccuFlow.Domain.Entities.ChartOfAccountEntity", "ParentAccount")
                         .WithMany("ChildAccounts")
                         .HasForeignKey("ParentAccountId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -459,30 +459,30 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("ParentAccount");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.JournalEntryEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.JournalEntryEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.UserEntity", "CreatedByUser")
+                    b.HasOne("AccuFlow.Domain.Entities.UserEntity", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AccuFlow.Entities.Entity.UserEntity", "DeletedByUser")
+                    b.HasOne("AccuFlow.Domain.Entities.UserEntity", "DeletedByUser")
                         .WithMany()
                         .HasForeignKey("DeletedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AccuFlow.Entities.Entity.UserEntity", "PostedByUser")
+                    b.HasOne("AccuFlow.Domain.Entities.UserEntity", "PostedByUser")
                         .WithMany()
                         .HasForeignKey("PostedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "ReversalJournal")
+                    b.HasOne("AccuFlow.Domain.Entities.JournalEntryEntity", "ReversalJournal")
                         .WithOne("OriginalJournal")
-                        .HasForeignKey("AccuFlow.Entities.Entity.JournalEntryEntity", "ReversalJournalId")
+                        .HasForeignKey("AccuFlow.Domain.Entities.JournalEntryEntity", "ReversalJournalId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("AccuFlow.Entities.Entity.UserEntity", "UpdatedByUser")
+                    b.HasOne("AccuFlow.Domain.Entities.UserEntity", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -498,15 +498,15 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("UpdatedByUser");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.JournalLineEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.JournalLineEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.ChartOfAccountEntity", "Account")
+                    b.HasOne("AccuFlow.Domain.Entities.ChartOfAccountEntity", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AccuFlow.Entities.Entity.JournalEntryEntity", "JournalEntry")
+                    b.HasOne("AccuFlow.Domain.Entities.JournalEntryEntity", "JournalEntry")
                         .WithMany("JournalLines")
                         .HasForeignKey("JournalId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -517,9 +517,9 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("JournalEntry");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.MenuEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.MenuEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.MenuEntity", "ParentMenu")
+                    b.HasOne("AccuFlow.Domain.Entities.MenuEntity", "ParentMenu")
                         .WithMany("ChildMenus")
                         .HasForeignKey("MenuParentId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -527,9 +527,9 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("ParentMenu");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.UserEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.UserEntity", b =>
                 {
-                    b.HasOne("AccuFlow.Entities.Entity.RoleEntity", "Role")
+                    b.HasOne("AccuFlow.Domain.Entities.RoleEntity", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -538,19 +538,19 @@ namespace AccuFlow.Entities.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.ChartOfAccountEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.ChartOfAccountEntity", b =>
                 {
                     b.Navigation("ChildAccounts");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.JournalEntryEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.JournalEntryEntity", b =>
                 {
                     b.Navigation("JournalLines");
 
                     b.Navigation("OriginalJournal");
                 });
 
-            modelBuilder.Entity("AccuFlow.Entities.Entity.MenuEntity", b =>
+            modelBuilder.Entity("AccuFlow.Domain.Entities.MenuEntity", b =>
                 {
                     b.Navigation("ChildMenus");
                 });
@@ -558,3 +558,4 @@ namespace AccuFlow.Entities.Migrations
         }
     }
 }
+

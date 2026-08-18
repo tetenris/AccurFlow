@@ -1,4 +1,4 @@
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Domain.Entities;
 
 namespace AccuFlow.Entities.Seeders
 {
@@ -109,3 +109,4 @@ namespace AccuFlow.Entities.Seeders
         }
     }
 }
+

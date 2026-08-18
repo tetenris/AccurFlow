@@ -1,5 +1,6 @@
-using AccuFlow.Models.JournalEntry;
+﻿using AccuFlow.Models.JournalEntry;
 using AccuFlow.Services;
+using AccuFlow.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,12 @@ namespace AccuFlow.Controllers
     {
         private readonly IJournalEntryService _journalEntryService;
         private readonly IChartOfAccountService _chartOfAccountService;
-        private readonly Entities.Context.AppDbContext _dbContext;
+        private readonly AccuFlow.Entities.Context.AppDbContext _dbContext;
 
         public JournalEntryController(
             IJournalEntryService journalEntryService,
             IChartOfAccountService chartOfAccountService,
-            Entities.Context.AppDbContext dbContext,
+            AccuFlow.Entities.Context.AppDbContext dbContext,
             IBaseService baseService) : base(baseService)
         {
             _journalEntryService = journalEntryService;
@@ -31,7 +32,7 @@ namespace AccuFlow.Controllers
             if (userId == Guid.Empty)
             {
                 // Get user with Accounting role as default
-                var accountingUser = await _dbContext.Set<Entities.Entity.UserEntity>()
+                var accountingUser = await _dbContext.Set<UserEntity>()
                     .Include(x => x.Role)
                     .Where(x => !x.IsDeleted && x.Role.RoleName == "Accounting")
                     .FirstOrDefaultAsync();
@@ -39,7 +40,7 @@ namespace AccuFlow.Controllers
                 if (accountingUser == null)
                 {
                     // Fallback to any active user
-                    accountingUser = await _dbContext.Set<Entities.Entity.UserEntity>()
+                    accountingUser = await _dbContext.Set<UserEntity>()
                         .Where(x => !x.IsDeleted)
                         .FirstOrDefaultAsync();
                 }
@@ -216,3 +217,4 @@ namespace AccuFlow.Controllers
         }
     }
 }
+

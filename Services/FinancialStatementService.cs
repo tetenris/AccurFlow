@@ -1,5 +1,5 @@
-using AccuFlow.Entities.Context;
-using AccuFlow.Entities.Entity;
+﻿using AccuFlow.Entities.Context;
+using AccuFlow.Domain.Entities;
 using AccuFlow.Services;
 using AccuFlow.Models.FinancialStatement;
 using Microsoft.EntityFrameworkCore;
@@ -538,3 +538,4 @@ public class FinancialStatementService : BaseService, IFinancialStatementService
         return ms.ToArray();
     }
 }
+
