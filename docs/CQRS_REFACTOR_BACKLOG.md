@@ -83,7 +83,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetInvoiceDatatableQuery` (filter invoice type/status/customer/supplier/date/search), `GetInvoiceByIdQuery` (main detail + lines + journal)
   - Command: `CreateInvoiceCommand` (auto number `SI-`/`PI-`), `UpdateInvoiceCommand` (soft delete lines lama), `DeleteInvoiceCommand`, `PostInvoiceCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand` dari fitur JournalEntries — send berantai antar handler MediatR), `CancelInvoiceCommand`
   - Handler port 1:1 dari `InvoiceService`. Build 0 error.
-- [ ] **B13. Accounting > Payments & Receipts** (User Manual §5.6) — `Payment` → draft/edit/post/print + alokasi invoice.
+- [x] **B13. Accounting > Payments & Receipts** (User Manual §5.6) — Selesai. `IPaymentService`/`PaymentService` (di `Services/BusinessModuleServices.cs`) **DIHAPUS** beserta registrasi DI. `PaymentController` → MediatR (`ISender`). Semua lewat `Application/Features/Payments`:
+  - Query: `GetPaymentDatatableQuery` (filter payment type/status/date), `GetPaymentByIdQuery` (detail + alokasi invoice + jurnal)
+  - Command: `CreatePaymentCommand` (auto number `PAY-`/`RCT-`), `UpdatePaymentCommand` (soft delete alokasi lama), `DeletePaymentCommand`, `PostPaymentCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand`, lalu update `PaidAmount` & status invoice per alokasi)
+  - Handler port 1:1 dari `PaymentService`. Build 0 error.
 - [ ] **B14. Accounting > Aging Report** (User Manual §5.7) — `AgingReport` → AR/AP aging.
 - [ ] **B15. Accounting > Returns** (User Manual §5.8) — `Return` → retur penjualan/pembelian.
 - [ ] **B16. Accounting > Receivable & Payable** (User Manual §5.9) — `ReceivablePayable` → detail AR/AP per invoice.
