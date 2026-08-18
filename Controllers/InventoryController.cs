@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Items.Commands;
+using AccuFlow.Application.Features.Items.Queries;
 using AccuFlow.Models.Inventory;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class InventoryController : BaseController
     {
-        private readonly IInventoryService _inventoryService;
+        private readonly ISender _mediator;
 
-        public InventoryController(IInventoryService inventoryService) : base(inventoryService)
+        public InventoryController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _inventoryService = inventoryService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -34,17 +37,17 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DatatableItems([FromBody] DataTableItemRequest request) => Json(await _inventoryService.DatatableItems(request));
+        public async Task<IActionResult> DatatableItems([FromBody] DataTableItemRequest request) => Json(await _mediator.Send(new GetItemsDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetActiveItems() => Json(await _inventoryService.GetActiveItems());
+        public async Task<IActionResult> GetActiveItems() => Json(await _mediator.Send(new GetActiveItemsQuery()));
 
         [HttpPost]
         public async Task<IActionResult> CreateItem([FromBody] CreateItemRequest request)
         {
             try
             {
-                await _inventoryService.CreateItem(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateItemCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Item created successfully" });
             }
             catch (Exception ex)
@@ -54,17 +57,17 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> StockCardDatatable([FromBody] DataTableStockMovementRequest request) => Json(await _inventoryService.StockCard(request));
+        public async Task<IActionResult> StockCardDatatable([FromBody] DataTableStockMovementRequest request) => Json(await _mediator.Send(new GetStockCardQuery(request)));
 
         [HttpPost]
-        public async Task<IActionResult> StockMinimumDatatable([FromBody] DataTableStockMinimumRequest request) => Json(await _inventoryService.StockMinimum(request));
+        public async Task<IActionResult> StockMinimumDatatable([FromBody] DataTableStockMinimumRequest request) => Json(await _mediator.Send(new GetStockMinimumQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> UpdateReorderPoint([FromBody] UpdateReorderPointRequest request)
         {
             try
             {
-                await _inventoryService.UpdateReorderPoint(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateReorderPointCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Reorder point updated successfully" });
             }
             catch (Exception ex)

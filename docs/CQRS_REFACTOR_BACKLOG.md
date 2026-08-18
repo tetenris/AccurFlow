@@ -134,7 +134,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetGoodsReceiptDatatableQuery`, `GetGoodsReceiptByIdQuery`, `GetGoodsReceiptWarehousesQuery`, `GetGoodsReceiptPurchaseOrdersQuery`, `GetGoodsReceiptPurchaseOrderLinesQuery`
   - Command: `CreateGoodsReceiptCommand` (nomor `GRN-xxxxx`), `UpdateGoodsReceiptCommand`, `DeleteGoodsReceiptCommand`, `PostGoodsReceiptCommand` (cek over-receipt, buat `StockMovement` masuk, auto jurnal beban inventory ↔ hutang via `CreateJournalCommand`+`PostJournalCommand`)
   - Handler port 1:1 dari `GoodsReceiptService`. Build 0 error.
-- [ ] **B27. Inventory > Items** (User Manual §8.1) — `Inventory` → item list.
+- [x] **B27. Inventory > Items** (User Manual §8.1) — Selesai. `IInventoryService`/`InventoryService` (`Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI (`StockMinimumController` yang juga inject service → hanya `IBaseService`). `InventoryController` → MediatR. Semua lewat `Application/Features/Items`:
+  - Query: `GetItemsDatatableQuery`, `GetActiveItemsQuery`, `GetStockCardQuery` (riwayat StockMovement), `GetStockMinimumQuery` (hitung stok & flag below reorder point)
+  - Command: `CreateItemCommand` (cekal ItemCode ganda), `UpdateReorderPointCommand`
+  - Handler port 1:1 dari `InventoryService`. Build 0 error.
 - [ ] **B28. Inventory > Stock Card** (User Manual §8.2) — `Inventory` → riwayat pergerakan stok.
 - [ ] **B29. Inventory > Stock Opname** (User Manual §8.3) — `StockOpname` → stok fisik + adjustment.
 - [ ] **B30. Inventory > Item Groups** (User Manual §8.4) — `ItemGroup` → CRUD grup barang.

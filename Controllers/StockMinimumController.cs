@@ -7,11 +7,8 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class StockMinimumController : BaseController
     {
-        private readonly IInventoryService _inventoryService;
-
-        public StockMinimumController(IInventoryService inventoryService) : base(inventoryService)
+        public StockMinimumController(IBaseService baseService) : base(baseService)
         {
-            _inventoryService = inventoryService;
         }
 
         public IActionResult Index()
