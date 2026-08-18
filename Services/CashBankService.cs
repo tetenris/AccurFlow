@@ -4,7 +4,6 @@ using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.CashBank;
 using AccuFlow.Models.JournalEntry;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace AccuFlow.Services
 {
@@ -24,77 +23,18 @@ namespace AccuFlow.Services
         Task UpdateReconciliationAsync(UpdateReconciliationRequest request, Guid userId);
         Task PostReconciliationAsync(Guid id, Guid userId);
         Task DeleteReconciliationAsync(Guid id, Guid userId);
-
-        Task<List<BankAccountViewModel>> GetCashAccountsAsync();
-        Task<List<BankAccountViewModel>> GetBankAccountsAsync();
     }
 
     public class CashBankService : BaseService, ICashBankService
     {
-        private const int UsageCash = 1;
-        private const int UsageBank = 2;
         private readonly IJournalEntryService _journalEntryService;
-        private readonly IGeneralLedgerService _generalLedgerService;
-        private readonly ILogger<CashBankService> _logger;
 
         public CashBankService(
             AppDbContext dbContext,
-            IJournalEntryService journalEntryService,
-            IGeneralLedgerService generalLedgerService,
-            ILogger<CashBankService> logger) : base(dbContext)
+            IJournalEntryService journalEntryService) : base(dbContext)
         {
             _journalEntryService = journalEntryService;
-            _generalLedgerService = generalLedgerService;
-            _logger = logger;
         }
-
-        #region Accounts
-
-        public async Task<List<BankAccountViewModel>> GetCashAccountsAsync()
-        {
-            return await GetAccountsAsync(UsageCash);
-        }
-
-        public async Task<List<BankAccountViewModel>> GetBankAccountsAsync()
-        {
-            return await GetAccountsAsync(UsageBank);
-        }
-
-        private async Task<List<BankAccountViewModel>> GetAccountsAsync(int usage)
-        {
-            var accounts = await _dbContext.ChartOfAccounts
-                .AsNoTracking()
-                .Where(x => x.AccountUsage == usage && !x.IsHeader && x.IsActive && !x.IsDeleted)
-                .OrderBy(x => x.AccountCode)
-                .ToListAsync();
-
-            var result = new List<BankAccountViewModel>();
-            foreach (var account in accounts)
-            {
-                var balance = 0m;
-                try
-                {
-                    balance = await _generalLedgerService.GetAccountBalanceAsync(account.AccountId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to get balance for account {AccountId}", account.AccountId);
-                }
-
-                result.Add(new BankAccountViewModel
-                {
-                    AccountId = account.AccountId,
-                    AccountCode = account.AccountCode,
-                    AccountName = account.AccountName,
-                    Usage = account.AccountUsage,
-                    Balance = balance
-                });
-            }
-
-            return result;
-        }
-
-        #endregion
 
         #region Transfers
 

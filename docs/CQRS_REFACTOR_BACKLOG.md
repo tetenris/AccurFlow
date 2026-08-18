@@ -164,7 +164,9 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetApprovalDatatableQuery` (filter DocumentType/Status + paging, resolve nama requester)
   - Command: `SubmitApprovalCommand` (status Pending, CurrentApproverId), `ApproveApprovalCommand` (status Approved + riwayat), `RejectApprovalCommand` (status Rejected + riwayat)
   - Handler port 1:1 dari `ApprovalService`. Build 0 error.
-- [ ] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — `CashBank` → list akun + saldo.
+- [x] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — Selesai. `CashBankController` aksi akun (Accounts/GetCashAccounts/GetBankAccounts) lepas dari `ICashBankService` → MediatR (`ISender`). Semua lewat `Application/Features/CashBankAccounts`:
+  - Query: `GetCashBankAccountsQuery` (filter `AccountUsage` 1=cash / 2=bank, non-header, active; saldo per akun dihitung ulang via `GetAccountBalanceQuery` dari fitur GeneralLedgers — reuse send berantai antar handler)
+  - Handler port 1:1 dari `CashBankService.GetAccountsAsync` (perbaiki bug: dulu pakai `.Result` sync-over-async di controller, sekarang async penuh). Aksi transfers/reconciliation masih pakai `ICashBankService` (B37/B38). Service tetap, method akun (**GetCashAccountsAsync/GetBankAccountsAsync**) dihapus dari interface & class beserta dependensi `IGeneralLedgerService`/`ILogger`. Build 0 error.
 - [ ] **B37. Kas & Bank > Cash Bank Transfers** (User Manual §10.2) — `CashBank` → transfer antar akun.
 - [ ] **B38. Kas & Bank > Bank Reconciliation** (User Manual §10.3) — `CashBank` → rekonsiliasi bank.
 - [ ] **B39. HRM / Payroll > Data Karyawan** (User Manual §11.1) — `Payroll` → master karyawan.

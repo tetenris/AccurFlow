@@ -1,5 +1,7 @@
+using AccuFlow.Application.Features.CashBankAccounts.Queries;
 using AccuFlow.Models.CashBank;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,17 +10,21 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class CashBankController : BaseController
     {
+        private const int UsageCash = 1;
+        private const int UsageBank = 2;
         private readonly ICashBankService _cashBankService;
+        private readonly ISender _mediator;
 
-        public CashBankController(ICashBankService cashBankService) : base(cashBankService)
+        public CashBankController(ICashBankService cashBankService, ISender mediator, IBaseService baseService) : base(baseService)
         {
             _cashBankService = cashBankService;
+            _mediator = mediator;
         }
 
-        public IActionResult Accounts()
+        public async Task<IActionResult> Accounts()
         {
             ViewData["Title"] = "Cash & Bank Accounts";
-            return View(_cashBankService.GetCashAccountsAsync().Result);
+            return View(await _mediator.Send(new GetCashBankAccountsQuery(UsageCash)));
         }
 
         public IActionResult Transfers()
@@ -34,10 +40,10 @@ namespace AccuFlow.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCashAccounts() => Json(await _cashBankService.GetCashAccountsAsync());
+        public async Task<IActionResult> GetCashAccounts() => Json(await _mediator.Send(new GetCashBankAccountsQuery(UsageCash)));
 
         [HttpGet]
-        public async Task<IActionResult> GetBankAccounts() => Json(await _cashBankService.GetBankAccountsAsync());
+        public async Task<IActionResult> GetBankAccounts() => Json(await _mediator.Send(new GetCashBankAccountsQuery(UsageBank)));
 
         [HttpGet]
         public async Task<IActionResult> GetBankStatement(Guid accountId, DateTime asOfDate) => Json(await _cashBankService.GetBankStatementAsync(accountId, asOfDate));
