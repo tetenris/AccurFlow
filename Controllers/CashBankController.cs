@@ -1,4 +1,6 @@
 using AccuFlow.Application.Features.CashBankAccounts.Queries;
+using AccuFlow.Application.Features.CashBankTransfers.Commands;
+using AccuFlow.Application.Features.CashBankTransfers.Queries;
 using AccuFlow.Models.CashBank;
 using AccuFlow.Services;
 using MediatR;
@@ -49,13 +51,13 @@ namespace AccuFlow.Controllers
         public async Task<IActionResult> GetBankStatement(Guid accountId, DateTime asOfDate) => Json(await _cashBankService.GetBankStatementAsync(accountId, asOfDate));
 
         [HttpPost]
-        public async Task<IActionResult> DatatableTransfers([FromBody] DataTableTransferRequest request) => Json(await _cashBankService.GetTransfersAsync(request));
+        public async Task<IActionResult> DatatableTransfers([FromBody] DataTableTransferRequest request) => Json(await _mediator.Send(new GetTransferDatatableQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> DatatableReconciliations([FromBody] DataTableReconciliationRequest request) => Json(await _cashBankService.GetReconciliationsAsync(request));
 
         [HttpGet]
-        public async Task<IActionResult> GetTransferDetail(Guid id) => Json(await _cashBankService.GetTransferDetailAsync(id));
+        public async Task<IActionResult> GetTransferDetail(Guid id) => Json(await _mediator.Send(new GetTransferDetailQuery(id)));
 
         [HttpGet]
         public async Task<IActionResult> GetReconciliationDetail(Guid id) => Json(await _cashBankService.GetReconciliationDetailAsync(id));
@@ -65,7 +67,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.CreateTransferAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateTransferCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Transfer created successfully" });
             }
             catch (Exception ex)
@@ -79,7 +81,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.UpdateTransferAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateTransferCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Transfer updated successfully" });
             }
             catch (Exception ex)
@@ -93,7 +95,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.PostTransferAsync(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostTransferCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Transfer posted successfully" });
             }
             catch (Exception ex)
@@ -107,7 +109,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _cashBankService.DeleteTransferAsync(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteTransferCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Transfer deleted successfully" });
             }
             catch (Exception ex)

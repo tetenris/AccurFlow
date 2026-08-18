@@ -2,20 +2,12 @@
 using AccuFlow.Domain.Entities;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.CashBank;
-using AccuFlow.Models.JournalEntry;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFlow.Services
 {
     public interface ICashBankService : IBaseService
     {
-        Task<BaseDatatableResponse> GetTransfersAsync(DataTableTransferRequest request);
-        Task<TransferDetailViewModel?> GetTransferDetailAsync(Guid id);
-        Task CreateTransferAsync(CreateTransferRequest request, Guid userId);
-        Task UpdateTransferAsync(UpdateTransferRequest request, Guid userId);
-        Task PostTransferAsync(Guid id, Guid userId);
-        Task DeleteTransferAsync(Guid id, Guid userId);
-
         Task<BaseDatatableResponse> GetReconciliationsAsync(DataTableReconciliationRequest request);
         Task<ReconciliationDetailViewModel?> GetReconciliationDetailAsync(Guid id);
         Task<List<ReconciliationLineViewModel>> GetBankStatementAsync(Guid accountId, DateTime asOfDate);
@@ -27,197 +19,9 @@ namespace AccuFlow.Services
 
     public class CashBankService : BaseService, ICashBankService
     {
-        private readonly IJournalEntryService _journalEntryService;
-
-        public CashBankService(
-            AppDbContext dbContext,
-            IJournalEntryService journalEntryService) : base(dbContext)
+        public CashBankService(AppDbContext dbContext) : base(dbContext)
         {
-            _journalEntryService = journalEntryService;
         }
-
-        #region Transfers
-
-        public async Task<BaseDatatableResponse> GetTransfersAsync(DataTableTransferRequest request)
-        {
-            var query = _dbContext.CashBankTransfers
-                .Include(x => x.FromAccount)
-                .Include(x => x.ToAccount)
-                .Where(x => !x.IsDeleted);
-
-            if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(x => x.Status == request.Status);
-            if (request.DateFrom.HasValue) query = query.Where(x => x.TransferDate >= request.DateFrom.Value.Date);
-            if (request.DateTo.HasValue) query = query.Where(x => x.TransferDate <= request.DateTo.Value.Date);
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                var search = request.Search.ToLower();
-                query = query.Where(x => x.TransferNumber.ToLower().Contains(search) || x.Description.ToLower().Contains(search));
-            }
-
-            var total = await query.CountAsync();
-            var data = await query.OrderByDescending(x => x.TransferDate)
-                .Skip((request.Page - 1) * request.Size).Take(request.Size)
-                .Select(x => new TransferViewModel
-                {
-                    TransferId = x.TransferId,
-                    TransferNumber = x.TransferNumber,
-                    TransferDate = x.TransferDate,
-                    FromAccountName = x.FromAccount != null ? x.FromAccount.AccountName : string.Empty,
-                    ToAccountName = x.ToAccount != null ? x.ToAccount.AccountName : string.Empty,
-                    Amount = x.Amount,
-                    Status = x.Status
-                }).ToListAsync();
-
-            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
-        }
-
-        public async Task<TransferDetailViewModel?> GetTransferDetailAsync(Guid id)
-        {
-            return await _dbContext.CashBankTransfers
-                .Include(x => x.FromAccount)
-                .Include(x => x.ToAccount)
-                .Include(x => x.JournalEntry)
-                .Where(x => x.TransferId == id && !x.IsDeleted)
-                .Select(x => new TransferDetailViewModel
-                {
-                    TransferId = x.TransferId,
-                    TransferNumber = x.TransferNumber,
-                    TransferDate = x.TransferDate,
-                    FromAccountId = x.FromAccountId,
-                    ToAccountId = x.ToAccountId,
-                    FromAccountName = x.FromAccount != null ? x.FromAccount.AccountName : string.Empty,
-                    ToAccountName = x.ToAccount != null ? x.ToAccount.AccountName : string.Empty,
-                    Amount = x.Amount,
-                    Description = x.Description,
-                    ReferenceNumber = x.ReferenceNumber,
-                    Status = x.Status,
-                    JournalNumber = x.JournalEntry != null ? x.JournalEntry.JournalNumber : null,
-                    CanEdit = x.Status == "Draft",
-                    CanDelete = x.Status == "Draft",
-                    CanPost = x.Status == "Draft"
-                }).FirstOrDefaultAsync();
-        }
-
-        public async Task CreateTransferAsync(CreateTransferRequest request, Guid userId)
-        {
-            ValidateTransfer(request.FromAccountId, request.ToAccountId, request.Amount);
-            await ValidateTransferAccountsAsync(request.FromAccountId, request.ToAccountId);
-
-            var transfer = new CashBankTransferEntity
-            {
-                TransferId = Guid.NewGuid(),
-                TransferNumber = await GenerateNumberAsync("TRF"),
-                TransferDate = request.TransferDate,
-                FromAccountId = request.FromAccountId,
-                ToAccountId = request.ToAccountId,
-                Amount = request.Amount,
-                Description = request.Description,
-                ReferenceNumber = request.ReferenceNumber,
-                Status = "Draft",
-                CreatedBy = userId.ToString()
-            };
-
-            _dbContext.CashBankTransfers.Add(transfer);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task UpdateTransferAsync(UpdateTransferRequest request, Guid userId)
-        {
-            var transfer = await _dbContext.CashBankTransfers.FirstOrDefaultAsync(x => x.TransferId == request.TransferId && !x.IsDeleted);
-            if (transfer == null) throw new Exception("Transfer not found");
-            if (transfer.Status != "Draft") throw new Exception("Only draft transfers can be edited");
-
-            ValidateTransfer(request.FromAccountId, request.ToAccountId, request.Amount);
-            await ValidateTransferAccountsAsync(request.FromAccountId, request.ToAccountId);
-
-            transfer.FromAccountId = request.FromAccountId;
-            transfer.ToAccountId = request.ToAccountId;
-            transfer.TransferDate = request.TransferDate;
-            transfer.Amount = request.Amount;
-            transfer.Description = request.Description;
-            transfer.ReferenceNumber = request.ReferenceNumber;
-            transfer.UpdatedAt = DateTime.UtcNow;
-            transfer.UpdatedBy = userId.ToString();
-
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task PostTransferAsync(Guid id, Guid userId)
-        {
-            var transfer = await _dbContext.CashBankTransfers.FirstOrDefaultAsync(x => x.TransferId == id && !x.IsDeleted);
-            if (transfer == null) throw new Exception("Transfer not found");
-            if (transfer.Status == "Posted") throw new Exception("Transfer is already posted");
-            if (transfer.Status != "Draft") throw new Exception("Only draft transfers can be posted");
-
-            var description = $"Auto journal for {transfer.TransferNumber}";
-            var lines = new List<JournalLineRequest>
-            {
-                new JournalLineRequest
-                {
-                    AccountId = transfer.ToAccountId,
-                    Description = description,
-                    DebitAmount = transfer.Amount,
-                    CreditAmount = 0
-                },
-                new JournalLineRequest
-                {
-                    AccountId = transfer.FromAccountId,
-                    Description = description,
-                    DebitAmount = 0,
-                    CreditAmount = transfer.Amount
-                }
-            };
-
-            var journalId = await _journalEntryService.CreateAsync(new CreateJournalEntryRequest
-            {
-                JournalDate = transfer.TransferDate,
-                Description = description,
-                JournalLines = lines
-            }, userId);
-
-            await _journalEntryService.PostAsync(new PostJournalRequest
-            {
-                JournalId = journalId,
-                PostedDate = transfer.TransferDate
-            }, userId);
-
-            transfer.JournalId = journalId;
-            transfer.Status = "Posted";
-            transfer.PostedDate = DateTime.UtcNow;
-            transfer.PostedBy = userId;
-            transfer.UpdatedAt = DateTime.UtcNow;
-            transfer.UpdatedBy = userId.ToString();
-
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteTransferAsync(Guid id, Guid userId)
-        {
-            var transfer = await _dbContext.CashBankTransfers.FirstOrDefaultAsync(x => x.TransferId == id && !x.IsDeleted);
-            if (transfer == null) throw new Exception("Transfer not found");
-            if (transfer.Status != "Draft") throw new Exception("Only draft transfers can be deleted");
-
-            transfer.IsDeleted = true;
-            transfer.DeletedAt = DateTime.UtcNow;
-            transfer.DeletedBy = userId.ToString();
-            await _dbContext.SaveChangesAsync();
-        }
-
-        private async Task ValidateTransferAccountsAsync(Guid fromAccountId, Guid toAccountId)
-        {
-            var accountIds = new[] { fromAccountId, toAccountId };
-            var valid = await _dbContext.ChartOfAccounts
-                .CountAsync(x => accountIds.Contains(x.AccountId) && (x.AccountUsage == 1 || x.AccountUsage == 2) && !x.IsHeader && x.IsActive && !x.IsDeleted);
-            if (valid != 2) throw new Exception("Both accounts must be active cash/bank accounts");
-        }
-
-        private void ValidateTransfer(Guid fromAccountId, Guid toAccountId, decimal amount)
-        {
-            if (fromAccountId == toAccountId) throw new Exception("From and To accounts must be different");
-            if (amount <= 0) throw new Exception("Amount must be greater than zero");
-        }
-
-        #endregion
 
         #region Reconciliations
 
@@ -435,23 +239,10 @@ namespace AccuFlow.Services
 
         private async Task<string> GenerateNumberAsync(string prefix)
         {
-            string number;
-            if (prefix == "TRF")
-            {
-                var last = await _dbContext.CashBankTransfers.Where(x => x.TransferNumber.StartsWith(prefix + "-"))
-                    .OrderByDescending(x => x.TransferNumber).Select(x => x.TransferNumber).FirstOrDefaultAsync();
-                var next = string.IsNullOrEmpty(last) ? 1 : int.Parse(last[(prefix.Length + 1)..]) + 1;
-                number = $"{prefix}-{next:D5}";
-            }
-            else
-            {
-                var last = await _dbContext.BankReconciliations.Where(x => x.ReconciliationNumber.StartsWith(prefix + "-"))
-                    .OrderByDescending(x => x.ReconciliationNumber).Select(x => x.ReconciliationNumber).FirstOrDefaultAsync();
-                var next = string.IsNullOrEmpty(last) ? 1 : int.Parse(last[(prefix.Length + 1)..]) + 1;
-                number = $"{prefix}-{next:D5}";
-            }
-
-            return number;
+            var last = await _dbContext.BankReconciliations.Where(x => x.ReconciliationNumber.StartsWith(prefix + "-"))
+                .OrderByDescending(x => x.ReconciliationNumber).Select(x => x.ReconciliationNumber).FirstOrDefaultAsync();
+            var next = string.IsNullOrEmpty(last) ? 1 : int.Parse(last[(prefix.Length + 1)..]) + 1;
+            return $"{prefix}-{next:D5}";
         }
 
         #endregion

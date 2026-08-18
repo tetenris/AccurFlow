@@ -167,7 +167,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 - [x] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — Selesai. `CashBankController` aksi akun (Accounts/GetCashAccounts/GetBankAccounts) lepas dari `ICashBankService` → MediatR (`ISender`). Semua lewat `Application/Features/CashBankAccounts`:
   - Query: `GetCashBankAccountsQuery` (filter `AccountUsage` 1=cash / 2=bank, non-header, active; saldo per akun dihitung ulang via `GetAccountBalanceQuery` dari fitur GeneralLedgers — reuse send berantai antar handler)
   - Handler port 1:1 dari `CashBankService.GetAccountsAsync` (perbaiki bug: dulu pakai `.Result` sync-over-async di controller, sekarang async penuh). Aksi transfers/reconciliation masih pakai `ICashBankService` (B37/B38). Service tetap, method akun (**GetCashAccountsAsync/GetBankAccountsAsync**) dihapus dari interface & class beserta dependensi `IGeneralLedgerService`/`ILogger`. Build 0 error.
-- [ ] **B37. Kas & Bank > Cash Bank Transfers** (User Manual §10.2) — `CashBank` → transfer antar akun.
+- [x] **B37. Kas & Bank > Cash Bank Transfers** (User Manual §10.2) — Selesai. `CashBankController` aksi transfer (DatatableTransfers/GetTransferDetail/CreateTransfer/UpdateTransfer/PostTransfer/DeleteTransfer) lepas dari `ICashBankService` → MediatR. Semua lewat `Application/Features/CashBankTransfers`:
+  - Query: `GetTransferDatatableQuery` (filter Status/DateFrom/DateTo + search, paging), `GetTransferDetailQuery` (termasuk JournalNumber + CanEdit/CanDelete/CanPost)
+  - Command: `CreateTransferCommand` (no. `TRF-{D5}`, validasi akun cash/bank), `UpdateTransferCommand`, `PostTransferCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand`), `DeleteTransferCommand`
+  - Handler port 1:1 dari `CashBankService`. Method transfer dihapus dari interface & class service (kini hanya reconciliation); dependensi `IJournalEntryService` + using `Models.JournalEntry` dihapus. Build 0 error.
 - [ ] **B38. Kas & Bank > Bank Reconciliation** (User Manual §10.3) — `CashBank` → rekonsiliasi bank.
 - [ ] **B39. HRM / Payroll > Data Karyawan** (User Manual §11.1) — `Payroll` → master karyawan.
 - [ ] **B40. HRM / Payroll > Penggajian** (User Manual §11.2) — `Payroll` → buat + post payroll.
