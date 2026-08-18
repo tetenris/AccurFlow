@@ -87,7 +87,9 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetPaymentDatatableQuery` (filter payment type/status/date), `GetPaymentByIdQuery` (detail + alokasi invoice + jurnal)
   - Command: `CreatePaymentCommand` (auto number `PAY-`/`RCT-`), `UpdatePaymentCommand` (soft delete alokasi lama), `DeletePaymentCommand`, `PostPaymentCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand`, lalu update `PaidAmount` & status invoice per alokasi)
   - Handler port 1:1 dari `PaymentService`. Build 0 error.
-- [ ] **B14. Accounting > Aging Report** (User Manual §5.7) — `AgingReport` → AR/AP aging.
+- [x] **B14. Accounting > Aging Report** (User Manual §5.7) — Selesai. `IAgingReportService`/`AgingReportService` (di `Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `AgingReportController` → MediatR (`ISender`). Semua lewat `Application/Features/AgingReports`:
+  - Query: `GetAgingReportQuery` (AR/AP, bucket Current/1-30/31-60/61-90/Over90 per partner, outstanding = Total - Paid)
+  - Handler port 1:1 dari `AgingReportService`. Build 0 error.
 - [ ] **B15. Accounting > Returns** (User Manual §5.8) — `Return` → retur penjualan/pembelian.
 - [ ] **B16. Accounting > Receivable & Payable** (User Manual §5.9) — `ReceivablePayable` → detail AR/AP per invoice.
 - [ ] **B17. Accounting > Taxes** (User Manual §5.10) — `Tax` → CRUD pajak + laporan PPN.

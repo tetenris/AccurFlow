@@ -1,4 +1,4 @@
-﻿using AccuFlow.Infrastructure.Persistence;
+using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
 using AccuFlow.Models.AgingReport;
 using AccuFlow.Models.Approval;
@@ -169,42 +169,6 @@ namespace AccuFlow.Services
         }
     }
 
-    public interface IAgingReportService : IBaseService
-    {
-        Task<List<AgingReportViewModel>> GetAging(AgingReportRequest request);
-    }
-
-    public class AgingReportService : BaseService, IAgingReportService
-    {
-        public AgingReportService(AppDbContext dbContext) : base(dbContext) { }
-
-        public async Task<List<AgingReportViewModel>> GetAging(AgingReportRequest request)
-        {
-            var query = _dbContext.Invoices.Include(x => x.Customer).Include(x => x.Supplier)
-                .Where(x => !x.IsDeleted && x.Status != "Cancelled" && x.TotalAmount > x.PaidAmount);
-            query = request.AgingType == "AP" ? query.Where(x => x.InvoiceType == "Purchase") : query.Where(x => x.InvoiceType == "Sales");
-            var invoices = await query.ToListAsync();
-            return invoices.GroupBy(x => new
-            {
-                Code = x.Customer != null ? x.Customer.CustomerCode : x.Supplier != null ? x.Supplier.SupplierCode : string.Empty,
-                Name = x.Customer != null ? x.Customer.CustomerName : x.Supplier != null ? x.Supplier.SupplierName : string.Empty
-            }).Select(g =>
-            {
-                var row = new AgingReportViewModel { PartnerCode = g.Key.Code, PartnerName = g.Key.Name };
-                foreach (var invoice in g)
-                {
-                    var outstanding = invoice.TotalAmount - invoice.PaidAmount;
-                    var age = (request.AsOfDate.Date - invoice.DueDate.Date).Days;
-                    if (age <= 0) row.Current += outstanding;
-                    else if (age <= 30) row.Days1To30 += outstanding;
-                    else if (age <= 60) row.Days31To60 += outstanding;
-                    else if (age <= 90) row.Days61To90 += outstanding;
-                    else row.Over90 += outstanding;
-                }
-                return row;
-            }).OrderBy(x => x.PartnerName).ToList();
-        }
-    }
 
     public interface IReceivablePayableService : IBaseService
     {
