@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.GoodsReceipts.Commands;
+using AccuFlow.Application.Features.GoodsReceipts.Queries;
 using AccuFlow.Models.GoodsReceipt;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class GoodsReceiptController : BaseController
     {
-        private readonly IGoodsReceiptService _goodsReceiptService;
+        private readonly ISender _mediator;
 
-        public GoodsReceiptController(IGoodsReceiptService goodsReceiptService) : base(goodsReceiptService)
+        public GoodsReceiptController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _goodsReceiptService = goodsReceiptService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,26 +25,26 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableGoodsReceiptRequest request) => Json(await _goodsReceiptService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableGoodsReceiptRequest request) => Json(await _mediator.Send(new GetGoodsReceiptDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _goodsReceiptService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetGoodsReceiptByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetWarehouses() => Json(await _goodsReceiptService.GetWarehouses());
+        public async Task<IActionResult> GetWarehouses() => Json(await _mediator.Send(new GetGoodsReceiptWarehousesQuery()));
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseOrders() => Json(await _goodsReceiptService.GetPurchaseOrders());
+        public async Task<IActionResult> GetPurchaseOrders() => Json(await _mediator.Send(new GetGoodsReceiptPurchaseOrdersQuery()));
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseOrderLines(Guid purchaseOrderId) => Json(await _goodsReceiptService.GetPurchaseOrderLines(purchaseOrderId));
+        public async Task<IActionResult> GetPurchaseOrderLines(Guid purchaseOrderId) => Json(await _mediator.Send(new GetGoodsReceiptPurchaseOrderLinesQuery(purchaseOrderId)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateGoodsReceiptRequest request)
         {
             try
             {
-                await _goodsReceiptService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateGoodsReceiptCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Goods receipt created successfully" });
             }
             catch (Exception ex)
@@ -55,7 +58,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _goodsReceiptService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateGoodsReceiptCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Goods receipt updated successfully" });
             }
             catch (Exception ex)
@@ -69,7 +72,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _goodsReceiptService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostGoodsReceiptCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Goods receipt posted successfully" });
             }
             catch (Exception ex)
@@ -83,7 +86,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _goodsReceiptService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteGoodsReceiptCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Goods receipt deleted successfully" });
             }
             catch (Exception ex)

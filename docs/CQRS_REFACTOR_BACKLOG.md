@@ -130,7 +130,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetPurchaseOrderDatatableQuery`, `GetPurchaseOrderByIdQuery` (juga dipakai action Print)
   - Command: `CreatePurchaseOrderCommand` (nomor `PO-xxxxx`), `UpdatePurchaseOrderCommand`, `DeletePurchaseOrderCommand` (soft-delete line), `ApprovePurchaseOrderCommand`, `ConvertPurchaseOrderToInvoiceCommand` (auto buat invoice `PI-`, status PO → Converted)
   - Handler port 1:1 dari `PurchaseOrderService`. Build 0 error.
-- [ ] **B26. Purchasing > Goods Received / GRN** (User Manual §7.3) — `GoodsReceipt` → dari PO, update stok + jurnal.
+- [x] **B26. Purchasing > Goods Received / GRN** (User Manual §7.3) — Selesai. `IGoodsReceiptService`/`GoodsReceiptService` (`Services/GoodsReceiptService.cs`) **DIHAPUS** beserta registrasi DI. `GoodsReceiptController` → MediatR. Semua lewat `Application/Features/GoodsReceipts`:
+  - Query: `GetGoodsReceiptDatatableQuery`, `GetGoodsReceiptByIdQuery`, `GetGoodsReceiptWarehousesQuery`, `GetGoodsReceiptPurchaseOrdersQuery`, `GetGoodsReceiptPurchaseOrderLinesQuery`
+  - Command: `CreateGoodsReceiptCommand` (nomor `GRN-xxxxx`), `UpdateGoodsReceiptCommand`, `DeleteGoodsReceiptCommand`, `PostGoodsReceiptCommand` (cek over-receipt, buat `StockMovement` masuk, auto jurnal beban inventory ↔ hutang via `CreateJournalCommand`+`PostJournalCommand`)
+  - Handler port 1:1 dari `GoodsReceiptService`. Build 0 error.
 - [ ] **B27. Inventory > Items** (User Manual §8.1) — `Inventory` → item list.
 - [ ] **B28. Inventory > Stock Card** (User Manual §8.2) — `Inventory` → riwayat pergerakan stok.
 - [ ] **B29. Inventory > Stock Opname** (User Manual §8.3) — `StockOpname` → stok fisik + adjustment.
