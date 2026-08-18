@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Invoices.Commands;
+using AccuFlow.Application.Features.Invoices.Queries;
 using AccuFlow.Models.Invoice;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class InvoiceController : BaseController
     {
-        private readonly IInvoiceService _invoiceService;
+        private readonly ISender _mediator;
 
-        public InvoiceController(IInvoiceService invoiceService) : base(invoiceService)
+        public InvoiceController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _invoiceService = invoiceService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,15 +25,15 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableInvoiceRequest request) => Json(await _invoiceService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableInvoiceRequest request) => Json(await _mediator.Send(new GetInvoiceDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _invoiceService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetInvoiceByIdQuery(id)));
 
         [HttpGet]
         public async Task<IActionResult> Print(Guid id)
         {
-            var invoice = await _invoiceService.GetById(id);
+            var invoice = await _mediator.Send(new GetInvoiceByIdQuery(id));
             if (invoice == null) return NotFound();
             return View(invoice);
         }
@@ -38,12 +41,12 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOpenInvoices(string invoiceType)
         {
-            var result = await _invoiceService.Datatable(new DataTableInvoiceRequest
+            var result = await _mediator.Send(new GetInvoiceDatatableQuery(new DataTableInvoiceRequest
             {
                 InvoiceType = invoiceType,
                 Page = 1,
                 Size = 1000
-            });
+            }));
 
             return Json(result.Data);
         }
@@ -53,7 +56,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _invoiceService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateInvoiceCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Invoice created successfully" });
             }
             catch (Exception ex)
@@ -67,7 +70,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _invoiceService.Edit(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateInvoiceCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Invoice updated successfully" });
             }
             catch (Exception ex)
@@ -81,7 +84,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _invoiceService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteInvoiceCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Invoice deleted successfully" });
             }
             catch (Exception ex)
@@ -95,7 +98,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _invoiceService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostInvoiceCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Invoice posted successfully" });
             }
             catch (Exception ex)
@@ -109,7 +112,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _invoiceService.Cancel(id, _currentUserService!.UserId);
+                await _mediator.Send(new CancelInvoiceCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Invoice cancelled successfully" });
             }
             catch (Exception ex)

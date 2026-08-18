@@ -79,7 +79,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetIncomeStatementQuery` (p/l per akun + subtotal + NetIncome), `GetBalanceSheetQuery` (Asset/Liability/Equity + balanced check), `GetCashFlowQuery` (operating/investing/financing + beginning/ending cash)
   - Export: `ExportIncomeStatementQuery`, `ExportBalanceSheetQuery`, `ExportCashFlowQuery` (Excel via NPOI)
   - Helper baru `Application/Common/Helpers/FinancialStatementHelper` (saldo & opening balance akun dari `JournalLine`, tanpa dependensi `IGeneralLedgerService`). Build 0 error.
-- [ ] **B12. Accounting > Invoices** (User Manual §5.5) — `Invoice` → draft/edit/post/cancel/print + attachment.
+- [x] **B12. Accounting > Invoices** (User Manual §5.5) — Selesai. `IInvoiceService`/`InvoiceService` (di `Services/BusinessModuleServices.cs`) **DIHAPUS** beserta registrasi DI. `InvoiceController` → MediatR (`ISender`). Semua lewat `Application/Features/Invoices`:
+  - Query: `GetInvoiceDatatableQuery` (filter invoice type/status/customer/supplier/date/search), `GetInvoiceByIdQuery` (main detail + lines + journal)
+  - Command: `CreateInvoiceCommand` (auto number `SI-`/`PI-`), `UpdateInvoiceCommand` (soft delete lines lama), `DeleteInvoiceCommand`, `PostInvoiceCommand` (auto jurnal via `CreateJournalCommand` + `PostJournalCommand` dari fitur JournalEntries — send berantai antar handler MediatR), `CancelInvoiceCommand`
+  - Handler port 1:1 dari `InvoiceService`. Build 0 error.
 - [ ] **B13. Accounting > Payments & Receipts** (User Manual §5.6) — `Payment` → draft/edit/post/print + alokasi invoice.
 - [ ] **B14. Accounting > Aging Report** (User Manual §5.7) — `AgingReport` → AR/AP aging.
 - [ ] **B15. Accounting > Returns** (User Manual §5.8) — `Return` → retur penjualan/pembelian.
