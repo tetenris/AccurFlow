@@ -187,7 +187,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetBomDatatableQuery` (search BomNumber/finished item + paging, LineCount), `GetBomByIdQuery` (detail + line komponen), `GetBomsQuery` (BOM aktif utk dropdown PO)
   - Command: `CreateBomCommand` (no. `BOM-{D5}`, cek komponen = finished item), `DeleteBomCommand` (tolak jika sudah ada production order posted)
   - Review dropdown reuse `GetActiveItemsQuery` (Items, B27) + `GetWarehousesQuery` baru (`Application/Features/Warehouses`, dipakai juga B42). Method BOM dihapus dari `ProductionService` (kini hanya production order). Build 0 error.
-- [ ] **B42. Produksi > Production Order** (User Manual §12.2) — `Production` → perintah produksi.
+- [x] **B42. Produksi > Production Order** (User Manual §12.2) — Selesai. `IProductionService`/`ProductionService` (`Services/ProductionService.cs`) **DIHAPUS** beserta registrasi DI. `ProductionController` → MediatR penuh (`ISender`). Semua lewat `Application/Features/ProductionOrders`:
+  - Query: `GetProductionOrderDatatableQuery` (search no. order/finished item, sort ProductionDate, LineCount + JournalNumber), `GetProductionOrderByIdQuery` (detail + line komponen)
+  - Command: `CreateProductionOrderCommand` (no. `PRD-{D5}`, wajib BOM, tarik line komponen `qty BOM × qty produksi`), `PostProductionOrderCommand` (cek stok komponen vs `QuantityRequired`, buat `StockMovement` Production Consumption/Output, auto jurnal WIP via `CreateJournalCommand`+`PostJournalCommand`, reuse `GetWarehousesQuery`), `DeleteProductionOrderCommand` (soft delete)
+  - Handler port 1:1 dari `ProductionService`. Build 0 error. **Seluruh backlog B (B1–B42) TUNTAS.**
 
 ### C. Pengujian & Penyempurnaan
 

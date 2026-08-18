@@ -1,6 +1,8 @@
 using AccuFlow.Application.Features.BillOfMaterials.Commands;
 using AccuFlow.Application.Features.BillOfMaterials.Queries;
 using AccuFlow.Application.Features.Items.Queries;
+using AccuFlow.Application.Features.ProductionOrders.Commands;
+using AccuFlow.Application.Features.ProductionOrders.Queries;
 using AccuFlow.Application.Features.Warehouses.Queries;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Production;
@@ -14,12 +16,10 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ProductionController : BaseController
     {
-        private readonly IProductionService _productionService;
         private readonly ISender _mediator;
 
-        public ProductionController(IProductionService productionService, ISender mediator, IBaseService baseService) : base(baseService)
+        public ProductionController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _productionService = productionService;
             _mediator = mediator;
         }
 
@@ -75,28 +75,28 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProductionOrderDatatable([FromBody] BaseDatatableRequest request) => Json(await _productionService.ProductionOrderDatatable(request));
+        public async Task<IActionResult> ProductionOrderDatatable([FromBody] BaseDatatableRequest request) => Json(await _mediator.Send(new GetProductionOrderDatatableQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> CreateProductionOrder([FromBody] CreateProductionOrderRequest request)
         {
             try
             {
-                await _productionService.CreateProductionOrder(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateProductionOrderCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Production order draft created" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProductionOrderById(Guid id) => Json(await _productionService.GetProductionOrderById(id));
+        public async Task<IActionResult> GetProductionOrderById(Guid id) => Json(await _mediator.Send(new GetProductionOrderByIdQuery(id)));
 
         [HttpPost]
         public async Task<IActionResult> PostProductionOrder([FromBody] Guid id)
         {
             try
             {
-                await _productionService.PostProductionOrder(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostProductionOrderCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Production order posted (stock + journal updated)" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -107,7 +107,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _productionService.DeleteProductionOrder(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteProductionOrderCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Production order draft deleted" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
