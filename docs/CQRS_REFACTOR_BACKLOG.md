@@ -109,7 +109,7 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetYearEndClosingPreviewQuery` (saldo per akun laba-rugi s.d. 31/12 via `GeneralLedgerHelper.CalculateBalance`), `GetYearEndClosingHistoryQuery`
   - Command: `CloseYearEndClosingCommand` (cekal fiscal year ganda, tutup akun revenue/expense → `RetainedEarnings`, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`)
   - Handler port 1:1 dari `YearEndClosingService`. Build 0 error.
-- [ ] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — `MemoJournal` → memo/adjustment.
+- [x] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — Selesai. `MemoJournalController` → MediatR (`ISender`). Reuse fitur `JournalEntries` yang sudah CQRS: `GetJournalDatatableQuery`, `GetJournalByIdQuery`, `CreateJournalCommand`, `UpdateJournalCommand`, `PostJournalCommand`, `ReverseJournalCommand`, `GenerateJournalNumberQuery`; dropdown akun via `GetCoaActiveAccountsQuery`. `IJournalEntryService`/`IChartOfAccountService` **tetap** (masih dipakai controller/service lain). Build 0 error.
 - [ ] **B21. Sales > Sales Quotation** (User Manual §6.1) — `SalesQuotation` → draft/approve, from quote → order.
 - [ ] **B22. Sales > Sales Order** (User Manual §6.2) — `SalesOrder` → draft/approve, generate dari quotation.
 - [ ] **B23. Sales > Delivery Order** (User Manual §6.3) — `DeliveryOrder` → draft/post (kurangi stok), convert ke sales invoice.

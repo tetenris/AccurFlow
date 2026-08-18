@@ -1,5 +1,9 @@
+using AccuFlow.Application.Features.ChartOfAccounts.Queries;
+using AccuFlow.Application.Features.JournalEntries.Commands;
+using AccuFlow.Application.Features.JournalEntries.Queries;
 using AccuFlow.Models.JournalEntry;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,17 +12,12 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class MemoJournalController : BaseController
     {
-        private readonly IJournalEntryService _journalEntryService;
-        private readonly IChartOfAccountService _chartOfAccountService;
+        private readonly ISender _mediator;
         private readonly IBaseService _baseService;
 
-        public MemoJournalController(
-            IJournalEntryService journalEntryService,
-            IChartOfAccountService chartOfAccountService,
-            IBaseService baseService) : base(baseService)
+        public MemoJournalController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _journalEntryService = journalEntryService;
-            _chartOfAccountService = chartOfAccountService;
+            _mediator = mediator;
             _baseService = baseService;
         }
 
@@ -29,14 +28,10 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableJournalEntryRequest request)
-        {
-            var result = await _journalEntryService.Datatable(request);
-            return Json(result);
-        }
+        public async Task<IActionResult> Datatable([FromBody] DataTableJournalEntryRequest request) => Json(await _mediator.Send(new GetJournalDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _journalEntryService.GetByIdAsync(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetJournalByIdQuery(id)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateJournalEntryRequest request)
@@ -47,7 +42,7 @@ namespace AccuFlow.Controllers
                 {
                     return BadRequest(new { success = false, message = "Journal type must be Memo or Adjustment" });
                 }
-                var journalId = await _journalEntryService.CreateAsync(request, _currentUserService!.UserId);
+                var journalId = await _mediator.Send(new CreateJournalCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = $"{request.JournalType} journal created successfully", journalId });
             }
             catch (Exception ex)
@@ -61,7 +56,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _journalEntryService.UpdateAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateJournalCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Journal updated successfully" });
             }
             catch (Exception ex)
@@ -75,7 +70,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _journalEntryService.PostAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new PostJournalCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Journal posted successfully" });
             }
             catch (Exception ex)
@@ -89,7 +84,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _journalEntryService.ReverseAsync(request, _currentUserService!.UserId);
+                await _mediator.Send(new ReverseJournalCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Journal reversed successfully" });
             }
             catch (Exception ex)
@@ -101,14 +96,14 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateNumber(DateTime journalDate, string journalType)
         {
-            var number = await _journalEntryService.GenerateJournalNumberAsync(journalDate, journalType);
+            var number = await _mediator.Send(new GenerateJournalNumberQuery(journalDate, journalType));
             return Json(new { number });
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAccountDropdown()
         {
-            var accounts = await _chartOfAccountService.GetDetailAccountsAsync();
+            var accounts = await _mediator.Send(new GetCoaActiveAccountsQuery());
             var dropdown = accounts
                 .Select(x => new { value = x.AccountId, text = $"{x.AccountCode} - {x.AccountName}" })
                 .ToList();
