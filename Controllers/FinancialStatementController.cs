@@ -1,6 +1,8 @@
+using AccuFlow.Application.Features.FinancialStatements.Queries;
 using AccuFlow.Controllers;
 using AccuFlow.Models.FinancialStatement;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +11,11 @@ namespace AccuFlow.Controllers;
 [Authorize]
 public class FinancialStatementController : BaseController
 {
-    private readonly IFinancialStatementService _financialStatementService;
+    private readonly ISender _mediator;
 
-    public FinancialStatementController(IFinancialStatementService financialStatementService) : base(financialStatementService)
+    public FinancialStatementController(ISender mediator, IBaseService baseService) : base(baseService)
     {
-        _financialStatementService = financialStatementService;
+        _mediator = mediator;
     }
 
     public IActionResult Index()
@@ -27,7 +29,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var result = await _financialStatementService.GetIncomeStatementAsync(request);
+            var result = await _mediator.Send(new GetIncomeStatementQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -41,7 +43,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var result = await _financialStatementService.GetBalanceSheetAsync(request);
+            var result = await _mediator.Send(new GetBalanceSheetQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -55,7 +57,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var result = await _financialStatementService.GetCashFlowStatementAsync(request);
+            var result = await _mediator.Send(new GetCashFlowQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -69,7 +71,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var fileBytes = await _financialStatementService.ExportIncomeStatementAsync(request);
+            var fileBytes = await _mediator.Send(new ExportIncomeStatementQuery(request));
             var fileName = $"IncomeStatement_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
@@ -84,7 +86,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var fileBytes = await _financialStatementService.ExportBalanceSheetAsync(request);
+            var fileBytes = await _mediator.Send(new ExportBalanceSheetQuery(request));
             var fileName = $"BalanceSheet_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
@@ -99,7 +101,7 @@ public class FinancialStatementController : BaseController
     {
         try
         {
-            var fileBytes = await _financialStatementService.ExportCashFlowAsync(request);
+            var fileBytes = await _mediator.Send(new ExportCashFlowQuery(request));
             var fileName = $"CashFlow_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }

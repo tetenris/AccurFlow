@@ -75,7 +75,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 - [x] **B10. Accounting > Trial Balance** (User Manual §5.3) — Selesai. `TrialBalanceService` (`ITrialBalanceService`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. `TrialBalanceController` → MediatR (`ISender`). Semua lewat `Application/Features/TrialBalances`:
   - Query: `GetTrialBalanceQuery` (per akun, grouped per tipe, subtotal + total + difference + IsBalanced), `ExportTrialBalanceQuery` (Excel via NPOI, rekanan pakai handler ini)
   - Handler port 1:1 dari `TrialBalanceService`; saldo akun dihitung inline dari `JournalLine` (pakai `GeneralLedgerHelper.CalculateBalance`), tanpa dependensi `IGeneralLedgerService`. Build 0 error.
-- [ ] **B11. Accounting > Financial Statements** (User Manual §5.4) — `FinancialStatement` → income/balance/cash flow.
+- [x] **B11. Accounting > Financial Statements** (User Manual §5.4) — Selesai. `FinancialStatementService` (`IFinancialStatementService`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. `FinancialStatementController` → MediatR (`ISender`). Semua lewat `Application/Features/FinancialStatements`:
+  - Query: `GetIncomeStatementQuery` (p/l per akun + subtotal + NetIncome), `GetBalanceSheetQuery` (Asset/Liability/Equity + balanced check), `GetCashFlowQuery` (operating/investing/financing + beginning/ending cash)
+  - Export: `ExportIncomeStatementQuery`, `ExportBalanceSheetQuery`, `ExportCashFlowQuery` (Excel via NPOI)
+  - Helper baru `Application/Common/Helpers/FinancialStatementHelper` (saldo & opening balance akun dari `JournalLine`, tanpa dependensi `IGeneralLedgerService`). Build 0 error.
 - [ ] **B12. Accounting > Invoices** (User Manual §5.5) — `Invoice` → draft/edit/post/cancel/print + attachment.
 - [ ] **B13. Accounting > Payments & Receipts** (User Manual §5.6) — `Payment` → draft/edit/post/print + alokasi invoice.
 - [ ] **B14. Accounting > Aging Report** (User Manual §5.7) — `AgingReport` → AR/AP aging.
