@@ -1,6 +1,8 @@
+using AccuFlow.Application.Features.TrialBalances.Queries;
 using AccuFlow.Controllers;
 using AccuFlow.Models.TrialBalance;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +11,11 @@ namespace AccuFlow.Controllers;
 [Authorize]
 public class TrialBalanceController : BaseController
 {
-    private readonly ITrialBalanceService _trialBalanceService;
+    private readonly ISender _mediator;
 
-    public TrialBalanceController(ITrialBalanceService trialBalanceService) : base(trialBalanceService)
+    public TrialBalanceController(ISender mediator, IBaseService baseService) : base(baseService)
     {
-        _trialBalanceService = trialBalanceService;
+        _mediator = mediator;
     }
 
     public IActionResult Index()
@@ -27,7 +29,7 @@ public class TrialBalanceController : BaseController
     {
         try
         {
-            var result = await _trialBalanceService.GetTrialBalanceAsync(request);
+            var result = await _mediator.Send(new GetTrialBalanceQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -41,7 +43,7 @@ public class TrialBalanceController : BaseController
     {
         try
         {
-            var fileBytes = await _trialBalanceService.ExportToExcelAsync(request);
+            var fileBytes = await _mediator.Send(new ExportTrialBalanceQuery(request));
             var fileName = $"TrialBalance_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
