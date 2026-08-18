@@ -63,7 +63,7 @@ namespace AccuFlow.Entities.Seeders
                 {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000006"),
                     MenuParentId = null,
-                    Icon = @"<i class=""ki-duotone ki-category fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span><span class=""path4""></span></i>",
+                    Icon = @"<i class=""ki-duotone ki-book fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span><span class=""path4""></span></i>",
                     Name = "Master",
                     Controller = "",
                     Action = @"[]",
@@ -269,7 +269,7 @@ namespace AccuFlow.Entities.Seeders
                 {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000031"),
                     MenuParentId = null,
-                    Icon = @"<i class=""ki-duotone ki-cart fs-2""><span class=""path1""></span><span class=""path2""></span></i>",
+                    Icon = @"<i class=""ki-duotone ki-basket fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span><span class=""path4""></span></i>",
                     Name = "Sales",
                     Controller = "",
                     Action = @"[]",
@@ -533,7 +533,7 @@ namespace AccuFlow.Entities.Seeders
                 {
                     MenuId = Guid.Parse("00000000-0000-0000-0000-000000000048"),
                     MenuParentId = null,
-                    Icon = @"<i class=""ki-duotone ki-buildings-2 fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
+                    Icon = @"<i class=""ki-duotone ki-cube-2 fs-2""><span class=""path1""></span><span class=""path2""></span><span class=""path3""></span></i>",
                     Name = "Produksi",
                     Controller = "",
                     Action = @"[]",

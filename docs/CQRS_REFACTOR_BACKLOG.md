@@ -4,7 +4,7 @@ Catatan kerja refactor dari pola **tradisional MVC + Service Layer** ke **Clean 
 
 > Branch kerja: `feature/cqrs-refactor`
 > Database target baru: `AccuFlowCqrsDb` (LocalDB)
-> Terakhir diperbarui: 2026-08-19 (backlog D2–D5 selesai, D6 dipertahankan)
+> Terakhir diperbarui: 2026-08-19 (perbaikan icon menu root: Sales, Produksi, Master)
 ---
 
 ## 1. Yang Sudah Dikerjakan
@@ -211,6 +211,21 @@ Hasil verifikasi `Services/` (2026-08-18): hanya ada 6 file service tersisa. Rin
 4. [x] **Hapus `IJournalEntryService`/`JournalEntryService` (file `JournalEntryService.cs`).** Setelah semua pemakai bermigrasi (Invoice B12, Payment B13, CashBank B36–B38, Return B15, GoodsReceipt B26, FixedAsset B18, Payroll B40, Production B42, YearEndClosing B19, MemoJournal B20), tidak ada controller/service yang meng-inject lagi (grep terverifikasi). Selesai 2026-08-19: file `Services/JournalEntryService.cs` **DIHAPUS** + registrasi DI (`AppServiceCollection.cs`) dihapus. Build 0 error.
 5. [x] **Hapus `IGeneralLedgerService`/`GeneralLedgerService` (2 file).** Setelah TrialBalance B10, FinancialStatement B11, CashBank B36, YearEndClosing B19 memakai helper/query sendiri, tidak ada yang meng-inject (grep terverifikasi). Selesai 2026-08-19: `Services/GeneralLedgerService.cs` + `Services/IGeneralLedgerService.cs` **DIHAPUS** + registrasi DI (`AppServiceCollection.cs`) dihapus. Build 0 error. **Backlog D tuntas (kecuali D6 dipertahankan).**
 6. [ ] **`BaseService`/`IBaseService` — dipertahankan (foundation).** Dipakai seluruh ~35 controller via `BaseController` (konstruktor). Migrasi total menyentuh `BaseController` + semua controller → di luar cakupan backlog D, dievaluasi terpisah.
+
+---
+
+## 4. Perbaikan Icon Menu (2026-08-19)
+
+Beberapa icon root menu di `MenuSeed.cs` merujuk kelas yang **tidak ada** di font icon Metronic (`plugins.bundle.css`), sehingga tampil kosong/polos di sidebar. Diperbaiki dengan icon valid yang tersedia di tema:
+
+| Menu | Sebelum (tidak valid) | Sesudah (valid) |
+|---|---|---|
+| Sales | `ki-cart` | `ki-basket` |
+| Produksi | `ki-buildings-2` | `ki-cube-2` |
+| Master | `ki-category` | `ki-book` |
+
+- Nilai di DB (`AccuFlowCqrsDb` & `AccuFlowDb`) di-`UPDATE` langsung karena seeder hanya berjalan saat startup; perubahan seed akan disync ulang oleh `Seeder.SeedMenu` pada restart berikutnya.
+- Verifikasi validitas icon via pengecekan selector `.ki-<name> .path` di `plugins.bundle.css`.
 
 ---
 
