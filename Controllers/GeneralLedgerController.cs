@@ -1,7 +1,7 @@
-using AccuFlow.Controllers;
+using AccuFlow.Application.Features.GeneralLedgers.Queries;
 using AccuFlow.Services;
-using AccuFlow.Services.Interfaces;
 using AccuFlow.Models.GeneralLedger;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +10,15 @@ namespace AccuFlow.Controllers;
 [Authorize]
 public class GeneralLedgerController : BaseController
 {
-    private readonly IGeneralLedgerService _generalLedgerService;
+    private readonly ISender _mediator;
     private readonly IChartOfAccountService _chartOfAccountService;
 
     public GeneralLedgerController(
-        IGeneralLedgerService generalLedgerService,
-        IChartOfAccountService chartOfAccountService) : base(generalLedgerService)
+        ISender mediator,
+        IChartOfAccountService chartOfAccountService,
+        IBaseService baseService) : base(baseService)
     {
-        _generalLedgerService = generalLedgerService;
+        _mediator = mediator;
         _chartOfAccountService = chartOfAccountService;
     }
 
@@ -39,7 +40,7 @@ public class GeneralLedgerController : BaseController
     {
         try
         {
-            var result = await _generalLedgerService.GetAccountLedgerAsync(request);
+            var result = await _mediator.Send(new GetLedgerQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -53,7 +54,7 @@ public class GeneralLedgerController : BaseController
     {
         try
         {
-            var result = await _generalLedgerService.GetLedgerSummaryAsync(request);
+            var result = await _mediator.Send(new GetLedgerSummaryQuery(request));
             return Ok(result);
         }
         catch (Exception ex)
@@ -67,7 +68,7 @@ public class GeneralLedgerController : BaseController
     {
         try
         {
-            var balance = await _generalLedgerService.GetAccountBalanceAsync(accountId, asOfDate);
+            var balance = await _mediator.Send(new GetAccountBalanceQuery(accountId, asOfDate));
             return Ok(new { balance });
         }
         catch (Exception ex)
@@ -81,7 +82,7 @@ public class GeneralLedgerController : BaseController
     {
         try
         {
-            var fileBytes = await _generalLedgerService.ExportLedgerToExcelAsync(request);
+            var fileBytes = await _mediator.Send(new ExportLedgerQuery(request));
             var account = await _chartOfAccountService.GetByIdAsync(request.AccountId);
             var fileName = $"Ledger_{account?.AccountCode}_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
@@ -97,7 +98,7 @@ public class GeneralLedgerController : BaseController
     {
         try
         {
-            var fileBytes = await _generalLedgerService.ExportSummaryToExcelAsync(request);
+            var fileBytes = await _mediator.Send(new ExportLedgerSummaryQuery(request));
             var fileName = $"LedgerSummary_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }

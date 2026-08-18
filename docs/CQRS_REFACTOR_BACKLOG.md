@@ -68,7 +68,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetJournalDatatableQuery`, `GetJournalByIdQuery`, `GetJournalByNumberQuery`, `GenerateJournalNumberQuery`, `ExportJournalQuery`
   - Helper baru `Application/Common/Helpers/JournalEntryHelper` (generate nomor `JE/JA/JM-yyyyMMdd-NNNN` + validasi balanced/account/header, dipakai create/update/reverse/generate)
   - Handler port 1:1 dari `JournalEntryService`; properti komputasi (`CanEdit/CanPost/CanReverse` dll) tetap dari entity. `JournalEntryService` **dipertahankan** (masih dipakai Invoice, Payment, CashBank, Return, GoodsReceipt, FixedAsset, Payroll, Production, YearEndClosing, MemoJournal). Endpoint COA (GetAccountDropdown, CheckAccounts) tetap pakai `IChartOfAccountService`. Build 0 error.
-- [ ] **B9. Accounting > General Ledger** (User Manual §5.2) — `GeneralLedger` → summary + ledger.
+- [x] **B9. Accounting > General Ledger** (User Manual §5.2) — Selesai. `GeneralLedgerController` lepas dari `IGeneralLedgerService` → MediatR (`ISender`). Semua lewat `Application/Features/GeneralLedgers`:
+  - Query: `GetLedgerQuery` (buku besar per akun + opening/running/closing balance), `GetLedgerSummaryQuery` (ringkasan per akun), `GetAccountBalanceQuery` (saldo s.d. tanggal), `ExportLedgerQuery`, `ExportLedgerSummaryQuery`
+  - Helper baru `Application/Common/Helpers/GeneralLedgerHelper` (kalkulasi saldo berdasarkan jenis akun, dipakai semua handler)
+  - Handler port 1:1 dari `GeneralLedgerService` (read-only, tanpa command). `GeneralLedgerService` **dipertahankan** (masih dipakai TrialBalance, FinancialStatement, CashBank, YearEndClosing). Build 0 error.
 - [ ] **B10. Accounting > Trial Balance** (User Manual §5.3) — `TrialBalance` → generate + export.
 - [ ] **B11. Accounting > Financial Statements** (User Manual §5.4) — `FinancialStatement` → income/balance/cash flow.
 - [ ] **B12. Accounting > Invoices** (User Manual §5.5) — `Invoice` → draft/edit/post/cancel/print + attachment.
