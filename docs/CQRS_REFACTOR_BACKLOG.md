@@ -155,7 +155,7 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetStockTransferDatatableQuery` (filter Status/WarehouseId/DateFrom/DateTo + Search), `GetStockTransferByIdQuery`, `GetStockTransferWarehousesQuery`
   - Command: `CreateStockTransferCommand` (no. `ST-{D5}`), `UpdateStockTransferCommand`, `PostStockTransferCommand` (cek stok tersedia → StockMovement "Stock Transfer Out/In"), `DeleteStockTransferCommand`
   - Handler port 1:1 dari `StockTransferService`. Build 0 error.
-- [ ] **B33. Inventory > Stock Minimum** (User Manual §8.7) — `StockMinimum` → reorder point.
+- [x] **B33. Inventory > Stock Minimum** (User Manual §8.7) — Selesai. Ditangani bersama B27: `GetStockMinimumQuery` (hitung stok aktual, flag `IsBelow` reorder point, filter `BelowOnly`) dan `UpdateReorderPointCommand` (`Application/Features/Items`). `StockMinimumController` hanya stub `Index`; datatable & update via `InventoryController` → MediatR. Tidak ada service terpisah. Build 0 error.
 - [ ] **B34. Inventory > Serial Number / Batch** (User Manual §8.8) — `SerialBatch` → register lot/serial, consume.
 - [ ] **B35. Approvals** (User Manual §9) — `Approval` → submit/approve/reject.
 - [ ] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — `CashBank` → list akun + saldo.
