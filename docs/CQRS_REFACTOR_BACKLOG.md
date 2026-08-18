@@ -156,7 +156,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CreateStockTransferCommand` (no. `ST-{D5}`), `UpdateStockTransferCommand`, `PostStockTransferCommand` (cek stok tersedia → StockMovement "Stock Transfer Out/In"), `DeleteStockTransferCommand`
   - Handler port 1:1 dari `StockTransferService`. Build 0 error.
 - [x] **B33. Inventory > Stock Minimum** (User Manual §8.7) — Selesai. Ditangani bersama B27: `GetStockMinimumQuery` (hitung stok aktual, flag `IsBelow` reorder point, filter `BelowOnly`) dan `UpdateReorderPointCommand` (`Application/Features/Items`). `StockMinimumController` hanya stub `Index`; datatable & update via `InventoryController` → MediatR. Tidak ada service terpisah. Build 0 error.
-- [ ] **B34. Inventory > Serial Number / Batch** (User Manual §8.8) — `SerialBatch` → register lot/serial, consume.
+- [x] **B34. Inventory > Serial Number / Batch** (User Manual §8.8) — Selesai. `IStockBatchService`/`StockBatchService` (`Services/StockBatchService.cs`) **DIHAPUS** beserta registrasi DI. `SerialBatchController` → MediatR. Semua lewat `Application/Features/StockBatches`:
+  - Query: `GetStockBatchDatatableQuery` (filter ItemId + Search; Status Available/Partial/Out), `GetStockBatchItemsQuery` (hanya item tipe Inventory)
+  - Command: `CreateStockBatchCommand` (register batch/serial), `ConsumeStockBatchCommand` (cekal melebihi RemainingQuantity), `DeleteStockBatchCommand` (tolak batch sudah terpakai)
+  - Handler port 1:1 dari `StockBatchService`. Build 0 error.
 - [ ] **B35. Approvals** (User Manual §9) — `Approval` → submit/approve/reject.
 - [ ] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — `CashBank` → list akun + saldo.
 - [ ] **B37. Kas & Bank > Cash Bank Transfers** (User Manual §10.2) — `CashBank` → transfer antar akun.

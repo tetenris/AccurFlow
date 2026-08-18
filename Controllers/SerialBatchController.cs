@@ -1,6 +1,9 @@
+using AccuFlow.Application.Features.StockBatches.Commands;
+using AccuFlow.Application.Features.StockBatches.Queries;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.StockBatch;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +12,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class SerialBatchController : BaseController
     {
-        private readonly IStockBatchService _stockBatchService;
+        private readonly ISender _mediator;
 
-        public SerialBatchController(IStockBatchService stockBatchService, IBaseService baseService) : base(baseService)
+        public SerialBatchController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _stockBatchService = stockBatchService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -25,14 +28,14 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] BaseDatatableRequest request, Guid? itemId = null)
         {
-            var result = await _stockBatchService.Datatable(request, itemId);
+            var result = await _mediator.Send(new GetStockBatchDatatableQuery(request, itemId));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> Items()
         {
-            var items = await _stockBatchService.GetItems();
+            var items = await _mediator.Send(new GetStockBatchItemsQuery());
             var dropdown = items.Select(x => new { value = x.ItemId, text = $"{x.ItemCode} - {x.ItemName}" }).ToList();
             return Json(dropdown);
         }
@@ -42,7 +45,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockBatchService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateStockBatchCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = $"Batch {request.BatchNumber} registered successfully" });
             }
             catch (Exception ex)
@@ -56,7 +59,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockBatchService.Consume(request, _currentUserService!.UserId);
+                await _mediator.Send(new ConsumeStockBatchCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Batch consumed successfully" });
             }
             catch (Exception ex)
@@ -70,7 +73,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockBatchService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteStockBatchCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Batch deleted successfully" });
             }
             catch (Exception ex)
