@@ -9,10 +9,6 @@ namespace AccuFlow.Services
 {
     public interface IPayrollService : IBaseService
     {
-        Task<BaseDatatableResponse> EmployeeDatatable(BaseDatatableRequest request);
-        Task CreateEmployee(EmployeeRequest request, Guid userId);
-        Task UpdateEmployee(Guid employeeId, EmployeeRequest request, Guid userId);
-        Task DeleteEmployee(Guid employeeId, Guid userId);
         Task<BaseDatatableResponse> PayrollDatatable(BaseDatatableRequest request);
         Task CreatePayroll(CreatePayrollRequest request, Guid userId);
         Task<PayrollDetailViewModel?> GetPayrollById(Guid id);
@@ -30,99 +26,6 @@ namespace AccuFlow.Services
         public PayrollService(AppDbContext dbContext, IJournalEntryService journalEntryService) : base(dbContext)
         {
             _journalEntryService = journalEntryService;
-        }
-
-        public async Task<BaseDatatableResponse> EmployeeDatatable(BaseDatatableRequest request)
-        {
-            var query = _dbContext.Employees.Where(x => !x.IsDeleted);
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                var search = request.Search.ToLower();
-                query = query.Where(x => x.EmployeeCode.ToLower().Contains(search)
-                    || x.FullName.ToLower().Contains(search)
-                    || (x.Position != null && x.Position.ToLower().Contains(search))
-                    || (x.Department != null && x.Department.ToLower().Contains(search)));
-            }
-
-            var total = await query.CountAsync();
-            var data = await query
-                .OrderBy(x => x.EmployeeCode)
-                .Skip((request.Page - 1) * request.Size).Take(request.Size)
-                .Select(x => new EmployeeViewModel
-                {
-                    EmployeeId = x.EmployeeId,
-                    EmployeeCode = x.EmployeeCode,
-                    FullName = x.FullName,
-                    Position = x.Position,
-                    Department = x.Department,
-                    HireDate = x.HireDate,
-                    BasicSalary = x.BasicSalary,
-                    BankAccountNumber = x.BankAccountNumber,
-                    IsActive = x.IsActive
-                }).ToListAsync();
-
-            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
-        }
-
-        public async Task CreateEmployee(EmployeeRequest request, Guid userId)
-        {
-            if (string.IsNullOrWhiteSpace(request.EmployeeCode)) throw new Exception("Employee code is required");
-            if (string.IsNullOrWhiteSpace(request.FullName)) throw new Exception("Employee name is required");
-
-            var exists = await _dbContext.Employees.AnyAsync(x => !x.IsDeleted && x.EmployeeCode == request.EmployeeCode.Trim());
-            if (exists) throw new Exception("Employee code already exists");
-
-            _dbContext.Employees.Add(new EmployeeEntity
-            {
-                EmployeeId = Guid.NewGuid(),
-                EmployeeCode = request.EmployeeCode.Trim(),
-                FullName = request.FullName.Trim(),
-                Position = request.Position,
-                Department = request.Department,
-                HireDate = request.HireDate,
-                BasicSalary = request.BasicSalary,
-                BankAccountNumber = request.BankAccountNumber,
-                IsActive = true,
-                CreatedBy = userId.ToString()
-            });
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task UpdateEmployee(Guid employeeId, EmployeeRequest request, Guid userId)
-        {
-            var employee = await _dbContext.Employees.FirstOrDefaultAsync(x => x.EmployeeId == employeeId && !x.IsDeleted);
-            if (employee == null) throw new Exception("Employee not found");
-            if (string.IsNullOrWhiteSpace(request.FullName)) throw new Exception("Employee name is required");
-
-            var exists = await _dbContext.Employees.AnyAsync(x => !x.IsDeleted && x.EmployeeId != employeeId && x.EmployeeCode == request.EmployeeCode.Trim());
-            if (exists) throw new Exception("Employee code already exists");
-
-            employee.EmployeeCode = request.EmployeeCode.Trim();
-            employee.FullName = request.FullName.Trim();
-            employee.Position = request.Position;
-            employee.Department = request.Department;
-            employee.HireDate = request.HireDate;
-            employee.BasicSalary = request.BasicSalary;
-            employee.BankAccountNumber = request.BankAccountNumber;
-            employee.UpdatedAt = DateTime.UtcNow;
-            employee.UpdatedBy = userId.ToString();
-
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteEmployee(Guid employeeId, Guid userId)
-        {
-            var employee = await _dbContext.Employees.FirstOrDefaultAsync(x => x.EmployeeId == employeeId && !x.IsDeleted);
-            if (employee == null) throw new Exception("Employee not found");
-
-            var usedInPayroll = await _dbContext.PayrollLines.AnyAsync(x => x.EmployeeId == employeeId);
-            if (usedInPayroll) throw new Exception("Cannot delete employee that already has payroll records");
-
-            employee.IsDeleted = true;
-            employee.DeletedAt = DateTime.UtcNow;
-            employee.DeletedBy = userId.ToString();
-            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<BaseDatatableResponse> PayrollDatatable(BaseDatatableRequest request)

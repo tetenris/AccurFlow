@@ -1,6 +1,9 @@
+using AccuFlow.Application.Features.Employees.Commands;
+using AccuFlow.Application.Features.Employees.Queries;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Payroll;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +13,12 @@ namespace AccuFlow.Controllers
     public class PayrollController : BaseController
     {
         private readonly IPayrollService _payrollService;
+        private readonly ISender _mediator;
 
-        public PayrollController(IPayrollService payrollService, IBaseService baseService) : base(baseService)
+        public PayrollController(IPayrollService payrollService, ISender mediator, IBaseService baseService) : base(baseService)
         {
             _payrollService = payrollService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -23,14 +28,14 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EmployeeDatatable([FromBody] BaseDatatableRequest request) => Json(await _payrollService.EmployeeDatatable(request));
+        public async Task<IActionResult> EmployeeDatatable([FromBody] BaseDatatableRequest request) => Json(await _mediator.Send(new GetEmployeeDatatableQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> CreateEmployee([FromBody] EmployeeRequest request)
         {
             try
             {
-                await _payrollService.CreateEmployee(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateEmployeeCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Employee created successfully" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -41,7 +46,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _payrollService.UpdateEmployee(id, request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateEmployeeCommand(id, request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Employee updated successfully" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -52,7 +57,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _payrollService.DeleteEmployee(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteEmployeeCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Employee deleted successfully" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }

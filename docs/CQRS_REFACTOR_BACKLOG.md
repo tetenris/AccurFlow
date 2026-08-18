@@ -175,7 +175,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetReconciliationDatatableQuery` (filter Status + search, paging, LineCount/ClearedCount), `GetReconciliationDetailQuery` (detail + lines + CanEdit/CanDelete/CanPost), `GetBankStatementQuery` (mutasi GL posted s.d. tanggal)
   - Command: `CreateReconciliationCommand` (no. `RCN-{D5}`), `UpdateReconciliationCommand` (soft-delete line lama), `PostReconciliationCommand` (cek keseimbangan GL + cleared − float = statement), `DeleteReconciliationCommand`
   - Handler port 1:1 dari `CashBankService`. Build 0 error. Modul Kas & Bank (B36–B38) tuntas.
-- [ ] **B39. HRM / Payroll > Data Karyawan** (User Manual §11.1) — `Payroll` → master karyawan.
+- [x] **B39. HRM / Payroll > Data Karyawan** (User Manual §11.1) — Selesai. `PayrollController` aksi employee (EmployeeDatatable/CreateEmployee/UpdateEmployee/DeleteEmployee) lepas dari `IPayrollService` → MediatR. Semua lewat `Application/Features/Employees`:
+  - Query: `GetEmployeeDatatableQuery` (search EmployeeCode/FullName/Position/Department + paging)
+  - Command: `CreateEmployeeCommand` (cekal EmployeeCode ganda), `UpdateEmployeeCommand` (cekal ganda kecuali diri sendiri), `DeleteEmployeeCommand` (tolak jika sudah ada payroll record)
+  - Handler port 1:1 dari `PayrollService`. Method employee dihapus dari interface & class service (kini hanya payroll). Build 0 error.
 - [ ] **B40. HRM / Payroll > Penggajian** (User Manual §11.2) — `Payroll` → buat + post payroll.
 - [ ] **B41. Produksi > Bill of Material (BOM)** (User Manual §12.1) — `Production` → BOM.
 - [ ] **B42. Produksi > Production Order** (User Manual §12.2) — `Production` → perintah produksi.
