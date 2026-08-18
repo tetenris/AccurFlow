@@ -53,6 +53,11 @@ namespace AccuFlow.Infrastructure.Persistence.Repositories
             return await _dbSet.AnyAsync(predicate, cancellationToken);
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.CountAsync(predicate, cancellationToken);
+        }
+
         public void Add(T entity) => _dbSet.Add(entity);
         public void AddRange(IEnumerable<T> entities) => _dbSet.AddRange(entities);
         public void Update(T entity) => _dbSet.Update(entity);

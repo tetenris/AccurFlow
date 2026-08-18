@@ -10,6 +10,7 @@ namespace AccuFlow.Application.Common.Interfaces
         Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         Task<T?> FirstOrDefaultWithIncludesAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default, params string[] includes);
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
+        Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
         void Add(T entity);
         void AddRange(IEnumerable<T> entities);
         void Update(T entity);
