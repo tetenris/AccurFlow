@@ -1,6 +1,9 @@
-﻿using AccuFlow.Models.JournalEntry;
+﻿using AccuFlow.Application.Features.JournalEntries.Commands;
+using AccuFlow.Application.Features.JournalEntries.Queries;
+using AccuFlow.Models.JournalEntry;
 using AccuFlow.Services;
 using AccuFlow.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,17 +13,17 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class JournalEntryController : BaseController
     {
-        private readonly IJournalEntryService _journalEntryService;
+        private readonly ISender _mediator;
         private readonly IChartOfAccountService _chartOfAccountService;
         private readonly AccuFlow.Infrastructure.Persistence.AppDbContext _dbContext;
 
         public JournalEntryController(
-            IJournalEntryService journalEntryService,
+            ISender mediator,
             IChartOfAccountService chartOfAccountService,
             AccuFlow.Infrastructure.Persistence.AppDbContext dbContext,
             IBaseService baseService) : base(baseService)
         {
-            _journalEntryService = journalEntryService;
+            _mediator = mediator;
             _chartOfAccountService = chartOfAccountService;
             _dbContext = dbContext;
         }
@@ -62,21 +65,21 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTableJournalEntryRequest request)
         {
-            var result = await _journalEntryService.Datatable(request);
+            var result = await _mediator.Send(new GetJournalDatatableQuery(request));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _journalEntryService.GetByIdAsync(id);
+            var result = await _mediator.Send(new GetJournalByIdQuery(id));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetByNumber(string number)
         {
-            var result = await _journalEntryService.GetByNumberAsync(number);
+            var result = await _mediator.Send(new GetJournalByNumberQuery(number));
             return Json(result);
         }
 
@@ -91,7 +94,7 @@ namespace AccuFlow.Controllers
                     return BadRequest(new { success = false, message = "No user found in system. Please create a user first." });
                 }
                 
-                var journalId = await _journalEntryService.CreateAsync(request, userId);
+                var journalId = await _mediator.Send(new CreateJournalCommand(request, userId));
                 return Ok(new { success = true, message = "Journal entry created successfully", journalId });
             }
             catch (Exception ex)
@@ -106,7 +109,7 @@ namespace AccuFlow.Controllers
             try
             {
                 var userId = await GetUserIdAsync();
-                await _journalEntryService.UpdateAsync(request, userId);
+                await _mediator.Send(new UpdateJournalCommand(request, userId));
                 return Ok(new { success = true, message = "Journal entry updated successfully" });
             }
             catch (Exception ex)
@@ -121,7 +124,7 @@ namespace AccuFlow.Controllers
             try
             {
                 var userId = await GetUserIdAsync();
-                await _journalEntryService.DeleteAsync(id, userId);
+                await _mediator.Send(new DeleteJournalCommand(id, userId));
                 return Ok(new { success = true, message = "Journal entry deleted successfully" });
             }
             catch (Exception ex)
@@ -136,7 +139,7 @@ namespace AccuFlow.Controllers
             try
             {
                 var userId = await GetUserIdAsync();
-                await _journalEntryService.PostAsync(request, userId);
+                await _mediator.Send(new PostJournalCommand(request, userId));
                 return Ok(new { success = true, message = "Journal entry posted successfully" });
             }
             catch (Exception ex)
@@ -151,7 +154,7 @@ namespace AccuFlow.Controllers
             try
             {
                 var userId = await GetUserIdAsync();
-                await _journalEntryService.ReverseAsync(request, userId);
+                await _mediator.Send(new ReverseJournalCommand(request, userId));
                 return Ok(new { success = true, message = "Journal entry reversed successfully" });
             }
             catch (Exception ex)
@@ -163,7 +166,7 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GenerateNumber(DateTime journalDate, string? journalType = null)
         {
-            var number = await _journalEntryService.GenerateJournalNumberAsync(journalDate, journalType);
+            var number = await _mediator.Send(new GenerateJournalNumberQuery(journalDate, journalType));
             return Json(new { number });
         }
 
@@ -186,7 +189,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var fileBytes = await _journalEntryService.ExportToExcelAsync(dateFrom, dateTo, status, accountId);
+                var fileBytes = await _mediator.Send(new ExportJournalQuery(dateFrom, dateTo, status, accountId));
                 var fileName = $"JournalEntries_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
                 return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
@@ -217,5 +220,3 @@ namespace AccuFlow.Controllers
         }
     }
 }
-
-
