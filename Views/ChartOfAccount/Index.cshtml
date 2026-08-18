@@ -141,7 +141,44 @@
     </div>
 </div>
 
-<!-- Modal Detail -->
+<!-- Modal Import -->
+<div class="modal fade" id="modal-import-account" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Chart of Accounts</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="fa fa-info-circle me-2"></i>
+                    <div>
+                        Download the template first, fill it in, then upload. The header row and column count must match the template exactly.
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Select Excel File (.xlsx)</label>
+                    <input type="file" class="form-control" id="import-file" accept=".xlsx" />
+                </div>
+                <div id="import-result" class="d-none">
+                    <div class="alert" id="import-result-alert" role="alert"></div>
+                    <div id="import-errors" class="d-none">
+                        <label class="form-label fw-bold">Details:</label>
+                        <div class="border rounded p-3 bg-light" style="max-height: 200px; overflow-y: auto;">
+                            <ul class="mb-0 ps-3" id="import-error-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btn-import-submit">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Account Detail -->
 <div class="modal fade" id="modal-account-detail" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

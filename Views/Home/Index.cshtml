@@ -15,17 +15,16 @@
 
 <style>
     .dashboard-canvas {
-        --dash-ink: #17312f;
-        --dash-muted: #6f817d;
-        --dash-teal: #0f8f7f;
-        --dash-teal-dark: #0c5f57;
-        --dash-gold: #d99a2b;
-        --dash-coral: #d96b4b;
-        --dash-paper: #fffaf1;
-        --dash-line: rgba(23, 49, 47, 0.11);
+        --dash-primary: #3E97FF;
+        --dash-primary-dark: #0B5CAD;
+        --dash-primary-light: #f1faff;
+        --dash-ink: #1B263B;
+        --dash-muted: #64748B;
+        --dash-line: #E4E9F2;
+        --dash-bg-soft: #F6F8FB;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 20px;
         color: var(--dash-ink);
     }
 
@@ -34,14 +33,7 @@
         overflow: hidden;
         display: grid;
         grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.6fr);
-        gap: 24px;
-        padding: clamp(24px, 4vw, 38px);
-        border: 1px solid var(--dash-line);
-        border-radius: 30px;
-        background:
-            radial-gradient(circle at 10% 18%, rgba(217, 154, 43, 0.28), transparent 32%),
-            linear-gradient(135deg, #fff7e8 0%, #e9f5ee 58%, #f8eadc 100%);
-        box-shadow: 0 24px 60px rgba(22, 50, 47, 0.1);
+        gap: 20px;
     }
 
     .dashboard-hero::after {
@@ -52,74 +44,118 @@
         width: 260px;
         height: 260px;
         border-radius: 999px;
-        background: radial-gradient(circle, rgba(15, 143, 127, 0.22), transparent 68%);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.25), transparent 68%);
+    }
+
+    .hero-panel {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 240px;
+        padding: clamp(24px, 3vw, 32px);
+        border-radius: 12px;
+        background: var(--dash-primary);
+        color: #fff;
     }
 
     .hero-eyebrow {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 8px 12px;
-        margin-bottom: 18px;
-        border: 1px solid rgba(15, 143, 127, 0.18);
-        border-radius: 999px;
-        color: var(--dash-teal-dark);
-        background: rgba(255, 255, 255, 0.62);
+        align-self: flex-start;
+        padding: 7px 12px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 6px;
+        color: rgba(255, 255, 255, 0.88);
+        background: rgba(255, 255, 255, 0.1);
         font-size: 12px;
         font-weight: 800;
         letter-spacing: 0.1em;
         text-transform: uppercase;
     }
 
+    .hero-eyebrow i {
+        display: grid;
+        place-items: center;
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
+        color: #fff;
+        background: #ff4d4f;
+        font-size: 11px;
+    }
+
     .hero-title {
         max-width: 760px;
         margin: 0;
-        font-size: clamp(34px, 4.6vw, 58px);
-        line-height: 0.98;
-        letter-spacing: -0.06em;
-        font-weight: 900;
+        font-size: clamp(28px, 3.4vw, 44px);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        font-weight: 800;
     }
 
     .hero-copy {
-        max-width: 650px;
-        margin: 18px 0 0;
-        color: var(--dash-muted);
-        font-size: 15px;
-        line-height: 1.75;
+        max-width: 640px;
+        margin: 14px 0 0;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 14px;
+        line-height: 1.7;
     }
 
     .hero-actions {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 26px;
+        gap: 10px;
+        margin-top: 22px;
     }
 
     .dash-button {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 12px 16px;
-        border-radius: 16px;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 8px;
         font-weight: 800;
+        font-size: 13px;
         text-decoration: none;
-        transition: transform 180ms ease, box-shadow 180ms ease;
+        transition: background 180ms ease, color 180ms ease;
     }
 
-    .dash-button:hover {
-        transform: translateY(-2px);
+    .dash-button i {
+        display: grid;
+        place-items: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        font-size: 13px;
+        line-height: 1;
+        color: #fff;
+        background: #ff4d4f;
     }
 
     .dash-button.primary {
-        color: #fff;
-        background: linear-gradient(135deg, var(--dash-teal-dark), var(--dash-teal));
-        box-shadow: 0 16px 28px rgba(15, 143, 127, 0.24);
+        color: var(--dash-primary);
+        background: #00FFFF;
+    }
+
+    .dash-button.primary:hover {
+        color: var(--dash-primary-dark);
+        background: #00e6e6;
     }
 
     .dash-button.soft {
-        color: var(--dash-teal-dark);
-        border: 1px solid rgba(15, 143, 127, 0.18);
-        background: rgba(255, 255, 255, 0.68);
+        color: #17312f;
+        border: 1px solid #00FFFF;
+        background: #00FFFF;
+    }
+
+    .dash-button.soft:hover {
+        color: var(--dash-primary);
+        background: #00e6e6;
+        border-color: #00e6e6;
     }
 
     .hero-score {
@@ -128,34 +164,33 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        min-height: 250px;
+        min-height: 240px;
         padding: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.7);
-        border-radius: 26px;
-        background: rgba(255, 255, 255, 0.64);
-        backdrop-filter: blur(14px);
+        border: 1px solid var(--dash-line);
+        border-radius: 12px;
+        background: #fff;
     }
 
     .score-ring {
         --score: 0deg;
         display: grid;
         place-items: center;
-        width: 136px;
-        height: 136px;
+        width: 120px;
+        height: 120px;
         margin-left: auto;
         border-radius: 50%;
-        background: conic-gradient(var(--dash-teal) var(--score), rgba(15, 143, 127, 0.12) 0);
+        background: conic-gradient(var(--dash-primary) var(--score), var(--dash-primary-light) 0);
     }
 
     .score-ring span {
         display: grid;
         place-items: center;
-        width: 104px;
-        height: 104px;
+        width: 92px;
+        height: 92px;
         border-radius: 50%;
-        background: var(--dash-paper);
-        font-size: 28px;
-        font-weight: 900;
+        background: #fff;
+        font-size: 24px;
+        font-weight: 800;
     }
 
     .metric-grid {
@@ -167,11 +202,10 @@
     .metric-card {
         position: relative;
         overflow: hidden;
-        padding: 22px;
+        padding: 20px;
         border: 1px solid var(--dash-line);
-        border-radius: 24px;
+        border-radius: 12px;
         background: #fff;
-        box-shadow: 0 16px 40px rgba(22, 50, 47, 0.06);
     }
 
     .metric-card::after {
@@ -190,19 +224,24 @@
         place-items: center;
         width: 44px;
         height: 44px;
-        margin-bottom: 18px;
-        border-radius: 16px;
-        color: var(--dash-teal-dark);
-        background: rgba(15, 143, 127, 0.1);
+        margin-bottom: 16px;
+        border-radius: 8px;
+        color: #fff;
+        background: #3E97FF;
+    }
+
+    .metric-icon i {
+        color: #fff;
+        font-size: 18px;
     }
 
     .metric-value {
         position: relative;
         z-index: 1;
         margin: 0;
-        font-size: 24px;
-        font-weight: 900;
-        letter-spacing: -0.04em;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
     }
 
     .metric-label {
@@ -223,9 +262,8 @@
     .dash-panel {
         padding: 24px;
         border: 1px solid var(--dash-line);
-        border-radius: 26px;
+        border-radius: 12px;
         background: #fff;
-        box-shadow: 0 16px 40px rgba(22, 50, 47, 0.06);
     }
 
     .panel-header {
@@ -237,8 +275,8 @@
 
     .panel-header h3 {
         margin: 0;
-        font-size: 20px;
-        font-weight: 900;
+        font-size: 18px;
+        font-weight: 800;
     }
 
     .quick-grid {
@@ -251,20 +289,20 @@
         display: flex;
         align-items: flex-start;
         gap: 14px;
-        padding: 18px;
-        min-height: 116px;
-        border: 1px solid rgba(23, 49, 47, 0.1);
-        border-radius: 20px;
+        padding: 16px;
+        min-height: 108px;
+        border: 1px solid var(--dash-line);
+        border-radius: 10px;
         color: var(--dash-ink);
-        background: linear-gradient(135deg, rgba(248, 242, 232, 0.9), rgba(255, 255, 255, 0.9));
+        background: var(--dash-bg-soft);
         text-decoration: none;
-        transition: transform 180ms ease, border-color 180ms ease;
+        transition: border-color 180ms ease, background 180ms ease;
     }
 
     .quick-tile:hover {
         color: var(--dash-ink);
-        border-color: rgba(15, 143, 127, 0.32);
-        transform: translateY(-3px);
+        border-color: var(--dash-primary);
+        background: var(--dash-primary-light);
     }
 
     .quick-tile i {
@@ -272,21 +310,22 @@
         place-items: center;
         flex: 0 0 42px;
         height: 42px;
-        border-radius: 14px;
+        border-radius: 12px;
         color: #fff;
-        background: var(--dash-teal);
+        font-size: 18px;
+        background: #4ade80;
     }
 
     .quick-tile strong {
         display: block;
-        margin-bottom: 5px;
-        font-weight: 900;
+        margin-bottom: 4px;
+        font-weight: 800;
     }
 
     .quick-tile span {
         color: var(--dash-muted);
         font-size: 12px;
-        line-height: 1.55;
+        line-height: 1.5;
     }
 
     .activity-list {
@@ -297,11 +336,11 @@
 
     .activity-item {
         display: grid;
-        grid-template-columns: 42px minmax(0, 1fr);
+        grid-template-columns: 40px minmax(0, 1fr);
         gap: 14px;
         align-items: start;
         padding-bottom: 14px;
-        border-bottom: 1px dashed rgba(23, 49, 47, 0.14);
+        border-bottom: 1px solid var(--dash-line);
     }
 
     .activity-item:last-child {
@@ -314,9 +353,9 @@
         place-items: center;
         width: 42px;
         height: 42px;
-        border-radius: 14px;
-        color: var(--dash-gold);
-        background: rgba(217, 154, 43, 0.12);
+        border-radius: 12px;
+        color: #fff;
+        background: #d99a2b;
         font-weight: 900;
     }
 
@@ -359,17 +398,17 @@
 
 <div class="dashboard-canvas">
     <section class="dashboard-hero">
-        <div>
-            <div class="hero-eyebrow"><i class="fa fa-chart-line"></i> Finance command center</div>
+        <div class="hero-panel">
+            <div class="hero-eyebrow"><i class="ki-outline ki-chart-line"></i> Finance command center</div>
             <h1 class="hero-title">Selamat datang, @Model.FullName</h1>
             <p class="hero-copy">
                 Pantau arus invoice, jurnal, kas, dan aktivitas operasional dari satu dashboard yang lebih jelas.
                 Anda login sebagai <strong>@Model.RoleName</strong>.
             </p>
             <div class="hero-actions">
-                <a class="dash-button primary" href="@Url.Action("Index", "JournalEntry")"><i class="fa fa-plus-circle"></i> New Journal</a>
-                <a class="dash-button soft" href="@Url.Action("Index", "Invoice")"><i class="fa fa-file-invoice"></i> Open Invoices</a>
-                <a class="dash-button soft" href="@Url.Action("Index", "GeneralLedger")"><i class="fa fa-book"></i> Ledger</a>
+                <a class="dash-button primary" href="@Url.Action("Index", "JournalEntry")"><i class="ki-outline ki-plus-square"></i> New Journal</a>
+                <a class="dash-button soft" href="@Url.Action("Index", "Invoice")"><i class="ki-outline ki-document"></i> Open Invoices</a>
+                <a class="dash-button soft" href="@Url.Action("Index", "GeneralLedger")"><i class="ki-outline ki-book"></i> Ledger</a>
             </div>
         </div>
         <aside class="hero-score">
@@ -386,22 +425,22 @@
 
     <section class="metric-grid">
         <article class="metric-card">
-            <div class="metric-icon"><i class="fa fa-wallet"></i></div>
+            <div class="metric-icon"><i class="ki-outline ki-wallet"></i></div>
             <h2 class="metric-value">@Currency(Model.Receivables)</h2>
             <p class="metric-label">Outstanding receivables</p>
         </article>
         <article class="metric-card">
-            <div class="metric-icon"><i class="fa fa-receipt"></i></div>
+            <div class="metric-icon"><i class="ki-outline ki-bank"></i></div>
             <h2 class="metric-value">@Currency(Model.Payables)</h2>
             <p class="metric-label">Outstanding payables</p>
         </article>
         <article class="metric-card">
-            <div class="metric-icon"><i class="fa fa-calendar-times"></i></div>
+            <div class="metric-icon"><i class="ki-outline ki-calendar-tick"></i></div>
             <h2 class="metric-value">@Model.OverdueInvoices</h2>
             <p class="metric-label">Overdue invoices from @Model.OpenInvoices open</p>
         </article>
         <article class="metric-card">
-            <div class="metric-icon"><i class="fa fa-money-bill-wave"></i></div>
+            <div class="metric-icon"><i class="ki-outline ki-dollar"></i></div>
             <h2 class="metric-value">@Currency(Model.CashMovementsThisMonth)</h2>
             <p class="metric-label">Cash movement this month</p>
         </article>
@@ -417,27 +456,27 @@
             </div>
             <div class="quick-grid">
                 <a class="quick-tile" href="@Url.Action("Index", "ChartOfAccount")">
-                    <i class="fa fa-sitemap"></i>
+                    <i class="ki-outline ki-folder"></i>
                     <div><strong>Chart of Accounts</strong><span>Kelola struktur akun dan akun posting.</span></div>
                 </a>
                 <a class="quick-tile" href="@Url.Action("Index", "Invoice")">
-                    <i class="fa fa-file-invoice-dollar"></i>
+                    <i class="ki-outline ki-document"></i>
                     <div><strong>Invoices</strong><span>Buat dan pantau invoice penjualan maupun pembelian.</span></div>
                 </a>
                 <a class="quick-tile" href="@Url.Action("Index", "Payment")">
-                    <i class="fa fa-credit-card"></i>
+                    <i class="ki-outline ki-credit-cart"></i>
                     <div><strong>Payments</strong><span>Catat penerimaan, pembayaran, dan alokasi invoice.</span></div>
                 </a>
                 <a class="quick-tile" href="@Url.Action("Index", "PurchaseOrder")">
-                    <i class="fa fa-truck-loading"></i>
+                    <i class="ki-outline ki-truck"></i>
                     <div><strong>Purchase Orders</strong><span>@Model.PendingPurchaseOrders dokumen masih perlu ditindaklanjuti.</span></div>
                 </a>
                 <a class="quick-tile" href="@Url.Action("Index", "User")">
-                    <i class="fa fa-users-cog"></i>
+                    <i class="ki-outline ki-user-edit"></i>
                     <div><strong>User Access</strong><span>@Model.ActiveUsers users aktif dan @Model.ActiveRoles roles aktif.</span></div>
                 </a>
                 <a class="quick-tile" href="@Url.Action("Index", "TrialBalance")">
-                    <i class="fa fa-balance-scale"></i>
+                    <i class="ki-outline ki-calculator"></i>
                     <div><strong>Trial Balance</strong><span>Review keseimbangan debit dan kredit periode berjalan.</span></div>
                 </a>
             </div>

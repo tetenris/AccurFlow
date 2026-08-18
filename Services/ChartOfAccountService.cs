@@ -3,8 +3,10 @@ using AccuFlow.Entities.Entity;
 using AccuFlow.Infrastructures;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.ChartOfAccount;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using NPOI.SS.UserModel;
 
 namespace AccuFlow.Services
 {
@@ -42,6 +44,10 @@ namespace AccuFlow.Services
 
         // Export
         Task<byte[]> ExportToExcelAsync(string? accountType, bool? isActive);
+
+        // Import / Template
+        Task<byte[]> DownloadTemplateAsync();
+        Task<ImportChartOfAccountResult> ImportFromExcelAsync(IFormFile file, Guid userId);
     }
 
     public class ChartOfAccountService : BaseService, IChartOfAccountService
@@ -805,6 +811,332 @@ namespace AccuFlow.Services
                     workbook.Write(ms);
                     return ms.ToArray();
                 }
+            }
+        }
+
+        private static readonly string[] TemplateHeaders =
+        {
+            "Account Code",
+            "Account Name",
+            "Account Type",
+            "Parent Account Code",
+            "Description",
+            "Is Header",
+            "Is Active",
+            "Opening Balance",
+            "Currency"
+        };
+
+        public async Task<byte[]> DownloadTemplateAsync()
+        {
+            using (var workbook = new NPOI.XSSF.UserModel.XSSFWorkbook())
+            {
+                var sheet = workbook.CreateSheet("ChartOfAccounts");
+
+                // Header style
+                var headerStyle = workbook.CreateCellStyle();
+                var headerFont = workbook.CreateFont();
+                headerFont.IsBold = true;
+                headerFont.FontHeightInPoints = 11;
+                headerStyle.SetFont(headerFont);
+                headerStyle.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+                headerStyle.FillPattern = NPOI.SS.UserModel.FillPattern.SolidForeground;
+                headerStyle.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+                headerStyle.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+                headerStyle.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+                headerStyle.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+
+                // Example data style
+                var dataStyle = workbook.CreateCellStyle();
+                dataStyle.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+                dataStyle.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+                dataStyle.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+                dataStyle.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+
+                // Create header row
+                var headerRow = sheet.CreateRow(0);
+                for (int i = 0; i < TemplateHeaders.Length; i++)
+                {
+                    var cell = headerRow.CreateCell(i);
+                    cell.SetCellValue(TemplateHeaders[i]);
+                    cell.CellStyle = headerStyle;
+                }
+
+                // Example rows (self-contained: parent listed before its children, so the template can be imported as-is to test)
+                var examples = new object[][]
+                {
+                    new object[] { "1-20000", "Non-Current Assets", "Asset", "", "EXAMPLE - header/root account. Delete this row before importing real data.", "Yes", "Yes", 0, "IDR" },
+                    new object[] { "1-20100", "Fixed Assets", "Asset", "1-20000", "EXAMPLE - sub-account of Non-Current Assets.", "No", "Yes", 0, "IDR" },
+                    new object[] { "1-20200", "Accumulated Depreciation", "Asset", "1-20000", "EXAMPLE - sub-account of Non-Current Assets.", "No", "Yes", 0, "IDR" }
+                };
+
+                for (int r = 0; r < examples.Length; r++)
+                {
+                    var row = sheet.CreateRow(r + 1);
+                    for (int c = 0; c < examples[r].Length; c++)
+                    {
+                        var cell = row.CreateCell(c);
+                        cell.SetCellValue(examples[r][c].ToString() ?? "");
+                        cell.CellStyle = dataStyle;
+                    }
+                }
+
+                // Instruction sheet
+                var instructionSheet = workbook.CreateSheet("Instructions");
+                var instructionHeaderRow = instructionSheet.CreateRow(0);
+                instructionHeaderRow.CreateCell(0).SetCellValue("Column");
+                instructionHeaderRow.CreateCell(1).SetCellValue("Required");
+                instructionHeaderRow.CreateCell(2).SetCellValue("Description");
+                for (int i = 0; i < 3; i++)
+                {
+                    instructionHeaderRow.GetCell(i).CellStyle = headerStyle;
+                }
+
+                string[,] instructions =
+                {
+                    { "Account Code", "Yes", "Unique account code. Recommended format: X-XXXXX (e.g., 1-10000). First digit follows the Account Type." },
+                    { "Account Name", "Yes", "Account name (3-255 characters)." },
+                    { "Account Type", "Yes", "One of: Asset, Liability, Equity, Revenue, Expense, Other Income, Other Expense." },
+                    { "Parent Account Code", "No", "Code of the parent account (must already exist or be listed earlier in the file). Leave blank for root account." },
+                    { "Description", "No", "Optional description (max 500 characters)." },
+                    { "Is Header", "Yes", "Yes/No. Header accounts cannot post transactions." },
+                    { "Is Active", "Yes", "Yes/No." },
+                    { "Opening Balance", "No", "Numeric opening balance. Default 0." },
+                    { "Currency", "No", "Currency code, e.g., IDR. Default IDR." }
+                };
+
+                for (int r = 0; r < instructions.GetLength(0); r++)
+                {
+                    var row = instructionSheet.CreateRow(r + 1);
+                    for (int c = 0; c < 3; c++)
+                    {
+                        var cell = row.CreateCell(c);
+                        cell.SetCellValue(instructions[r, c]);
+                        cell.CellStyle = dataStyle;
+                    }
+                }
+
+                for (int i = 0; i < TemplateHeaders.Length; i++)
+                {
+                    sheet.AutoSizeColumn(i);
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    instructionSheet.AutoSizeColumn(i);
+                }
+
+                using (var ms = new MemoryStream())
+                {
+                    workbook.Write(ms);
+                    return ms.ToArray();
+                }
+            }
+        }
+
+        public async Task<ImportChartOfAccountResult> ImportFromExcelAsync(IFormFile file, Guid userId)
+        {
+            if (file == null || file.Length == 0)
+                throw new Exception("Please select a file to import");
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (extension != ".xlsx")
+                throw new Exception("Only .xlsx files are supported. Please download the template and fill it in.");
+
+            var result = new ImportChartOfAccountResult();
+
+            using (var stream = file.OpenReadStream())
+            using (var workbook = new NPOI.XSSF.UserModel.XSSFWorkbook(stream))
+            {
+                var sheet = workbook.GetSheetAt(0);
+                if (sheet == null)
+                    throw new Exception("The Excel file does not contain any worksheet");
+
+                // Validate header row
+                var headerRow = sheet.GetRow(0);
+                if (headerRow == null)
+                    throw new Exception("The file has no header row. Please use the downloaded template.");
+
+                var headerColumnCount = headerRow.LastCellNum;
+                if (headerColumnCount != TemplateHeaders.Length)
+                    throw new Exception($"Invalid number of columns. Expected {TemplateHeaders.Length} columns, found {headerColumnCount}. Please use the downloaded template.");
+
+                for (int i = 0; i < TemplateHeaders.Length; i++)
+                {
+                    var headerCell = headerRow.GetCell(i);
+                    var headerValue = headerCell?.ToString()?.Trim() ?? string.Empty;
+                    if (!string.Equals(headerValue, TemplateHeaders[i], StringComparison.OrdinalIgnoreCase))
+                        throw new Exception($"Invalid header at column {i + 1}. Expected '{TemplateHeaders[i]}', found '{headerValue}'. Header names must match the template exactly.");
+                }
+
+                var accountTypes = new[] { "Asset", "Liability", "Equity", "Revenue", "Expense", "Other Income", "Other Expense" };
+
+                // Load existing accounts for parent/duplicate resolution
+                var existingAccounts = await _dbContext.Set<ChartOfAccountEntity>()
+                    .Where(x => !x.IsDeleted)
+                    .ToListAsync();
+
+                var codeToAccount = existingAccounts.ToDictionary(x => x.AccountCode, x => x.AccountId);
+
+                var accountsToAdd = new List<ChartOfAccountEntity>();
+                var currentRow = 1;
+
+                // First pass: create account objects (parent resolved by code, may reference earlier rows in the file)
+                while (true)
+                {
+                    var row = sheet.GetRow(currentRow);
+                    if (row == null) break;
+
+                    bool isEmptyRow = true;
+                    for (int c = 0; c < TemplateHeaders.Length; c++)
+                    {
+                        var cell = row.GetCell(c);
+                        if (cell != null && !string.IsNullOrWhiteSpace(cell.ToString()))
+                        {
+                            isEmptyRow = false;
+                            break;
+                        }
+                    }
+                    if (isEmptyRow) break;
+
+                    result.TotalRows++;
+
+                    var getValue = (int col) => row.GetCell(col)?.ToString()?.Trim() ?? string.Empty;
+
+                    var accountCode = getValue(0);
+                    var accountName = getValue(1);
+                    var accountType = getValue(2);
+                    var parentCode = getValue(3);
+                    var description = getValue(4);
+                    var isHeaderText = getValue(5);
+                    var isActiveText = getValue(6);
+                    var openingBalanceText = getValue(7);
+                    var currency = getValue(8);
+
+                    // Row validation
+                    var rowErrors = new List<string>();
+                    if (string.IsNullOrWhiteSpace(accountCode))
+                        rowErrors.Add("Account Code is required");
+                    else if (accountCode.Length > 20)
+                        rowErrors.Add("Account Code cannot exceed 20 characters");
+                    else if (codeToAccount.ContainsKey(accountCode))
+                        rowErrors.Add($"Account Code '{accountCode}' already exists");
+
+                    if (string.IsNullOrWhiteSpace(accountName))
+                        rowErrors.Add("Account Name is required");
+                    else if (accountName.Length < 3 || accountName.Length > 255)
+                        rowErrors.Add("Account Name must be between 3 and 255 characters");
+
+                    if (string.IsNullOrWhiteSpace(accountType))
+                        rowErrors.Add("Account Type is required");
+                    else if (!accountTypes.Contains(accountType))
+                        rowErrors.Add($"Account Type '{accountType}' is not valid. Must be one of: {string.Join(", ", accountTypes)}");
+
+                    bool isHeader = false;
+                    if (string.IsNullOrWhiteSpace(isHeaderText))
+                        rowErrors.Add("Is Header is required (Yes/No)");
+                    else if (!TryParseYesNo(isHeaderText, out isHeader))
+                        rowErrors.Add($"Is Header value '{isHeaderText}' is not valid. Use Yes or No.");
+
+                    bool isActive = true;
+                    if (string.IsNullOrWhiteSpace(isActiveText))
+                        rowErrors.Add("Is Active is required (Yes/No)");
+                    else if (!TryParseYesNo(isActiveText, out isActive))
+                        rowErrors.Add($"Is Active value '{isActiveText}' is not valid. Use Yes or No.");
+
+                    decimal openingBalance = 0;
+                    if (!string.IsNullOrWhiteSpace(openingBalanceText) && !decimal.TryParse(openingBalanceText, out openingBalance))
+                        rowErrors.Add($"Opening Balance value '{openingBalanceText}' is not a valid number");
+
+                    // Resolve parent (by code, may be in earlier rows of the file)
+                    Guid? parentAccountId = null;
+                    if (!string.IsNullOrWhiteSpace(parentCode))
+                    {
+                        if (codeToAccount.TryGetValue(parentCode, out var existingParentId))
+                        {
+                            parentAccountId = existingParentId;
+                            var parent = existingAccounts.FirstOrDefault(x => x.AccountId == existingParentId)
+                                ?? accountsToAdd.FirstOrDefault(x => x.AccountId == existingParentId);
+                            if (parent != null && string.Equals(parent.AccountType, accountType, StringComparison.OrdinalIgnoreCase) == false)
+                                rowErrors.Add($"Parent account '{parentCode}' type ({parent.AccountType}) does not match '{accountType}'");
+                        }
+                        else
+                        {
+                            rowErrors.Add($"Parent account code '{parentCode}' not found. Make sure parent exists in the system or is listed earlier in the file.");
+                        }
+                    }
+
+                    if (rowErrors.Any())
+                    {
+                        result.SkippedCount++;
+                        result.Errors.Add($"Row {currentRow + 1}: {string.Join("; ", rowErrors)}");
+                        currentRow++;
+                        continue;
+                    }
+
+                    var account = new ChartOfAccountEntity
+                    {
+                        AccountId = Guid.NewGuid(),
+                        AccountCode = accountCode,
+                        AccountName = accountName,
+                        AccountType = accountType,
+                        Description = description,
+                        ParentAccountId = parentAccountId,
+                        IsHeader = isHeader,
+                        IsActive = isActive,
+                        OpeningBalance = openingBalance,
+                        NormalBalance = GetNormalBalance(accountType),
+                        Currency = string.IsNullOrWhiteSpace(currency) ? "IDR" : currency,
+                        Level = parentAccountId.HasValue
+                            ? (existingAccounts.FirstOrDefault(x => x.AccountId == parentAccountId.Value)?.Level ?? -1) + 1
+                            : 0,
+                        CreatedBy = userId.ToString(),
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    codeToAccount[accountCode] = account.AccountId;
+                    existingAccounts.Add(account);
+                    accountsToAdd.Add(account);
+
+                    currentRow++;
+                }
+
+                if (accountsToAdd.Any())
+                {
+                    _dbContext.Set<ChartOfAccountEntity>().AddRange(accountsToAdd);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                result.ImportedCount = accountsToAdd.Count;
+                result.Success = true;
+
+                if (result.SkippedCount == 0)
+                    result.Message = $"Successfully imported {result.ImportedCount} account(s)";
+                else
+                    result.Message = $"Imported {result.ImportedCount} account(s), skipped {result.SkippedCount} row(s) with errors";
+
+                return result;
+            }
+        }
+
+        private static bool TryParseYesNo(string value, out bool result)
+        {
+            switch (value.Trim().ToLowerInvariant())
+            {
+                case "yes":
+                case "y":
+                case "1":
+                case "true":
+                    result = true;
+                    return true;
+                case "no":
+                case "n":
+                case "0":
+                case "false":
+                    result = false;
+                    return true;
+                default:
+                    result = false;
+                    return false;
             }
         }
     }
