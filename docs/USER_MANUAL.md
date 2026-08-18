@@ -113,11 +113,21 @@ Menu untuk mengisi "data pokok" (master data) yang menjadi acuan transaksi sehar
 **Kapan dipakai:** menentukan ke mana tiap transaksi dicatat. Ini fondasi seluruh pembukuan.
 
 **Aksi:**
-- Toolbar: `Add Account`, `Export Excel`.
+- Toolbar: `Add Account`, `Download Template`, `Export Excel`, `Import`.
 - Per baris: `View Detail`, `Edit`, `Delete`, `Toggle Status` (Aktif/Nonaktif).
 - Filter: Account Type, Status, lalu **Apply Filter**.
 
 **Tabel:** No, Account Code, Account Name, Type, Parent, Status, Action.
+
+**Download Template & Import:**
+- **Download Template** → mengunduh file Excel (`.xlsx`) berisi 2 sheet: `ChartOfAccounts` (kolom contoh) dan `Instructions` (panduan tiap kolom). Kolom template: **Account Code, Account Name, Account Type, Parent Account Code, Description, Is Header, Is Active, Opening Balance, Currency**.
+- **Import** → memilih file `.xlsx` untuk diunggah. **Syarat wajib: jumlah kolom dan nama header harus sama persis dengan template.** Kalau tidak cocok, muncul alert error dan import dibatalkan.
+- Aturan isi per baris:
+  - `Account Code` (wajib, unik), `Account Name` (wajib, 3–255 karakter), `Account Type` (salah satu: Asset, Liability, Equity, Revenue, Expense, Other Income, Other Expense).
+  - `Parent Account Code` (opsional) — kode akun induk; harus sudah ada di sistem atau ditulis di baris yang lebih atas pada file yang sama. Kosongkan untuk akun root.
+  - `Is Header` & `Is Active` diisi `Yes`/`No`.
+  - `Currency` default `IDR` jika dikosongkan.
+- Hasil import ditampilkan: jumlah berhasil diimpor dan jumlah baris yang dilewati karena error, lengkap dengan detail error per baris.
 
 ### 4.2 Customers
 **Fungsi:** data pelanggan — identitas, kontak, alamat, dan syarat kredit.

@@ -140,5 +140,33 @@ namespace AccuFlow.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadTemplate()
+        {
+            try
+            {
+                var fileBytes = await _chartOfAccountService.DownloadTemplateAsync();
+                return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ChartOfAccounts_Template.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Import(IFormFile file)
+        {
+            try
+            {
+                var result = await _chartOfAccountService.ImportFromExcelAsync(file, _currentUserService.UserId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

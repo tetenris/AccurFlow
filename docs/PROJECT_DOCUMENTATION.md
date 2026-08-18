@@ -99,7 +99,7 @@ Namespace sisa template `KomatsuERP` sudah dirapikan ke `AccuFlow`.
 ## 6. Fitur Utama
 
 ### Accounting Core
-- **Chart of Accounts** — master akun (CRUD, hierarchy, export)
+- **Chart of Accounts** — master akun (CRUD, hierarchy, export, download template, import excel)
 - **Journal Entry** — draft/post/reverse (nomor `JE-`)
 - **General Ledger** — buku besar + summary
 - **Trial Balance** — generate + export
@@ -165,7 +165,7 @@ Namespace sisa template `KomatsuERP` sudah dirapikan ke `AccuFlow`.
 | 2 | Database Seeding | Seed | khusus admin (dev) |
 | 3 | User Management > Users | User | CRUD + unlock |
 | 4 | User Management > Roles | Role | CRUD + permission matrix |
-| 5 | Master > Chart of Accounts | ChartOfAccount | CRUD, hierarchy, export |
+| 5 | Master > Chart of Accounts | ChartOfAccount | CRUD, hierarchy, export, download template, import excel |
 | 6 | Master > Customers | Customer | CRUD, status, export |
 | 7 | Master > Suppliers | Supplier | CRUD, status, export |
 | 8 | Accounting > Journal Entry | JournalEntry | draft/post/reverse |
@@ -227,6 +227,7 @@ Sudah ada di kode tapi belum jadi menu/UI:
 - Accounting core: `JournalEntry`, `JournalLine`, posting, reversal, soft delete.
 - Report accounting: `GeneralLedger`, `TrialBalance`, `FinancialStatement` (income, balance, cash flow).
 - Export Excel: chart of accounts, customer, supplier, journal entry, general ledger, trial balance, financial statements.
+- **Import Excel COA (baru)**: `Download Template` menghasilkan file `.xlsx` 2 sheet (`ChartOfAccounts` berisi 9 kolom + contoh data mandiri, `Instructions` panduan kolom). `Import` memvalidasi jumlah kolom & nama header harus sama persis dengan template (jika tidak, alert error & import batal), lalu memvalidasi per baris: kode unik, nama wajib, tipe valid, Yes/No untuk Is Header/Is Active, parent harus ada (di sistem atau baris lebih atas di file) & type harus match. Hasil: jumlah diimpor + skipped beserta detail error per baris. Implementasi: `ImportChartOfAccountResult`, `ChartOfAccountService.DownloadTemplateAsync` / `ImportFromExcelAsync`, action `ChartOfAccount/DownloadTemplate` & `ChartOfAccount/Import`, tombol toolbar + modal di `Views/ChartOfAccount/Index.cshtml` & `wwwroot/custom/features/chartofaccount/index.js`.
 - Alur penjualan: `SalesQuotation` / `SalesOrder` / `DeliveryOrder` (post kurangi stok, convert ke invoice).
 - Alur pembelian: `PurchaseRequest` (convert ke PO sesuai supplier & tanggal).
 - Master inventory: `ItemGroup` & `Unit` (CRUD + seed); `Item` ber-relasi ke group.
@@ -318,5 +319,5 @@ Sudah ada di kode tapi belum jadi menu/UI:
 
 ---
 
-*Terakhir diperbarui: 2026-08-17*
+*Terakhir diperbarui: 2026-08-18*
 *Status pembandingan: 41 menu terhubung; seluruh backlog berjumlah 0 (selesai).*

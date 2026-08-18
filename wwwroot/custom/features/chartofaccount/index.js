@@ -84,9 +84,7 @@ function initializeDataTable() {
             {
                 data: 'accountCode',
                 render: function (data, type, row) {
-                    const indent = '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(row.level);
-                    const icon = row.hasChildren ? '<i class="ki-duotone ki-down fs-3"></i> ' : '';
-                    return indent + icon + data;
+                    return data;
                 }
             },
             {
@@ -189,6 +187,26 @@ function initializeEventHandlers() {
     });
     $('#toolbar-section-button').append(btnExport);
 
+    // Download Template button to toolbar
+    var btnTemplate = $('<a>', {
+        href: 'javascript:void(0)',
+        class: 'btn btn-outline btn-outline-primary',
+        type: 'button',
+        id: 'btn-download-template',
+        html: '<i class="fa fa-file-arrow-down"></i> Download Template'
+    });
+    $('#toolbar-section-button').append(btnTemplate);
+
+    // Import button to toolbar
+    var btnImport = $('<a>', {
+        href: 'javascript:void(0)',
+        class: 'btn btn-outline btn-outline-primary',
+        type: 'button',
+        id: 'btn-import-account',
+        html: '<i class="fa fa-file-import"></i> Import'
+    });
+    $('#toolbar-section-button').append(btnImport);
+
     // Add account button (using event delegation)
     $(document).on('click', '#btn-add-account', function () {
         openModal(false);
@@ -197,6 +215,25 @@ function initializeEventHandlers() {
     // Export button click
     $(document).on('click', '#btn-export-account', function () {
         exportToExcel();
+    });
+
+    // Download Template button click
+    $(document).on('click', '#btn-download-template', function () {
+        downloadTemplate();
+    });
+
+    // Import button click
+    $(document).on('click', '#btn-import-account', function () {
+        $('#import-file').val('');
+        $('#import-result').addClass('d-none');
+        $('#import-errors').addClass('d-none');
+        $('#import-error-list').empty();
+        $('#modal-import-account').modal('show');
+    });
+
+    // Import submit
+    $(document).on('click', '#btn-import-submit', function () {
+        importAccounts();
     });
 
     // Account type change - load parent accounts and generate code
@@ -499,6 +536,65 @@ function exportToExcel() {
     
     // Trigger download
     window.location.href = '/ChartOfAccount/ExportExcel' + queryString;
+}
+
+// Download Template
+function downloadTemplate() {
+    window.location.href = '/ChartOfAccount/DownloadTemplate';
+}
+
+// Import Accounts
+function importAccounts() {
+    const fileInput = $('#import-file')[0];
+    if (!fileInput.files || fileInput.files.length === 0) {
+        Swal.fire('Warning', 'Please select an Excel file first', 'warning');
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    $('#btn-import-submit').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Importing...');
+
+    $.ajax({
+        url: '/ChartOfAccount/Import',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            $('#btn-import-submit').prop('disabled', false).html('Import');
+
+            Swal.fire('Success', data.message, 'success');
+            if (data.skippedCount > 0) {
+                showImportErrors(data);
+            }
+            $('#modal-import-account').modal('hide');
+            dataTable.ajax.reload();
+        },
+        error: function (xhr) {
+            $('#btn-import-submit').prop('disabled', false).html('Import');
+
+            let message = xhr.responseJSON?.message || 'An error occurred during import';
+            Swal.fire('Error', message, 'error');
+        }
+    });
+}
+
+function showImportErrors(data) {
+    $('#import-result').removeClass('d-none');
+    $('#import-errors').removeClass('d-none');
+    $('#import-error-list').empty();
+
+    $('#import-result-alert')
+        .removeClass('alert-success alert-danger alert-warning')
+        .addClass('alert-warning')
+        .text(data.message);
+
+    (data.errors || []).forEach(function (err) {
+        $('#import-error-list').append(`<li class="text-danger">${err}</li>`);
+    });
 }
 
 // View Detail
