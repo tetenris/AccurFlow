@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Returns.Commands;
+using AccuFlow.Application.Features.Returns.Queries;
 using AccuFlow.Models.Return;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ReturnController : BaseController
     {
-        private readonly IReturnService _returnService;
+        private readonly ISender _mediator;
 
-        public ReturnController(IReturnService returnService) : base(returnService)
+        public ReturnController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _returnService = returnService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,26 +25,26 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableReturnRequest request) => Json(await _returnService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableReturnRequest request) => Json(await _mediator.Send(new GetReturnDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _returnService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetReturnByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetWarehouses() => Json(await _returnService.GetWarehouses());
+        public async Task<IActionResult> GetWarehouses() => Json(await _mediator.Send(new GetReturnWarehousesQuery()));
 
         [HttpGet]
-        public async Task<IActionResult> GetInvoices(string returnType) => Json(await _returnService.GetInvoices(returnType));
+        public async Task<IActionResult> GetInvoices(string returnType) => Json(await _mediator.Send(new GetReturnInvoicesQuery(returnType)));
 
         [HttpGet]
-        public async Task<IActionResult> GetInvoiceLines(Guid invoiceId) => Json(await _returnService.GetInvoiceLines(invoiceId));
+        public async Task<IActionResult> GetInvoiceLines(Guid invoiceId) => Json(await _mediator.Send(new GetReturnInvoiceLinesQuery(invoiceId)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateReturnRequest request)
         {
             try
             {
-                await _returnService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateReturnCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Return created successfully" });
             }
             catch (Exception ex)
@@ -55,7 +58,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _returnService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateReturnCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Return updated successfully" });
             }
             catch (Exception ex)
@@ -69,7 +72,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _returnService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostReturnCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Return posted successfully" });
             }
             catch (Exception ex)
@@ -83,7 +86,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _returnService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteReturnCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Return deleted successfully" });
             }
             catch (Exception ex)

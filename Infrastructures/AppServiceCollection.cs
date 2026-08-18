@@ -22,7 +22,6 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
             services.AddScoped<IPurchaseRequestService, PurchaseRequestService>();
             services.AddScoped<IGoodsReceiptService, GoodsReceiptService>();
-            services.AddScoped<IReturnService, ReturnService>();
             services.AddScoped<IQuotationService, QuotationService>();
             services.AddScoped<ISalesOrderService, SalesOrderService>();
             services.AddScoped<IDeliveryOrderService, DeliveryOrderService>();
