@@ -47,7 +47,11 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CreateUserCommand`, `UpdateUserCommand`, `UnlockUserCommand` (reset ke `Qwerty@123` + expired), `DeleteUserCommand` (soft delete)
   - Helper baru `Application/Common/Helpers/SuperAdminCheck` (cek current user Super Administrator, dipakai handler User & Role)
   Build 0 error.
-- [ ] **B4. User Management > Roles** (User Manual §3.2) — `Role` → CRUD + permission matrix.
+- [x] **B4. User Management > Roles** (User Manual §3.2) — Selesai. `RoleService` (`IRoleService`), `RoleMenuService` (`IRoleMenuService` + `IRoleMenuService.cs`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. Semua lewat MediatR di `Application/Features/Roles`:
+  - Query: `GetRolesDatatableQuery`, `GetRoleByIdQuery`, `GetRoleDropdownQuery`, `GetRoleMenuPermissionsQuery` (menu + permission matrix)
+  - Command: `CreateRoleCommand`, `EditRoleCommand` (cek active users, role type change, deactivate guard), `DeleteRoleCommand` (soft delete role + role menus, cek user assigned), `SaveRoleMenuPermissionsCommand` (replace permission), `FixRoleTypeDataCommand`
+  Build 0 error (25 warning).
+  - **UI Role (2026-08-18)**: halaman Edit (pensil) hanya untuk edit info role (description + active); halaman `Permissions` (kunci) terpisah untuk manage access control (`/Role/Permissions`); **Delete role dihapus** (controller action + `DeleteRoleCommand` + handler + tombol).
 - [ ] **B5. Master > Chart of Accounts (PILOT)** (User Manual §4.1) — `ChartOfAccount` → Command: Create, Update, Delete, ToggleStatus, Import; Query: Paginated, GetById, GetParents, GetHierarchy, GetActive, GenerateCode, ValidateCode; plus DownloadTemplate.
 - [ ] **B6. Master > Customers** (User Manual §4.2) — `Customer` → CRUD, ToggleStatus, Export.
 - [ ] **B7. Master > Suppliers** (User Manual §4.3) — `Supplier` → CRUD, ToggleStatus, Export.

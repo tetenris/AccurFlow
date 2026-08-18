@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    let currentRoleId = $('#role-id').val();
+    const currentRoleId = $('#role-id').val();
 
     // Populate Role Type dropdown from shared data
     function populateRoleType() {
@@ -15,8 +15,6 @@ $(document).ready(function () {
         });
     }
 
-    // Load dropdown + role data + permissions on page load
-    loadMenuPermissions(currentRoleId);
     populateRoleType();
 
     // Save Role
@@ -51,22 +49,9 @@ $(document).ready(function () {
             });
 
             if (response.success) {
-                // Save permissions
-                const permissions = collectPermissions();
-
-                await $.ajax({
-                    url: '/Role/SaveRoleMenuPermissions',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        roleId: currentRoleId,
-                        permissions: permissions
-                    })
-                });
-
                 Swal.fire({
                     title: 'Success',
-                    text: 'Role and permissions saved successfully',
+                    text: 'Role updated successfully',
                     icon: 'success',
                     confirmButtonText: 'OK',
                     customClass: {

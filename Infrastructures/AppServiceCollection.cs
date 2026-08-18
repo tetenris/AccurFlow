@@ -15,14 +15,12 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IBaseService, BaseService>();
             
             // Register services
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<Services.Interfaces.IMenuService, MenuService>();
             services.AddScoped<IChartOfAccountService, ChartOfAccountService>();
             services.AddScoped<IJournalEntryService, JournalEntryService>();
             services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
             services.AddScoped<ITrialBalanceService, TrialBalanceService>();
             services.AddScoped<IFinancialStatementService, FinancialStatementService>();
-            services.AddScoped<IRoleMenuService, RoleMenuService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<ISupplierService, SupplierService>();
             services.AddScoped<IInvoiceService, InvoiceService>();

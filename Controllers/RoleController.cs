@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Roles.Commands;
+using AccuFlow.Application.Features.Roles.Queries;
 using AccuFlow.Models.Role;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,13 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class RoleController : BaseController
     {
-        private readonly IRoleService _roleService;
-        private readonly IRoleMenuService _roleMenuService;
+        private readonly ISender _mediator;
 
-        public RoleController(IRoleService roleService, IRoleMenuService roleMenuService) : base(roleService)
+        public RoleController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _roleService = roleService;
-            _roleMenuService = roleMenuService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -26,7 +27,7 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var role = await _roleService.GetById(id);
+            var role = await _mediator.Send(new GetRoleByIdQuery(id));
             if (role == null)
             {
                 return NotFound();
@@ -37,17 +38,31 @@ namespace AccuFlow.Controllers
             return View(role);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Permissions(Guid id)
+        {
+            var role = await _mediator.Send(new GetRoleByIdQuery(id));
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Title"] = $"Role Permissions - {role.RoleName}";
+            ViewData["Back"] = "/Role/Index";
+            return View(role);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTableRoleRequest request)
         {
-            var result = await _roleService.Datatable(request);
+            var result = await _mediator.Send(new GetRolesDatatableQuery(request));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var result = await _roleService.GetById(id);
+            var result = await _mediator.Send(new GetRoleByIdQuery(id));
             return Json(result);
         }
 
@@ -56,7 +71,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var roleId = await _roleService.Create(request, _currentUserService.UserId);
+                var roleId = await _mediator.Send(new CreateRoleCommand(request, _currentUserService.UserId));
                 return Ok(new { success = true, message = "Role created successfully", roleId });
             }
             catch (Exception ex)
@@ -70,7 +85,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _roleService.Edit(request, _currentUserService.UserId);
+                await _mediator.Send(new EditRoleCommand(request, _currentUserService.UserId));
                 return Ok(new { success = true, message = "Role updated successfully" });
             }
             catch (Exception ex)
@@ -79,24 +94,10 @@ namespace AccuFlow.Controllers
             }
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody] Guid id)
-        {
-            try
-            {
-                await _roleService.Delete(id);
-                return Ok(new { success = true, message = "Role deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
         [HttpGet]
-        public IActionResult GetRoleDropdown()
+        public async Task<IActionResult> GetRoleDropdown()
         {
-            var roles = _roleService.GetRoleDropdown();
+            var roles = await _mediator.Send(new GetRoleDropdownQuery());
             return Json(roles);
         }
 
@@ -105,7 +106,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _roleService.FixRoleTypeData();
+                await _mediator.Send(new FixRoleTypeDataCommand());
                 return Ok(new { success = true, message = "Role type data fixed successfully" });
             }
             catch (Exception ex)
@@ -124,8 +125,8 @@ namespace AccuFlow.Controllers
                 {
                     Guid.TryParse(roleId, out parsedRoleId);
                 }
-                
-                var result = await _roleMenuService.GetRoleMenuPermissionsAsync(parsedRoleId);
+
+                var result = await _mediator.Send(new GetRoleMenuPermissionsQuery(parsedRoleId));
                 return Ok(result);
             }
             catch (Exception ex)
@@ -139,7 +140,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _roleMenuService.SaveRoleMenuPermissionsAsync(request);
+                await _mediator.Send(new SaveRoleMenuPermissionsCommand(request));
                 return Ok(new { success = true, message = "Permissions saved successfully" });
             }
             catch (Exception ex)

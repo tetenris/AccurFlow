@@ -42,47 +42,35 @@ namespace AccuFlow.Application.Features.Dashboard.Handlers
             var purchaseInvoices = _invoiceRepository.Query()
                 .Where(x => !x.IsDeleted && x.InvoiceType == "Purchase" && x.Status != "Cancelled");
 
-            var cashMovementsThisMonthTask = _paymentRepository.Query()
+            var cashMovementsThisMonth = await _paymentRepository.Query()
                 .Where(x => !x.IsDeleted && x.Status != "Cancelled" && x.PaymentDate >= monthStart)
                 .SumAsync(x => x.TotalAmount, cancellationToken);
 
-            var activeUsersTask = _userRepository.CountAsync(x => !x.IsDeleted && x.IsActive, cancellationToken);
-            var activeRolesTask = _roleRepository.CountAsync(x => !x.IsDeleted && x.IsActive, cancellationToken);
-            var draftJournalsTask = _journalRepository.CountAsync(x => !x.IsDeleted && x.Status == "Draft", cancellationToken);
-            var postedJournalsTask = _journalRepository.CountAsync(x => !x.IsDeleted && x.Status == "Posted", cancellationToken);
-            var openInvoicesTask = salesInvoices.CountAsync(x => x.TotalAmount > x.PaidAmount, cancellationToken);
-            var overdueInvoicesTask = salesInvoices.CountAsync(x => x.TotalAmount > x.PaidAmount && x.DueDate.Date < today, cancellationToken);
-            var pendingPurchaseOrdersTask = _purchaseOrderRepository.CountAsync(
+            var activeUsers = await _userRepository.CountAsync(x => !x.IsDeleted && x.IsActive, cancellationToken);
+            var activeRoles = await _roleRepository.CountAsync(x => !x.IsDeleted && x.IsActive, cancellationToken);
+            var draftJournals = await _journalRepository.CountAsync(x => !x.IsDeleted && x.Status == "Draft", cancellationToken);
+            var postedJournals = await _journalRepository.CountAsync(x => !x.IsDeleted && x.Status == "Posted", cancellationToken);
+            var openInvoices = await salesInvoices.CountAsync(x => x.TotalAmount > x.PaidAmount, cancellationToken);
+            var overdueInvoices = await salesInvoices.CountAsync(x => x.TotalAmount > x.PaidAmount && x.DueDate.Date < today, cancellationToken);
+            var pendingPurchaseOrders = await _purchaseOrderRepository.CountAsync(
                 x => !x.IsDeleted && x.Status != "Completed" && x.Status != "Cancelled", cancellationToken);
-            var receivablesTask = salesInvoices.SumAsync(x => x.TotalAmount - x.PaidAmount, cancellationToken);
-            var payablesTask = purchaseInvoices.SumAsync(x => x.TotalAmount - x.PaidAmount, cancellationToken);
-
-            await Task.WhenAll(
-                cashMovementsThisMonthTask,
-                activeUsersTask,
-                activeRolesTask,
-                draftJournalsTask,
-                postedJournalsTask,
-                openInvoicesTask,
-                overdueInvoicesTask,
-                pendingPurchaseOrdersTask,
-                receivablesTask,
-                payablesTask);
+            var receivables = await salesInvoices.SumAsync(x => x.TotalAmount - x.PaidAmount, cancellationToken);
+            var payables = await purchaseInvoices.SumAsync(x => x.TotalAmount - x.PaidAmount, cancellationToken);
 
             var recentActivities = await GetRecentActivitiesAsync(cancellationToken);
 
             return new DashboardSummaryDto
             {
-                ActiveUsers = await activeUsersTask,
-                ActiveRoles = await activeRolesTask,
-                DraftJournals = await draftJournalsTask,
-                PostedJournals = await postedJournalsTask,
-                OpenInvoices = await openInvoicesTask,
-                OverdueInvoices = await overdueInvoicesTask,
-                PendingPurchaseOrders = await pendingPurchaseOrdersTask,
-                Receivables = await receivablesTask,
-                Payables = await payablesTask,
-                CashMovementsThisMonth = await cashMovementsThisMonthTask,
+                ActiveUsers = activeUsers,
+                ActiveRoles = activeRoles,
+                DraftJournals = draftJournals,
+                PostedJournals = postedJournals,
+                OpenInvoices = openInvoices,
+                OverdueInvoices = overdueInvoices,
+                PendingPurchaseOrders = pendingPurchaseOrders,
+                Receivables = receivables,
+                Payables = payables,
+                CashMovementsThisMonth = cashMovementsThisMonth,
                 RecentActivities = recentActivities
             };
         }

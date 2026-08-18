@@ -14,7 +14,7 @@
                 </div>
                 <div>
                     <h3 class="mb-1">Edit Role</h3>
-                    <div class="text-muted fs-7">Kelola informasi role dan access control.</div>
+                    <div class="text-muted fs-7">Kelola informasi role.</div>
                 </div>
             </div>
         </div>
@@ -26,8 +26,7 @@
     </div>
     <div class="card-body py-8">
         <div class="row">
-            <!-- Left Side: Role Info -->
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <form id="form-role">
                     <input type="hidden" id="role-id" value="@Model.RoleId" />
                     <input type="hidden" id="role-type-value" value="@Model.RoleType" />
@@ -56,27 +55,6 @@
                     </div>
                 </form>
             </div>
-
-            <!-- Right Side: Access Control -->
-            <div class="col-md-8">
-                <h5 class="mb-4">Access Control</h5>
-
-                <!-- Full Access -->
-                <div class="mb-4">
-                    <h6>Full Access</h6>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="select-all-permissions">
-                        <label class="form-check-label" for="select-all-permissions">
-                            Select All
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Menu Permissions -->
-                <div id="menu-permissions-container" style="max-height: 400px; overflow-y: auto;">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
         </div>
 
         <div class="d-flex justify-content-end mt-6 pt-3 border-top">
@@ -88,6 +66,5 @@
 
 @section Scripts {
     <script src="~/custom/features/role/role-type-data.js"></script>
-    <script src="~/custom/features/role/permissions.js"></script>
     <script src="~/custom/features/role/edit.js"></script>
 }

@@ -204,10 +204,10 @@ $(document).ready(function () {
         window.location.href = `/Role/Edit?id=${roleId}`;
     });
 
-    // Manage Role Permissions (navigate to edit page)
+    // Manage Role Permissions (navigate to permission page)
     $('#role_datatable').on('click', '.btn-permission', function () {
         const roleId = $(this).data('id');
-        window.location.href = `/Role/Edit?id=${roleId}`;
+        window.location.href = `/Role/Permissions?id=${roleId}`;
     });
 
     // Save Role (Add mode only; Edit uses dedicated page)
@@ -399,73 +399,6 @@ $(document).ready(function () {
     });
 
     // Delete Role
-    $('#role_datatable').on('click', '.btn-delete', function () {
-        const roleId = $(this).data('id');
-        const canDelete = $(this).data('candelete');
-
-        // Validasi: hanya bisa delete jika inactive
-        if (!canDelete) {
-            Swal.fire({
-                title: 'Cannot Delete Active Role',
-                text: 'Please deactivate the role first before deleting',
-                icon: 'warning',
-                confirmButtonText: 'OK',
-                customClass: {
-                    confirmButton: 'btn btn-warning'
-                },
-                buttonsStyling: false
-            });
-            return;
-        }
-
-        Swal.fire({
-            title: 'Delete selected data?',
-            text: "Are you sure you want to delete this role? This action cannot be undone.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel',
-            customClass: {
-                confirmButton: 'btn btn-danger',
-                cancelButton: 'btn btn-secondary'
-            },
-            buttonsStyling: false
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    const response = await $.ajax({
-                        url: '/Role/Delete',
-                        type: 'DELETE',
-                        contentType: 'application/json',
-                        data: JSON.stringify(roleId)
-                    });
-
-                    if (response.success) {
-                        Swal.fire({
-                            title: 'Deleted!',
-                            text: response.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK',
-                            customClass: {
-                                confirmButton: 'btn btn-primary'
-                            },
-                            buttonsStyling: false
-                        });
-                        table.ajax.reload();
-                    }
-                } catch (error) {
-                    Swal.fire({
-                        title: 'Error',
-                        text: error.responseJSON?.message || 'Failed to delete role',
-                        icon: 'error',
-                        confirmButtonText: 'OK',
-                        customClass: {
-                            confirmButton: 'btn btn-danger'
-                        },
-                        buttonsStyling: false
-                    });
-                }
-            }
-        });
-    });
+    // Role tidak boleh dihapus: tombol delete dihilangkan dari action cell dan
+    // action Delete dihapus dari controller.
 });
