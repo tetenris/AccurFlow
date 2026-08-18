@@ -183,7 +183,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetPayrollDatatableQuery` (search PayrollNumber/Notes, sort period, LineCount + JournalNumber), `GetPayrollByIdQuery` (detail + line pegawai)
   - Command: `CreatePayrollCommand` (no. `PR-yyyymm-NNNN`, cek period ganda, tarik semua pegawai aktif), `PostPayrollCommand` (auto jurnal beban gaji ↔ hutang gaji via `CreateJournalCommand` + `PostJournalCommand`), `DeletePayrollCommand` (soft delete)
   - Handler port 1:1 dari `PayrollService`. Build 0 error. Modul HRM/Payroll (B39–B40) tuntas.
-- [ ] **B41. Produksi > Bill of Material (BOM)** (User Manual §12.1) — `Production` → BOM.
+- [x] **B41. Produksi > Bill of Material (BOM)** (User Manual §12.1) — Selesai. `ProductionController` aksi BOM (BomDatatable/GetBomById/Items/Warehouses/Boms/CreateBom/DeleteBom) lepas dari `IProductionService` → MediatR. Semua lewat `Application/Features/BillOfMaterials`:
+  - Query: `GetBomDatatableQuery` (search BomNumber/finished item + paging, LineCount), `GetBomByIdQuery` (detail + line komponen), `GetBomsQuery` (BOM aktif utk dropdown PO)
+  - Command: `CreateBomCommand` (no. `BOM-{D5}`, cek komponen = finished item), `DeleteBomCommand` (tolak jika sudah ada production order posted)
+  - Review dropdown reuse `GetActiveItemsQuery` (Items, B27) + `GetWarehousesQuery` baru (`Application/Features/Warehouses`, dipakai juga B42). Method BOM dihapus dari `ProductionService` (kini hanya production order). Build 0 error.
 - [ ] **B42. Produksi > Production Order** (User Manual §12.2) — `Production` → perintah produksi.
 
 ### C. Pengujian & Penyempurnaan

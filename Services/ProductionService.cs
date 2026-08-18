@@ -9,13 +9,6 @@ namespace AccuFlow.Services
 {
     public interface IProductionService : IBaseService
     {
-        Task<BaseDatatableResponse> BomDatatable(BaseDatatableRequest request);
-        Task<BomDetailViewModel?> GetBomById(Guid id);
-        Task<List<ItemEntity>> GetItems();
-        Task<List<WarehouseEntity>> GetWarehouses();
-        Task CreateBom(BomRequest request, Guid userId);
-        Task DeleteBom(Guid id, Guid userId);
-        Task<List<BomViewModel>> GetBoms();
         Task<BaseDatatableResponse> ProductionOrderDatatable(BaseDatatableRequest request);
         Task CreateProductionOrder(CreateProductionOrderRequest request, Guid userId);
         Task<ProductionOrderDetailViewModel?> GetProductionOrderById(Guid id);
@@ -30,145 +23,6 @@ namespace AccuFlow.Services
         public ProductionService(AppDbContext dbContext, IJournalEntryService journalEntryService) : base(dbContext)
         {
             _journalEntryService = journalEntryService;
-        }
-
-        public async Task<BaseDatatableResponse> BomDatatable(BaseDatatableRequest request)
-        {
-            var query = _dbContext.BillOfMaterials
-                .Include(x => x.FinishedItem)
-                .Where(x => !x.IsDeleted);
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                var search = request.Search.ToLower();
-                query = query.Where(x => x.BomNumber.ToLower().Contains(search)
-                    || x.FinishedItem.ItemCode.ToLower().Contains(search)
-                    || x.FinishedItem.ItemName.ToLower().Contains(search));
-            }
-
-            var total = await query.CountAsync();
-            var data = await query
-                .OrderByDescending(x => x.CreatedAt)
-                .Skip((request.Page - 1) * request.Size).Take(request.Size)
-                .Select(x => new BomViewModel
-                {
-                    BomId = x.BomId,
-                    BomNumber = x.BomNumber,
-                    FinishedItemId = x.FinishedItemId,
-                    FinishedItemCode = x.FinishedItem.ItemCode,
-                    FinishedItemName = x.FinishedItem.ItemName,
-                    LineCount = x.Lines.Count,
-                    IsActive = x.IsActive,
-                    Notes = x.Notes
-                }).ToListAsync();
-
-            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
-        }
-
-        public async Task<BomDetailViewModel?> GetBomById(Guid id)
-        {
-            return await _dbContext.BillOfMaterials
-                .Include(x => x.FinishedItem)
-                .Include(x => x.Lines.Where(l => !l.IsDeleted)).ThenInclude(l => l.ComponentItem)
-                .Where(x => x.BomId == id && !x.IsDeleted)
-                .Select(x => new BomDetailViewModel
-                {
-                    BomId = x.BomId,
-                    BomNumber = x.BomNumber,
-                    FinishedItemId = x.FinishedItemId,
-                    FinishedItemCode = x.FinishedItem.ItemCode,
-                    FinishedItemName = x.FinishedItem.ItemName,
-                    IsActive = x.IsActive,
-                    Notes = x.Notes,
-                    Lines = x.Lines.OrderBy(l => l.ComponentItem.ItemCode).Select(l => new BomLineViewModel
-                    {
-                        BomLineId = l.BomLineId,
-                        ComponentItemId = l.ComponentItemId,
-                        ComponentItemCode = l.ComponentItem.ItemCode,
-                        ComponentItemName = l.ComponentItem.ItemName,
-                        QuantityPerUnit = l.QuantityPerUnit
-                    }).ToList()
-                }).FirstOrDefaultAsync();
-        }
-
-        public async Task<List<ItemEntity>> GetItems()
-        {
-            return await _dbContext.Items
-                .Where(x => x.IsActive && !x.IsDeleted)
-                .OrderBy(x => x.ItemCode)
-                .ToListAsync();
-        }
-
-        public async Task<List<WarehouseEntity>> GetWarehouses()
-        {
-            return await _dbContext.Warehouses
-                .Where(x => x.IsActive && !x.IsDeleted)
-                .OrderBy(x => x.WarehouseCode)
-                .ToListAsync();
-        }
-
-        public async Task CreateBom(BomRequest request, Guid userId)
-        {
-            if (request.FinishedItemId == Guid.Empty) throw new Exception("Finished item is required");
-            if (request.Lines == null || request.Lines.Count == 0) throw new Exception("At least one component line is required");
-            if (request.Lines.Any(l => l.QuantityPerUnit <= 0)) throw new Exception("Component quantity must be greater than zero");
-            if (request.Lines.Any(l => l.ComponentItemId == request.FinishedItemId)) throw new Exception("Component cannot be the same as finished item");
-
-            var bom = new BillOfMaterialEntity
-            {
-                BomId = Guid.NewGuid(),
-                BomNumber = await GenerateBomNumberAsync(),
-                FinishedItemId = request.FinishedItemId,
-                Notes = request.Notes,
-                IsActive = true,
-                CreatedBy = userId.ToString()
-            };
-
-            foreach (var line in request.Lines)
-            {
-                bom.Lines.Add(new BillOfMaterialLineEntity
-                {
-                    BomLineId = Guid.NewGuid(),
-                    ComponentItemId = line.ComponentItemId,
-                    QuantityPerUnit = line.QuantityPerUnit,
-                    CreatedBy = userId.ToString()
-                });
-            }
-
-            _dbContext.BillOfMaterials.Add(bom);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteBom(Guid id, Guid userId)
-        {
-            var bom = await _dbContext.BillOfMaterials.FirstOrDefaultAsync(x => x.BomId == id && !x.IsDeleted);
-            if (bom == null) throw new Exception("Bill of material not found");
-
-            var usedInOrder = await _dbContext.ProductionOrders.AnyAsync(x => x.BomId == id && !x.IsDeleted && x.Status != "Draft");
-            if (usedInOrder) throw new Exception("Cannot delete BOM that already has posted production orders");
-
-            bom.IsDeleted = true;
-            bom.DeletedAt = DateTime.UtcNow;
-            bom.DeletedBy = userId.ToString();
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task<List<BomViewModel>> GetBoms()
-        {
-            return await _dbContext.BillOfMaterials
-                .Include(x => x.FinishedItem)
-                .Where(x => x.IsActive && !x.IsDeleted)
-                .OrderByDescending(x => x.CreatedAt)
-                .Select(x => new BomViewModel
-                {
-                    BomId = x.BomId,
-                    BomNumber = x.BomNumber,
-                    FinishedItemId = x.FinishedItemId,
-                    FinishedItemCode = x.FinishedItem.ItemCode,
-                    FinishedItemName = x.FinishedItem.ItemName,
-                    LineCount = x.Lines.Count,
-                    IsActive = x.IsActive
-                }).ToListAsync();
         }
 
         public async Task<BaseDatatableResponse> ProductionOrderDatatable(BaseDatatableRequest request)
@@ -439,14 +293,6 @@ namespace AccuFlow.Services
                 .GroupBy(x => x.ItemId)
                 .Select(g => new { ItemId = g.Key, Quantity = g.Sum(m => m.QuantityIn - m.QuantityOut) })
                 .ToDictionaryAsync(x => x.ItemId, x => x.Quantity);
-        }
-
-        private async Task<string> GenerateBomNumberAsync()
-        {
-            var last = await _dbContext.BillOfMaterials.Where(x => x.BomNumber.StartsWith("BOM-"))
-                .OrderByDescending(x => x.BomNumber).Select(x => x.BomNumber).FirstOrDefaultAsync();
-            var next = string.IsNullOrEmpty(last) ? 1 : int.Parse(last[4..]) + 1;
-            return $"BOM-{next:D5}";
         }
 
         private async Task<string> GenerateProductionOrderNumberAsync()

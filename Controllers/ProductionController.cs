@@ -1,6 +1,11 @@
+using AccuFlow.Application.Features.BillOfMaterials.Commands;
+using AccuFlow.Application.Features.BillOfMaterials.Queries;
+using AccuFlow.Application.Features.Items.Queries;
+using AccuFlow.Application.Features.Warehouses.Queries;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Production;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +15,12 @@ namespace AccuFlow.Controllers
     public class ProductionController : BaseController
     {
         private readonly IProductionService _productionService;
+        private readonly ISender _mediator;
 
-        public ProductionController(IProductionService productionService, IBaseService baseService) : base(baseService)
+        public ProductionController(IProductionService productionService, ISender mediator, IBaseService baseService) : base(baseService)
         {
             _productionService = productionService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -23,34 +30,34 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BomDatatable([FromBody] BaseDatatableRequest request) => Json(await _productionService.BomDatatable(request));
+        public async Task<IActionResult> BomDatatable([FromBody] BaseDatatableRequest request) => Json(await _mediator.Send(new GetBomDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetBomById(Guid id) => Json(await _productionService.GetBomById(id));
+        public async Task<IActionResult> GetBomById(Guid id) => Json(await _mediator.Send(new GetBomByIdQuery(id)));
 
         [HttpGet]
         public async Task<IActionResult> Items()
         {
-            var items = await _productionService.GetItems();
+            var items = await _mediator.Send(new GetActiveItemsQuery());
             return Json(items.Select(x => new { value = x.ItemId, text = $"{x.ItemCode} - {x.ItemName}" }).ToList());
         }
 
         [HttpGet]
         public async Task<IActionResult> Warehouses()
         {
-            var warehouses = await _productionService.GetWarehouses();
+            var warehouses = await _mediator.Send(new GetWarehousesQuery());
             return Json(warehouses.Select(x => new { value = x.WarehouseId, text = $"{x.WarehouseCode} - {x.WarehouseName}" }).ToList());
         }
 
         [HttpGet]
-        public async Task<IActionResult> Boms() => Json(await _productionService.GetBoms());
+        public async Task<IActionResult> Boms() => Json(await _mediator.Send(new GetBomsQuery()));
 
         [HttpPost]
         public async Task<IActionResult> CreateBom([FromBody] BomRequest request)
         {
             try
             {
-                await _productionService.CreateBom(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateBomCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Bill of material created successfully" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -61,7 +68,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _productionService.DeleteBom(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteBomCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Bill of material deleted" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
