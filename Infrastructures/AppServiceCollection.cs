@@ -19,7 +19,6 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<IChartOfAccountService, ChartOfAccountService>();
             services.AddScoped<IJournalEntryService, JournalEntryService>();
             services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
-            services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
             services.AddScoped<IGoodsReceiptService, GoodsReceiptService>();
             services.AddScoped<ICashBankService, CashBankService>();
             services.AddScoped<IInventoryService, InventoryService>();

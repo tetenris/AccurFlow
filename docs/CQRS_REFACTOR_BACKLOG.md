@@ -126,7 +126,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetPurchaseRequestDatatableQuery`, `GetPurchaseRequestByIdQuery`
   - Command: `CreatePurchaseRequestCommand` (nomor `PR-xxxxx`, RequestedBy default nama user login), `UpdatePurchaseRequestCommand`, `DeletePurchaseRequestCommand`, `ApprovePurchaseRequestCommand`, `ConvertPurchaseRequestCommand` (auto buat PO `PO-`, status PR → Converted)
   - Handler port 1:1 dari `PurchaseRequestService`. Build 0 error.
-- [ ] **B25. Purchasing > Purchase Orders** (User Manual §7.2) — `PurchaseOrder` → draft/approve/convert/print.
+- [x] **B25. Purchasing > Purchase Orders** (User Manual §7.2) — Selesai. `IPurchaseOrderService`/`PurchaseOrderService` (`Services/BusinessModuleServices.cs`) **DIHAPUS** (file dihapus) beserta registrasi DI. `PurchaseOrderController` → MediatR. Semua lewat `Application/Features/PurchaseOrders`:
+  - Query: `GetPurchaseOrderDatatableQuery`, `GetPurchaseOrderByIdQuery` (juga dipakai action Print)
+  - Command: `CreatePurchaseOrderCommand` (nomor `PO-xxxxx`), `UpdatePurchaseOrderCommand`, `DeletePurchaseOrderCommand` (soft-delete line), `ApprovePurchaseOrderCommand`, `ConvertPurchaseOrderToInvoiceCommand` (auto buat invoice `PI-`, status PO → Converted)
+  - Handler port 1:1 dari `PurchaseOrderService`. Build 0 error.
 - [ ] **B26. Purchasing > Goods Received / GRN** (User Manual §7.3) — `GoodsReceipt` → dari PO, update stok + jurnal.
 - [ ] **B27. Inventory > Items** (User Manual §8.1) — `Inventory` → item list.
 - [ ] **B28. Inventory > Stock Card** (User Manual §8.2) — `Inventory` → riwayat pergerakan stok.

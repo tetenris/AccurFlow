@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.PurchaseOrders.Commands;
+using AccuFlow.Application.Features.PurchaseOrders.Queries;
 using AccuFlow.Models.PurchaseOrder;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class PurchaseOrderController : BaseController
     {
-        private readonly IPurchaseOrderService _purchaseOrderService;
+        private readonly ISender _mediator;
 
-        public PurchaseOrderController(IPurchaseOrderService purchaseOrderService) : base(purchaseOrderService)
+        public PurchaseOrderController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _purchaseOrderService = purchaseOrderService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,15 +25,15 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTablePurchaseOrderRequest request) => Json(await _purchaseOrderService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTablePurchaseOrderRequest request) => Json(await _mediator.Send(new GetPurchaseOrderDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _purchaseOrderService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetPurchaseOrderByIdQuery(id)));
 
         [HttpGet]
         public async Task<IActionResult> Print(Guid id)
         {
-            var purchaseOrder = await _purchaseOrderService.GetById(id);
+            var purchaseOrder = await _mediator.Send(new GetPurchaseOrderByIdQuery(id));
             if (purchaseOrder == null) return NotFound();
             return View(purchaseOrder);
         }
@@ -40,7 +43,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _purchaseOrderService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreatePurchaseOrderCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Purchase order created successfully" });
             }
             catch (Exception ex)
@@ -54,7 +57,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _purchaseOrderService.Edit(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdatePurchaseOrderCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Purchase order updated successfully" });
             }
             catch (Exception ex)
@@ -68,7 +71,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _purchaseOrderService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeletePurchaseOrderCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Purchase order deleted successfully" });
             }
             catch (Exception ex)
@@ -82,7 +85,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _purchaseOrderService.Approve(id, _currentUserService!.UserId);
+                await _mediator.Send(new ApprovePurchaseOrderCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Purchase order approved successfully" });
             }
             catch (Exception ex)
@@ -96,7 +99,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _purchaseOrderService.ConvertToInvoice(id, _currentUserService!.UserId);
+                await _mediator.Send(new ConvertPurchaseOrderToInvoiceCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Purchase order converted to invoice successfully" });
             }
             catch (Exception ex)
