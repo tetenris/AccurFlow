@@ -2,6 +2,8 @@
 using AccuFlow.Entities.Context;
 using AccuFlow.Extentions;
 using AccuFlow.Infrastructures;
+using AccuFlow.Application;
+using AccuFlow.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,11 +22,32 @@ builder.Services.AddAuthentication("Cookies")
         options.ExpireTimeSpan = TimeSpan.FromHours(24);
     });
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Database provider: SqlServer (default), Postgres, or MySql
+string dbProvider = builder.Configuration["Database:Provider"] ?? "SqlServer";
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    switch (dbProvider.ToLowerInvariant())
+    {
+        case "postgres":
+        case "postgresql":
+        case "npgsql":
+            options.UseNpgsql(connectionString);
+            break;
+        case "mysql":
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            break;
+        default:
+            options.UseSqlServer(connectionString);
+            break;
+    }
+});
 
 builder.Services.AddMemoryCache();
 builder.Services.AddAppService(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddHangfireServices(builder.Configuration);
 
 builder.Services.AddSession(options =>
