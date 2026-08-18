@@ -122,7 +122,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetDeliveryDatatableQuery`, `GetDeliveryByIdQuery`, `GetDeliveryOrdersQuery` (SO approved dgn sisa qty > 0), `GetDeliveryOrderLinesQuery`
   - Command: `CreateDeliveryCommand` (nomor `DO-xxxxx`, validasi line milik SO approved), `UpdateDeliveryCommand`, `PostDeliveryCommand` (cek over-delivery + buat `StockMovement` keluar), `DeleteDeliveryCommand`, `ConvertDeliveryToInvoiceCommand` (auto buat invoice `SI-`)
   - Handler port 1:1 dari `DeliveryOrderService`. Build 0 error.
-- [ ] **B24. Purchasing > Purchase Request** (User Manual §7.1) — `PurchaseRequest` → draft/approve, convert ke PO.
+- [x] **B24. Purchasing > Purchase Request** (User Manual §7.1) — Selesai. `IPurchaseRequestService`/`PurchaseRequestService` (`Services/PurchaseRequestService.cs`) **DIHAPUS** beserta registrasi DI. `PurchaseRequestController` → MediatR. Semua lewat `Application/Features/PurchaseRequests`:
+  - Query: `GetPurchaseRequestDatatableQuery`, `GetPurchaseRequestByIdQuery`
+  - Command: `CreatePurchaseRequestCommand` (nomor `PR-xxxxx`, RequestedBy default nama user login), `UpdatePurchaseRequestCommand`, `DeletePurchaseRequestCommand`, `ApprovePurchaseRequestCommand`, `ConvertPurchaseRequestCommand` (auto buat PO `PO-`, status PR → Converted)
+  - Handler port 1:1 dari `PurchaseRequestService`. Build 0 error.
 - [ ] **B25. Purchasing > Purchase Orders** (User Manual §7.2) — `PurchaseOrder` → draft/approve/convert/print.
 - [ ] **B26. Purchasing > Goods Received / GRN** (User Manual §7.3) — `GoodsReceipt` → dari PO, update stok + jurnal.
 - [ ] **B27. Inventory > Items** (User Manual §8.1) — `Inventory` → item list.
