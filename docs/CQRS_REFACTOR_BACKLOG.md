@@ -139,7 +139,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CreateItemCommand` (cekal ItemCode ganda), `UpdateReorderPointCommand`
   - Handler port 1:1 dari `InventoryService`. Build 0 error.
 - [x] **B28. Inventory > Stock Card** (User Manual §8.2) — Selesai. Ditangani bersama B27: `GetStockCardQuery` (`Application/Features/Items`) menggantikan `InventoryService.StockCard`. Build 0 error.
-- [ ] **B29. Inventory > Stock Opname** (User Manual §8.3) — `StockOpname` → stok fisik + adjustment.
+- [x] **B29. Inventory > Stock Opname** (User Manual §8.3) — Selesai. `IStockOpnameService`/`StockOpnameService` (`Services/StockOpnameService.cs`) **DIHAPUS** beserta registrasi DI. `StockOpnameController` → MediatR. Semua lewat `Application/Features/StockOpnames`:
+  - Query: `GetStockOpnameDatatableQuery` (filter Status + Search, sort OpnameDate desc), `GetStockOpnameByIdQuery`, `GetStockOpnameWarehousesQuery`, `GetStockOpnameQuantitiesQuery` (stok sistem per gudang dari StockMovements)
+  - Command: `CreateStockOpnameCommand` (no. `OPN-{D5}`), `UpdateStockOpnameCommand` (soft-delete line lama + add baru), `PostStockOpnameCommand` (buat StockMovement "Opname Adjustment"), `DeleteStockOpnameCommand`
+  - Handler port 1:1 dari `StockOpnameService`. Build 0 error.
 - [x] **B30. Inventory > Item Groups** (User Manual §8.4) — Selesai. `IItemGroupService`/`ItemGroupService` (`Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `ItemGroupController` → MediatR. Semua lewat `Application/Features/ItemGroups`:
   - Query: `GetItemGroupDatatableQuery` (termasuk `ItemCount`), `GetItemGroupByIdQuery`, `GetActiveItemGroupsQuery`
   - Command: `CreateItemGroupCommand` (cekal GroupCode ganda), `UpdateItemGroupCommand`, `DeleteItemGroupCommand` (tolak jika dipakai item)

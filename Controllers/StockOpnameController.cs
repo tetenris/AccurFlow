@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.StockOpnames.Commands;
+using AccuFlow.Application.Features.StockOpnames.Queries;
 using AccuFlow.Models.StockOpname;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class StockOpnameController : BaseController
     {
-        private readonly IStockOpnameService _stockOpnameService;
+        private readonly ISender _mediator;
 
-        public StockOpnameController(IStockOpnameService stockOpnameService) : base(stockOpnameService)
+        public StockOpnameController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _stockOpnameService = stockOpnameService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,23 +25,23 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableStockOpnameRequest request) => Json(await _stockOpnameService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableStockOpnameRequest request) => Json(await _mediator.Send(new GetStockOpnameDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _stockOpnameService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetStockOpnameByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetWarehouses() => Json(await _stockOpnameService.GetWarehouses());
+        public async Task<IActionResult> GetWarehouses() => Json(await _mediator.Send(new GetStockOpnameWarehousesQuery()));
 
         [HttpGet]
-        public async Task<IActionResult> GetStockQuantities(Guid warehouseId) => Json(await _stockOpnameService.GetStockQuantities(warehouseId));
+        public async Task<IActionResult> GetStockQuantities(Guid warehouseId) => Json(await _mediator.Send(new GetStockOpnameQuantitiesQuery(warehouseId)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockOpnameRequest request)
         {
             try
             {
-                await _stockOpnameService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateStockOpnameCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock opname created successfully" });
             }
             catch (Exception ex)
@@ -52,7 +55,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockOpnameService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateStockOpnameCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock opname updated successfully" });
             }
             catch (Exception ex)
@@ -66,7 +69,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockOpnameService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostStockOpnameCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock opname posted successfully" });
             }
             catch (Exception ex)
@@ -80,7 +83,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockOpnameService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteStockOpnameCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock opname deleted successfully" });
             }
             catch (Exception ex)
