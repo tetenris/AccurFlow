@@ -4,7 +4,7 @@ Catatan kerja refactor dari pola **tradisional MVC + Service Layer** ke **Clean 
 
 > Branch kerja: `feature/cqrs-refactor`
 > Database target baru: `AccuFlowCqrsDb` (LocalDB)
-> Terakhir diperbarui: 2026-08-19 (perbaikan icon menu root: Sales, Produksi, Master)
+> Terakhir diperbarui: 2026-08-19 (backlog E1 scrollX false selesai — 12/12 lokasi)
 ---
 
 ## 1. Yang Sudah Dikerjakan
@@ -226,6 +226,39 @@ Beberapa icon root menu di `MenuSeed.cs` merujuk kelas yang **tidak ada** di fon
 
 - Nilai di DB (`AccuFlowCqrsDb` & `AccuFlowDb`) di-`UPDATE` langsung karena seeder hanya berjalan saat startup; perubahan seed akan disync ulang oleh `Seeder.SeedMenu` pada restart berikutnya.
 - Verifikasi validitas icon via pengecekan selector `.ki-<name> .path` di `plugins.bundle.css`.
+
+---
+
+### E. Datatable: `scrollX` → `false` (bug geser kolom responsive)
+
+> **CATATAN 2026-08-19** — Bug: pada layar sempit, kolom/icon action bisa bergeser menjauh dari value-nya karena kombinasi `scrollX: true` + `responsive: true` (responsive menyembunyikan kolom sementara scrollX memaksa tabel melebar → render tak sinkron). Solusi terverifikasi di COA: set `scrollX: false`. **Belum dikerjakan untuk halaman lain.**
+>
+> **Keputusan cakupan:** total ada **40 datatable** di `wwwroot/custom/features/`. **13 datatable** eksplisit `scrollX: true` (bermasalah; COA sudah diperbaiki → tersisa 12). **27 datatable** lainnya **tidak menulis `scrollX`** → default DataTables sudah `false`. Untuk **konsistensi eksplisit**, semua 40 ditetapkan `scrollX: false` (12 = perbaikan perilaku, 27 = eksplisit/penegasan, 1 = COA sudah selesai).
+
+**A. Yang masih eksplisit `scrollX: true` → ubah ke `false` (12 lokasi, 10 file):**
+
+| File | Baris |
+|---|---|
+| `customer/index.js` | 14 |
+| `supplier/index.js` | 14 |
+| `user/index.js` | 34 |
+| `role/index.js` | 30 |
+| `journalentry/index.js` | 16 |
+| `memojournal/index.js` | 16 |
+| `generalledger/summary.js` | 10 |
+| `payroll/index.js` | 14, 78 |
+| `production/index.js` | 30, 64 |
+| `serialbatch/index.js` | 13 |
+
+(COA `chartofaccount/index.js` sudah `scrollX: false` — selesai 2026-08-19.)
+
+**B. Yang belum menulis `scrollX` → tambahkan `scrollX: false` eksplisit (27 lokasi, 24 file):**
+
+`agingreport`, `approval`, `cashbank`(2), `deliveryorder`, `fixedasset`, `goodsreceipt`, `inventory/index`, `inventory/stock-card`, `invoice`, `itemgroup`, `itemunit`, `payment`, `purchaseorder`, `purchaserequest`, `receivablepayable`, `return`, `salesorder`, `salesquotation`, `stockminimum`, `stockopname`, `stocktransfer`, `tax`(2), `yearendclosing`(2) — masing-masing `index.js`/`stock-card.js` 1 datatable (kecuali yang bertanda `(2)`), plus 1 datatable kedua di `generalledger/summary.js` yang tidak menulis `scrollX` (summary.js baris lain ikut ditambahkan eksplisit).
+
+Langkah:
+- [x] E1. Semua `scrollX: true` → `scrollX: false` (12 lokasi di 10 file: customer, supplier, user, role, journalentry, memojournal, generalledger/summary, payroll×2, production×2, serialbatch). COA sudah selesai sebelumnya. `rg "scrollX:\\s*true"` → 0 hasil. Selesai 2026-08-19.
+- [ ] E2. Verifikasi manual per halaman: datatable tidak overflow (pakai wrapper `table-responsive`), kolom action tidak bergeser saat layar disempitkan.
 
 ---
 

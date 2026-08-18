@@ -7,7 +7,7 @@ function initializeSummaryTable() {
     $('#ledger_summary_datatable').DataTable({
         processing: true,
         searching: true,
-        scrollX: true,
+        scrollX: false,
         pageLength: 25,
         responsive: true,
         dom: '<"top"lf>rt<"bottom d-flex align-items-center justify-content-between"ip><"clear">',

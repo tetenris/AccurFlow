@@ -27,7 +27,7 @@ $(document).ready(function () {
     const table = $("#role_datatable").DataTable({
         serverSide: true,
         searching: true,
-        scrollX: true,
+        scrollX: false,
         pageLength: 10,
         responsive: true,
         dom: '<"top"lf>rt<"bottom d-flex align-items-center justify-content-between"ip><"clear">',
