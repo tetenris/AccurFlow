@@ -1,5 +1,7 @@
 using AccuFlow.Application.Features.Employees.Commands;
 using AccuFlow.Application.Features.Employees.Queries;
+using AccuFlow.Application.Features.Payrolls.Commands;
+using AccuFlow.Application.Features.Payrolls.Queries;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.Payroll;
 using AccuFlow.Services;
@@ -12,12 +14,10 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class PayrollController : BaseController
     {
-        private readonly IPayrollService _payrollService;
         private readonly ISender _mediator;
 
-        public PayrollController(IPayrollService payrollService, ISender mediator, IBaseService baseService) : base(baseService)
+        public PayrollController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _payrollService = payrollService;
             _mediator = mediator;
         }
 
@@ -64,14 +64,14 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PayrollDatatable([FromBody] BaseDatatableRequest request) => Json(await _payrollService.PayrollDatatable(request));
+        public async Task<IActionResult> PayrollDatatable([FromBody] BaseDatatableRequest request) => Json(await _mediator.Send(new GetPayrollDatatableQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> CreatePayroll([FromBody] CreatePayrollRequest request)
         {
             try
             {
-                await _payrollService.CreatePayroll(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreatePayrollCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = $"Payroll {request.PeriodMonth}/{request.PeriodYear} draft created" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -80,7 +80,7 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPayrollById(Guid id)
         {
-            var data = await _payrollService.GetPayrollById(id);
+            var data = await _mediator.Send(new GetPayrollByIdQuery(id));
             return Json(data);
         }
 
@@ -89,7 +89,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _payrollService.PostPayroll(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostPayrollCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Payroll posted successfully (journal created)" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }
@@ -100,7 +100,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _payrollService.DeletePayroll(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeletePayrollCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Payroll draft deleted" });
             }
             catch (Exception ex) { return BadRequest(new { success = false, message = ex.Message }); }

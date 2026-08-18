@@ -179,7 +179,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetEmployeeDatatableQuery` (search EmployeeCode/FullName/Position/Department + paging)
   - Command: `CreateEmployeeCommand` (cekal EmployeeCode ganda), `UpdateEmployeeCommand` (cekal ganda kecuali diri sendiri), `DeleteEmployeeCommand` (tolak jika sudah ada payroll record)
   - Handler port 1:1 dari `PayrollService`. Method employee dihapus dari interface & class service (kini hanya payroll). Build 0 error.
-- [ ] **B40. HRM / Payroll > Penggajian** (User Manual §11.2) — `Payroll` → buat + post payroll.
+- [x] **B40. HRM / Payroll > Penggajian** (User Manual §11.2) — Selesai. `IPayrollService`/`PayrollService` (`Services/PayrollService.cs`) **DIHAPUS** beserta registrasi DI. `PayrollController` → MediatR penuh (`ISender`). Semua lewat `Application/Features/Payrolls`:
+  - Query: `GetPayrollDatatableQuery` (search PayrollNumber/Notes, sort period, LineCount + JournalNumber), `GetPayrollByIdQuery` (detail + line pegawai)
+  - Command: `CreatePayrollCommand` (no. `PR-yyyymm-NNNN`, cek period ganda, tarik semua pegawai aktif), `PostPayrollCommand` (auto jurnal beban gaji ↔ hutang gaji via `CreateJournalCommand` + `PostJournalCommand`), `DeletePayrollCommand` (soft delete)
+  - Handler port 1:1 dari `PayrollService`. Build 0 error. Modul HRM/Payroll (B39–B40) tuntas.
 - [ ] **B41. Produksi > Bill of Material (BOM)** (User Manual §12.1) — `Production` → BOM.
 - [ ] **B42. Produksi > Production Order** (User Manual §12.2) — `Production` → perintah produksi.
 
