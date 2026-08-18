@@ -16,7 +16,6 @@ namespace AccuFlow.Infrastructures
             
             // Register services
             services.AddScoped<IRoleService, RoleService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<Services.Interfaces.IMenuService, MenuService>();
             services.AddScoped<IChartOfAccountService, ChartOfAccountService>();
             services.AddScoped<IJournalEntryService, JournalEntryService>();

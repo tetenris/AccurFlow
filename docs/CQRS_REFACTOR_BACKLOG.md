@@ -42,7 +42,11 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Logout/Profile tetap di controller (tanpa service).
   Build 0 error; user percobaan `admin` / `Admin123!`.
 - [x] **B2. Dashboard** (User Manual §2) — `HomeController` sudah lepas dari `AppDbContext` langsung → `GetDashboardSummaryQuery` + `GetDashboardSummaryQueryHandler` di `Application/Features/Dashboard` (agregat: Users, Roles, JournalEntries, Invoices, Payments, PurchaseOrders; pakai `IRepository<T>.Query()` + EF async; `IRepository` & `Repository<T>` ditambah `CountAsync`). Controller tinggal `IMediator.Send` + mapping ke `DashboardViewModel`. Build 0 error.
-- [ ] **B3. User Management > Users** (User Manual §3.1) — `User` → CRUD, Unlock/Reset Password, Audit Trail.
+- [x] **B3. User Management > Users** (User Manual §3.1) — Selesai. `UserService` (`IUserService`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. Semua aksi lewat MediatR di `Application/Features/Users`:
+  - Query: `GetUsersDatatableQuery` (datatable + search/filter/sort/paging), `GetUserByIdQuery`, `GetUserRoleDropdownQuery`
+  - Command: `CreateUserCommand`, `UpdateUserCommand`, `UnlockUserCommand` (reset ke `Qwerty@123` + expired), `DeleteUserCommand` (soft delete)
+  - Helper baru `Application/Common/Helpers/SuperAdminCheck` (cek current user Super Administrator, dipakai handler User & Role)
+  Build 0 error.
 - [ ] **B4. User Management > Roles** (User Manual §3.2) — `Role` → CRUD + permission matrix.
 - [ ] **B5. Master > Chart of Accounts (PILOT)** (User Manual §4.1) — `ChartOfAccount` → Command: Create, Update, Delete, ToggleStatus, Import; Query: Paginated, GetById, GetParents, GetHierarchy, GetActive, GenerateCode, ValidateCode; plus DownloadTemplate.
 - [ ] **B6. Master > Customers** (User Manual §4.2) — `Customer` → CRUD, ToggleStatus, Export.

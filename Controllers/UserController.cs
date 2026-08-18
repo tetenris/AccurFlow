@@ -1,6 +1,8 @@
-using AccuFlow.Models.BaseModel;
+using AccuFlow.Application.Features.Users.Commands;
+using AccuFlow.Application.Features.Users.Queries;
 using AccuFlow.Models.User;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,13 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class UserController : BaseController
     {
-        private readonly IUserService _userService;
-        private readonly IRoleService _roleService;
+        private readonly ISender _mediator;
 
-        public UserController(IUserService userService, IRoleService roleService) : base(userService)
+        public UserController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _userService = userService;
-            _roleService = roleService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -26,14 +26,14 @@ namespace AccuFlow.Controllers
         [HttpPost]
         public async Task<IActionResult> Datatable([FromBody] DataTableUserRequest request)
         {
-            var result = await _userService.Datatable(request);
+            var result = await _mediator.Send(new GetUsersDatatableQuery(request));
             return Json(result);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _mediator.Send(new GetUserByIdQuery(id));
             if (user == null)
             {
                 return NotFound(new { success = false, message = "User not found" });
@@ -44,7 +44,7 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRoleDropdown()
         {
-            var roles = await _roleService.GetActiveRolesAsync();
+            var roles = await _mediator.Send(new GetUserRoleDropdownQuery());
             var dropdown = roles.Select(r => new
             {
                 value = r.RoleId.ToString(),
@@ -63,7 +63,7 @@ namespace AccuFlow.Controllers
 
             try
             {
-                await _userService.CreateAsync(model);
+                await _mediator.Send(new CreateUserCommand(model));
                 return Ok(new { success = true, message = "User created successfully" });
             }
             catch (Exception ex)
@@ -82,7 +82,7 @@ namespace AccuFlow.Controllers
 
             try
             {
-                await _userService.UpdateAsync(model);
+                await _mediator.Send(new UpdateUserCommand(model));
                 return Ok(new { success = true, message = "User updated successfully" });
             }
             catch (Exception ex)
@@ -96,7 +96,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _userService.UnlockAsync(id);
+                await _mediator.Send(new UnlockUserCommand(id));
                 return Ok(new { success = true, message = "User unlocked successfully. Password reset to default Qwerty@123 and user must change it on next login." });
             }
             catch (Exception ex)
@@ -110,7 +110,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _userService.DeleteAsync(id);
+                await _mediator.Send(new DeleteUserCommand(id));
                 return Ok(new { success = true, message = "User deleted successfully" });
             }
             catch (Exception ex)

@@ -1,3 +1,4 @@
+using AccuFlow.Application.Common.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AccuFlow.Application
@@ -8,6 +9,8 @@ namespace AccuFlow.Application
         {
             // MediatR will pick up all handlers from this assembly
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ApplicationModule).Assembly));
+
+            services.AddScoped<ISuperAdminCheck, SuperAdminCheck>();
 
             return services;
         }
