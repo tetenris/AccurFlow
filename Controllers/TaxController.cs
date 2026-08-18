@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Taxes.Commands;
+using AccuFlow.Application.Features.Taxes.Queries;
 using AccuFlow.Models.Tax;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class TaxController : BaseController
     {
-        private readonly ITaxService _taxService;
+        private readonly ISender _mediator;
 
-        public TaxController(ITaxService taxService) : base(taxService)
+        public TaxController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _taxService = taxService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,20 +25,20 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableTaxRequest request) => Json(await _taxService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableTaxRequest request) => Json(await _mediator.Send(new GetTaxDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _taxService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetTaxByIdQuery(id)));
 
         [HttpPost]
-        public async Task<IActionResult> VatReport([FromBody] VatReportRequest request) => Json(await _taxService.VatReport(request));
+        public async Task<IActionResult> VatReport([FromBody] VatReportRequest request) => Json(await _mediator.Send(new GetVatReportQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTaxRequest request)
         {
             try
             {
-                await _taxService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateTaxCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Tax created successfully" });
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _taxService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateTaxCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Tax updated successfully" });
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _taxService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteTaxCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Tax deleted successfully" });
             }
             catch (Exception ex)

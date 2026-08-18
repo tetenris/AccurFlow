@@ -97,7 +97,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 - [x] **B16. Accounting > Receivable & Payable** (User Manual §5.9) — Selesai. `IReceivablePayableService`/`ReceivablePayableService` (di `Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `ReceivablePayableController` → MediatR (`ISender`). Semua lewat `Application/Features/ReceivablePayables`:
   - Query: `GetReceivablePayableQuery` (AR/AP per invoice, outstanding = Total - Paid, status Overdue/Open)
   - Handler port 1:1 dari `ReceivablePayableService`. Build 0 error.
-- [ ] **B17. Accounting > Taxes** (User Manual §5.10) — `Tax` → CRUD pajak + laporan PPN.
+- [x] **B17. Accounting > Taxes** (User Manual §5.10) — Selesai. `ITaxService`/`TaxService` (di `Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `TaxController` → MediatR (`ISender`). Semua lewat `Application/Features/Taxes`:
+  - Query: `GetTaxDatatableQuery` (search/filter/paging), `GetTaxByIdQuery`, `GetVatReportQuery` (laporan PPN: DPP + Output/Input VAT dari invoice posted, anonim object `{ lines, summary }`)
+  - Command: `CreateTaxCommand` (cek duplikasi kode), `UpdateTaxCommand`, `DeleteTaxCommand` (soft delete)
+  - Handler port 1:1 dari `TaxService`. Build 0 error.
 - [ ] **B18. Accounting > Fixed Assets** (User Manual §5.11) — `FixedAsset` → daftar aset + penyusutan.
 - [ ] **B19. Accounting > Year-End Closing** (User Manual §5.12) — `YearEndClosing` → tutup tahun + jurnal otomatis.
 - [ ] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — `MemoJournal` → memo/adjustment.
