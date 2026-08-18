@@ -1,4 +1,5 @@
-﻿using AccuFlow.Application.Features.JournalEntries.Commands;
+﻿using AccuFlow.Application.Features.ChartOfAccounts.Queries;
+using AccuFlow.Application.Features.JournalEntries.Commands;
 using AccuFlow.Application.Features.JournalEntries.Queries;
 using AccuFlow.Models.JournalEntry;
 using AccuFlow.Services;
@@ -14,17 +15,14 @@ namespace AccuFlow.Controllers
     public class JournalEntryController : BaseController
     {
         private readonly ISender _mediator;
-        private readonly IChartOfAccountService _chartOfAccountService;
         private readonly AccuFlow.Infrastructure.Persistence.AppDbContext _dbContext;
 
         public JournalEntryController(
             ISender mediator,
-            IChartOfAccountService chartOfAccountService,
             AccuFlow.Infrastructure.Persistence.AppDbContext dbContext,
             IBaseService baseService) : base(baseService)
         {
             _mediator = mediator;
-            _chartOfAccountService = chartOfAccountService;
             _dbContext = dbContext;
         }
 
@@ -173,7 +171,7 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAccountDropdown()
         {
-            var accounts = await _chartOfAccountService.GetDetailAccountsAsync();
+            var accounts = await _mediator.Send(new GetCoaDetailAccountsQuery());
             var dropdown = accounts
                 .Select(x => new
                 {
@@ -202,14 +200,14 @@ namespace AccuFlow.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckAccounts()
         {
-            var allAccounts = await _chartOfAccountService.Datatable(new Models.ChartOfAccount.DataTableChartOfAccountRequest 
+            var allAccounts = await _mediator.Send(new GetCoaDatatableQuery(new Models.ChartOfAccount.DataTableChartOfAccountRequest 
             { 
                 Draw = 1, 
                 Page = 1, 
                 Size = 100 
-            });
+            }));
             
-            var detailAccounts = await _chartOfAccountService.GetDetailAccountsAsync();
+            var detailAccounts = await _mediator.Send(new GetCoaDetailAccountsQuery());
             
             return Json(new 
             { 

@@ -4,7 +4,7 @@ Catatan kerja refactor dari pola **tradisional MVC + Service Layer** ke **Clean 
 
 > Branch kerja: `feature/cqrs-refactor`
 > Database target baru: `AccuFlowCqrsDb` (LocalDB)
-> Terakhir diperbarui: 2026-08-18
+> Terakhir diperbarui: 2026-08-18 (tambah backlog D: cleanup service tersisa)
 ---
 
 ## 1. Yang Sudah Dikerjakan
@@ -196,6 +196,21 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 
 - [ ] **C1. Smoke test runtime** — login, CRUD COA, import template, laporan dasar.
 - [ ] **C2. Uji multi-provider** (opsional) — coba `Database:Provider=Postgres` / `MySql` dengan connection string masing-masing.
+
+### D. Bersihkan Service Lama yang Tersisa → CQRS (pasca B1–B42)
+
+Hasil verifikasi `Services/` (2026-08-18): hanya ada 6 file service tersisa. Rincian pemakaian aktual & rencana migrasi:
+
+1. [x] **`IChartOfAccountService`/`ChartOfAccountService` — migrasi, lalu hapus.** Selesai 2026-08-18. Tiga titik dipakai alihkan ke query CQRS:
+   - `JournalEntryController.GetAccountDropdown()` → `GetCoaDetailAccountsQuery` (query **baru**, port 1:1 dari `GetDetailAccountsAsync` — filter `!IsHeader && IsActive`; tidak bisa pakai `GetCoaActiveAccountsQuery` karena itu menyertakan header)
+   - `JournalEntryController.CheckAccounts()` → `GetCoaDatatableQuery` + `GetCoaDetailAccountsQuery`
+   - `GeneralLedgerController.ExportLedger()` → `GetCoaByIdQuery`
+   - `Services/ChartOfAccountService.cs` **DIHAPUS** + registrasi DI (`AppServiceCollection.cs`) dihapus. Build 0 error.
+2. [ ] **`IMenuService`/`MenuService` — migrasi ke CQRS.** Dipakai sidebar via `@inject` di `Views/Shared/_Sidebar.cshtml` & `_Sidebar_Simple.cshtml` (`GetMenuHierarchyAsync` / `GetMenuHierarchyByRoleAsync`). Rencana: `Application/Features/Menus` → `GetMenuHierarchyQuery` (bisa filter role), view injeksi `ISender`; hapus `MenuService.cs` + `IMenuService.cs` + DI.
+3. [ ] **`IDocumentAttachmentService`/`DocumentAttachmentService` — migrasi ke CQRS.** Dipakai `DocumentAttachmentController` (`Datatable`, `GetByDocument`, `Upload` [IFormFile + config `Storage:*`], `Download`, `Delete`). Rencana: `Application/Features/DocumentAttachments` → `GetAttachmentDatatableQuery`, `GetAttachmentsByDocumentQuery`, `UploadAttachmentCommand`, `GetAttachmentFileQuery`, `DeleteAttachmentCommand`; controller → `ISender`; hapus `InventoryAndWorkflowServices.cs` + DI.
+4. [ ] **Hapus `IJournalEntryService`/`JournalEntryService` (file `JournalEntryService.cs`).** Setelah semua pemakai bermigrasi (Invoice B12, Payment B13, CashBank B36–B38, Return B15, GoodsReceipt B26, FixedAsset B18, Payroll B40, Production B42, YearEndClosing B19, MemoJournal B20), tidak ada controller/service yang meng-inject lagi (grep terverifikasi). Catatan lama B8/B20 yang menulis "dipertahankan karena masih dipakai …" **tidak berlaku lagi**. Hapus file + DI (`AppServiceCollection.cs`).
+5. [ ] **Hapus `IGeneralLedgerService`/`GeneralLedgerService` (2 file).** Setelah TrialBalance B10, FinancialStatement B11, CashBank B36, YearEndClosing B19 memakai helper/query sendiri, tidak ada yang meng-inject (grep terverifikasi). Hapus 2 file + DI (`AppServiceCollection.cs`).
+6. [ ] **`BaseService`/`IBaseService` — dipertahankan (foundation).** Dipakai seluruh ~35 controller via `BaseController` (konstruktor). Migrasi total menyentuh `BaseController` + semua controller → di luar cakupan backlog D, dievaluasi terpisah.
 
 ---
 

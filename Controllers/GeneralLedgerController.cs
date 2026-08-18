@@ -1,6 +1,7 @@
+using AccuFlow.Application.Features.ChartOfAccounts.Queries;
 using AccuFlow.Application.Features.GeneralLedgers.Queries;
-using AccuFlow.Services;
 using AccuFlow.Models.GeneralLedger;
+using AccuFlow.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,15 +12,12 @@ namespace AccuFlow.Controllers;
 public class GeneralLedgerController : BaseController
 {
     private readonly ISender _mediator;
-    private readonly IChartOfAccountService _chartOfAccountService;
 
     public GeneralLedgerController(
         ISender mediator,
-        IChartOfAccountService chartOfAccountService,
         IBaseService baseService) : base(baseService)
     {
         _mediator = mediator;
-        _chartOfAccountService = chartOfAccountService;
     }
 
     public IActionResult Index()
@@ -83,7 +81,7 @@ public class GeneralLedgerController : BaseController
         try
         {
             var fileBytes = await _mediator.Send(new ExportLedgerQuery(request));
-            var account = await _chartOfAccountService.GetByIdAsync(request.AccountId);
+            var account = await _mediator.Send(new GetCoaByIdQuery(request.AccountId));
             var fileName = $"Ledger_{account?.AccountCode}_{DateTime.Now:yyyyMMdd}.xlsx";
             return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
