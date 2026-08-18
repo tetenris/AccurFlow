@@ -114,7 +114,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetQuotationDatatableQuery`, `GetQuotationByIdQuery`, `GetApprovedQuotesQuery`
   - Command: `CreateQuotationCommand` (nomor `QT-xxxxx`), `UpdateQuotationCommand` (soft-delete line lama), `DeleteQuotationCommand`, `ApproveQuotationCommand`
   - Handler port 1:1 dari `QuotationService`. Build 0 error.
-- [ ] **B22. Sales > Sales Order** (User Manual §6.2) — `SalesOrder` → draft/approve, generate dari quotation.
+- [x] **B22. Sales > Sales Order** (User Manual §6.2) — Selesai. `ISalesOrderService`/`SalesOrderService` (`Services/SalesFlowServices.cs`) **DIHAPUS** beserta registrasi DI (`SalesFlowServices.cs` kini hanya berisi DeliveryOrderService). `SalesOrderController` → MediatR. Semua lewat `Application/Features/SalesOrders`:
+  - Query: `GetOrderDatatableQuery`, `GetOrderByIdQuery`, `GetOrderQuoteByIdQuery` (quote approved utk generate order); `GetApprovedQuotes` reuse `GetApprovedQuotesQuery` (SalesQuotations)
+  - Command: `CreateOrderCommand` (nomor `SO-xxxxx`), `UpdateOrderCommand`, `DeleteOrderCommand`, `ApproveOrderCommand`
+  - Handler port 1:1 dari `SalesOrderService`. Build 0 error.
 - [ ] **B23. Sales > Delivery Order** (User Manual §6.3) — `DeliveryOrder` → draft/post (kurangi stok), convert ke sales invoice.
 - [ ] **B24. Purchasing > Purchase Request** (User Manual §7.1) — `PurchaseRequest` → draft/approve, convert ke PO.
 - [ ] **B25. Purchasing > Purchase Orders** (User Manual §7.2) — `PurchaseOrder` → draft/approve/convert/print.
