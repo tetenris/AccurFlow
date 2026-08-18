@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.ItemGroups.Commands;
+using AccuFlow.Application.Features.ItemGroups.Queries;
 using AccuFlow.Models.Inventory;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ItemGroupController : BaseController
     {
-        private readonly IItemGroupService _itemGroupService;
+        private readonly ISender _mediator;
 
-        public ItemGroupController(IItemGroupService itemGroupService) : base(itemGroupService)
+        public ItemGroupController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _itemGroupService = itemGroupService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,20 +25,20 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableItemGroupRequest request) => Json(await _itemGroupService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableItemGroupRequest request) => Json(await _mediator.Send(new GetItemGroupDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _itemGroupService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetItemGroupByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetActiveGroups() => Json(await _itemGroupService.GetActiveGroups());
+        public async Task<IActionResult> GetActiveGroups() => Json(await _mediator.Send(new GetActiveItemGroupsQuery()));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateItemGroupRequest request)
         {
             try
             {
-                await _itemGroupService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateItemGroupCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Item group created successfully" });
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _itemGroupService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateItemGroupCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Item group updated successfully" });
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _itemGroupService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteItemGroupCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Item group deleted successfully" });
             }
             catch (Exception ex)

@@ -138,9 +138,12 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetItemsDatatableQuery`, `GetActiveItemsQuery`, `GetStockCardQuery` (riwayat StockMovement), `GetStockMinimumQuery` (hitung stok & flag below reorder point)
   - Command: `CreateItemCommand` (cekal ItemCode ganda), `UpdateReorderPointCommand`
   - Handler port 1:1 dari `InventoryService`. Build 0 error.
-- [ ] **B28. Inventory > Stock Card** (User Manual §8.2) — `Inventory` → riwayat pergerakan stok.
+- [x] **B28. Inventory > Stock Card** (User Manual §8.2) — Selesai. Ditangani bersama B27: `GetStockCardQuery` (`Application/Features/Items`) menggantikan `InventoryService.StockCard`. Build 0 error.
 - [ ] **B29. Inventory > Stock Opname** (User Manual §8.3) — `StockOpname` → stok fisik + adjustment.
-- [ ] **B30. Inventory > Item Groups** (User Manual §8.4) — `ItemGroup` → CRUD grup barang.
+- [x] **B30. Inventory > Item Groups** (User Manual §8.4) — Selesai. `IItemGroupService`/`ItemGroupService` (`Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `ItemGroupController` → MediatR. Semua lewat `Application/Features/ItemGroups`:
+  - Query: `GetItemGroupDatatableQuery` (termasuk `ItemCount`), `GetItemGroupByIdQuery`, `GetActiveItemGroupsQuery`
+  - Command: `CreateItemGroupCommand` (cekal GroupCode ganda), `UpdateItemGroupCommand`, `DeleteItemGroupCommand` (tolak jika dipakai item)
+  - Handler port 1:1 dari `ItemGroupService`. Build 0 error.
 - [ ] **B31. Inventory > Units** (User Manual §8.5) — `ItemUnit` → CRUD satuan.
 - [ ] **B32. Inventory > Stock Transfer** (User Manual §8.6) — `StockTransfer` → mutasi antar gudang.
 - [ ] **B33. Inventory > Stock Minimum** (User Manual §8.7) — `StockMinimum` → reorder point.
