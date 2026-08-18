@@ -110,7 +110,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CloseYearEndClosingCommand` (cekal fiscal year ganda, tutup akun revenue/expense → `RetainedEarnings`, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`)
   - Handler port 1:1 dari `YearEndClosingService`. Build 0 error.
 - [x] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — Selesai. `MemoJournalController` → MediatR (`ISender`). Reuse fitur `JournalEntries` yang sudah CQRS: `GetJournalDatatableQuery`, `GetJournalByIdQuery`, `CreateJournalCommand`, `UpdateJournalCommand`, `PostJournalCommand`, `ReverseJournalCommand`, `GenerateJournalNumberQuery`; dropdown akun via `GetCoaActiveAccountsQuery`. `IJournalEntryService`/`IChartOfAccountService` **tetap** (masih dipakai controller/service lain). Build 0 error.
-- [ ] **B21. Sales > Sales Quotation** (User Manual §6.1) — `SalesQuotation` → draft/approve, from quote → order.
+- [x] **B21. Sales > Sales Quotation** (User Manual §6.1) — Selesai. `IQuotationService`/`QuotationService` (`Services/SalesFlowServices.cs`) **DIHAPUS** beserta registrasi DI. `SalesQuotationController` → MediatR. Semua lewat `Application/Features/SalesQuotations`:
+  - Query: `GetQuotationDatatableQuery`, `GetQuotationByIdQuery`, `GetApprovedQuotesQuery`
+  - Command: `CreateQuotationCommand` (nomor `QT-xxxxx`), `UpdateQuotationCommand` (soft-delete line lama), `DeleteQuotationCommand`, `ApproveQuotationCommand`
+  - Handler port 1:1 dari `QuotationService`. Build 0 error.
 - [ ] **B22. Sales > Sales Order** (User Manual §6.2) — `SalesOrder` → draft/approve, generate dari quotation.
 - [ ] **B23. Sales > Delivery Order** (User Manual §6.3) — `DeliveryOrder` → draft/post (kurangi stok), convert ke sales invoice.
 - [ ] **B24. Purchasing > Purchase Request** (User Manual §7.1) — `PurchaseRequest` → draft/approve, convert ke PO.

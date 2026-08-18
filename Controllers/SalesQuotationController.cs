@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.SalesQuotations.Commands;
+using AccuFlow.Application.Features.SalesQuotations.Queries;
 using AccuFlow.Models.Quotation;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class SalesQuotationController : BaseController
     {
-        private readonly IQuotationService _quotationService;
+        private readonly ISender _mediator;
 
-        public SalesQuotationController(IQuotationService quotationService) : base(quotationService)
+        public SalesQuotationController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _quotationService = quotationService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,20 +25,20 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableQuotationRequest request) => Json(await _quotationService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableQuotationRequest request) => Json(await _mediator.Send(new GetQuotationDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _quotationService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetQuotationByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetApprovedQuotes() => Json(await _quotationService.GetApprovedQuotes());
+        public async Task<IActionResult> GetApprovedQuotes() => Json(await _mediator.Send(new GetApprovedQuotesQuery()));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateQuotationRequest request)
         {
             try
             {
-                await _quotationService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateQuotationCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Quotation created successfully" });
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _quotationService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateQuotationCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Quotation updated successfully" });
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _quotationService.Approve(id, _currentUserService!.UserId);
+                await _mediator.Send(new ApproveQuotationCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Quotation approved successfully" });
             }
             catch (Exception ex)
@@ -77,7 +80,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _quotationService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteQuotationCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Quotation deleted successfully" });
             }
             catch (Exception ex)
