@@ -151,7 +151,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetUnitDatatableQuery` (search UnitCode/UnitName), `GetUnitByIdQuery`, `GetActiveUnitsQuery`
   - Command: `CreateUnitCommand` (cekal UnitCode ganda), `UpdateUnitCommand`, `DeleteUnitCommand`
   - Handler port 1:1 dari `ItemUnitService`. Build 0 error.
-- [ ] **B32. Inventory > Stock Transfer** (User Manual §8.6) — `StockTransfer` → mutasi antar gudang.
+- [x] **B32. Inventory > Stock Transfer** (User Manual §8.6) — Selesai. `IStockTransferService`/`StockTransferService` (`Services/StockTransferService.cs`) **DIHAPUS** beserta registrasi DI. `StockTransferController` → MediatR. Semua lewat `Application/Features/StockTransfers`:
+  - Query: `GetStockTransferDatatableQuery` (filter Status/WarehouseId/DateFrom/DateTo + Search), `GetStockTransferByIdQuery`, `GetStockTransferWarehousesQuery`
+  - Command: `CreateStockTransferCommand` (no. `ST-{D5}`), `UpdateStockTransferCommand`, `PostStockTransferCommand` (cek stok tersedia → StockMovement "Stock Transfer Out/In"), `DeleteStockTransferCommand`
+  - Handler port 1:1 dari `StockTransferService`. Build 0 error.
 - [ ] **B33. Inventory > Stock Minimum** (User Manual §8.7) — `StockMinimum` → reorder point.
 - [ ] **B34. Inventory > Serial Number / Batch** (User Manual §8.8) — `SerialBatch` → register lot/serial, consume.
 - [ ] **B35. Approvals** (User Manual §9) — `Approval` → submit/approve/reject.

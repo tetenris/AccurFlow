@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.StockTransfers.Commands;
+using AccuFlow.Application.Features.StockTransfers.Queries;
 using AccuFlow.Models.StockTransfer;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class StockTransferController : BaseController
     {
-        private readonly IStockTransferService _stockTransferService;
+        private readonly ISender _mediator;
 
-        public StockTransferController(IStockTransferService stockTransferService) : base(stockTransferService)
+        public StockTransferController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _stockTransferService = stockTransferService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,20 +25,20 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableStockTransferRequest request) => Json(await _stockTransferService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableStockTransferRequest request) => Json(await _mediator.Send(new GetStockTransferDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _stockTransferService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetStockTransferByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetWarehouses() => Json(await _stockTransferService.GetWarehouses());
+        public async Task<IActionResult> GetWarehouses() => Json(await _mediator.Send(new GetStockTransferWarehousesQuery()));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateStockTransferRequest request)
         {
             try
             {
-                await _stockTransferService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateStockTransferCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock transfer created successfully" });
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockTransferService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateStockTransferCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock transfer updated successfully" });
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockTransferService.Post(id, _currentUserService!.UserId);
+                await _mediator.Send(new PostStockTransferCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock transfer posted successfully" });
             }
             catch (Exception ex)
@@ -77,7 +80,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _stockTransferService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteStockTransferCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Stock transfer deleted successfully" });
             }
             catch (Exception ex)
