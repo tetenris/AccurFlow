@@ -1,5 +1,7 @@
+using AccuFlow.Application.Features.ReceivablePayables.Queries;
 using AccuFlow.Models.ReceivablePayable;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +10,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ReceivablePayableController : BaseController
     {
-        private readonly IReceivablePayableService _receivablePayableService;
+        private readonly ISender _mediator;
 
-        public ReceivablePayableController(IReceivablePayableService receivablePayableService) : base(receivablePayableService)
+        public ReceivablePayableController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _receivablePayableService = receivablePayableService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,6 +24,6 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Generate([FromBody] ReceivablePayableRequest request) => Json(await _receivablePayableService.GetDetail(request));
+        public async Task<IActionResult> Generate([FromBody] ReceivablePayableRequest request) => Json(await _mediator.Send(new GetReceivablePayableQuery(request)));
     }
 }

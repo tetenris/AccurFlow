@@ -94,7 +94,9 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetReturnDatatableQuery` (filter return type/status/search), `GetReturnByIdQuery` (detail + line + jurnal), `GetReturnWarehousesQuery`, `GetReturnInvoicesQuery` (invoice posted yang masih punya sisa qty), `GetReturnInvoiceLinesQuery` (sisa qty per line)
   - Command: `CreateReturnCommand` (auto number `SR-`/`PR-`), `UpdateReturnCommand`, `PostReturnCommand` (validasi qty vs invoice, buat `StockMovement`, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`), `DeleteReturnCommand`
   - Helper baru `Application/Features/Returns/Helpers/ReturnHelper` (akumulasi qty yang sudah di-return per invoice line, dipakai 3 handler). Handler port 1:1 dari `ReturnService`. Build 0 error.
-- [ ] **B16. Accounting > Receivable & Payable** (User Manual §5.9) — `ReceivablePayable` → detail AR/AP per invoice.
+- [x] **B16. Accounting > Receivable & Payable** (User Manual §5.9) — Selesai. `IReceivablePayableService`/`ReceivablePayableService` (di `Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI. `ReceivablePayableController` → MediatR (`ISender`). Semua lewat `Application/Features/ReceivablePayables`:
+  - Query: `GetReceivablePayableQuery` (AR/AP per invoice, outstanding = Total - Paid, status Overdue/Open)
+  - Handler port 1:1 dari `ReceivablePayableService`. Build 0 error.
 - [ ] **B17. Accounting > Taxes** (User Manual §5.10) — `Tax` → CRUD pajak + laporan PPN.
 - [ ] **B18. Accounting > Fixed Assets** (User Manual §5.11) — `FixedAsset` → daftar aset + penyusutan.
 - [ ] **B19. Accounting > Year-End Closing** (User Manual §5.12) — `YearEndClosing` → tutup tahun + jurnal otomatis.

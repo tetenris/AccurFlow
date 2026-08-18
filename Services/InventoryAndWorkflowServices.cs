@@ -170,39 +170,6 @@ namespace AccuFlow.Services
     }
 
 
-    public interface IReceivablePayableService : IBaseService
-    {
-        Task<List<ReceivablePayableViewModel>> GetDetail(ReceivablePayableRequest request);
-    }
-
-    public class ReceivablePayableService : BaseService, IReceivablePayableService
-    {
-        public ReceivablePayableService(AppDbContext dbContext) : base(dbContext) { }
-
-        public async Task<List<ReceivablePayableViewModel>> GetDetail(ReceivablePayableRequest request)
-        {
-            var query = _dbContext.Invoices.Include(x => x.Customer).Include(x => x.Supplier)
-                .Where(x => !x.IsDeleted && x.Status != "Cancelled" && x.TotalAmount > x.PaidAmount);
-            query = request.ReportType == "AP" ? query.Where(x => x.InvoiceType == "Purchase") : query.Where(x => x.InvoiceType == "Sales");
-            var invoices = await query.ToListAsync();
-            return invoices.Select(x =>
-            {
-                var outstanding = x.TotalAmount - x.PaidAmount;
-                return new ReceivablePayableViewModel
-                {
-                    PartnerCode = x.Customer != null ? x.Customer.CustomerCode : x.Supplier != null ? x.Supplier.SupplierCode : string.Empty,
-                    PartnerName = x.Customer != null ? x.Customer.CustomerName : x.Supplier != null ? x.Supplier.SupplierName : string.Empty,
-                    InvoiceNumber = x.InvoiceNumber,
-                    InvoiceDate = x.InvoiceDate,
-                    DueDate = x.DueDate,
-                    TotalAmount = x.TotalAmount,
-                    PaidAmount = x.PaidAmount,
-                    OutstandingAmount = outstanding,
-                    Status = x.DueDate.Date < request.AsOfDate.Date ? "Overdue" : "Open"
-                };
-            }).OrderBy(x => x.PartnerName).ThenBy(x => x.DueDate).ToList();
-        }
-    }
 
     public interface IApprovalService : IBaseService
     {
