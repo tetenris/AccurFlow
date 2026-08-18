@@ -22,7 +22,6 @@ namespace AccuFlow.Infrastructures
             services.AddScoped<ICashBankService, CashBankService>();
             services.AddScoped<IPayrollService, PayrollService>();
             services.AddScoped<IProductionService, ProductionService>();
-            services.AddScoped<IApprovalService, ApprovalService>();
             services.AddScoped<IDocumentAttachmentService, DocumentAttachmentService>();
 
             return services;

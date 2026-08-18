@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Approvals.Commands;
+using AccuFlow.Application.Features.Approvals.Queries;
 using AccuFlow.Models.Approval;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ApprovalController : BaseController
     {
-        private readonly IApprovalService _approvalService;
+        private readonly ISender _mediator;
 
-        public ApprovalController(IApprovalService approvalService) : base(approvalService)
+        public ApprovalController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _approvalService = approvalService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,26 +25,26 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableApprovalRequest request) => Json(await _approvalService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableApprovalRequest request) => Json(await _mediator.Send(new GetApprovalDatatableQuery(request)));
 
         [HttpPost]
         public async Task<IActionResult> Submit([FromBody] SubmitApprovalRequest request)
         {
-            await _approvalService.Submit(request, _currentUserService!.UserId);
+            await _mediator.Send(new SubmitApprovalCommand(request, _currentUserService!.UserId));
             return Ok(new { success = true, message = "Approval submitted successfully" });
         }
 
         [HttpPost]
         public async Task<IActionResult> Approve([FromBody] ApprovalActionRequest request)
         {
-            await _approvalService.Approve(request, _currentUserService!.UserId);
+            await _mediator.Send(new ApproveApprovalCommand(request, _currentUserService!.UserId));
             return Ok(new { success = true, message = "Document approved successfully" });
         }
 
         [HttpPost]
         public async Task<IActionResult> Reject([FromBody] ApprovalActionRequest request)
         {
-            await _approvalService.Reject(request, _currentUserService!.UserId);
+            await _mediator.Send(new RejectApprovalCommand(request, _currentUserService!.UserId));
             return Ok(new { success = true, message = "Document rejected successfully" });
         }
     }

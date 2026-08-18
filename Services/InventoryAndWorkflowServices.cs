@@ -1,88 +1,11 @@
 using AccuFlow.Infrastructure.Persistence;
 using AccuFlow.Domain.Entities;
-using AccuFlow.Models.AgingReport;
-using AccuFlow.Models.Approval;
 using AccuFlow.Models.BaseModel;
 using AccuFlow.Models.DocumentAttachment;
-using AccuFlow.Models.Inventory;
-using AccuFlow.Models.ReceivablePayable;
-using AccuFlow.Models.Tax;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccuFlow.Services
 {
-    public interface IApprovalService : IBaseService
-    {
-        Task<BaseDatatableResponse> Datatable(DataTableApprovalRequest request);
-        Task Submit(SubmitApprovalRequest request, Guid userId);
-        Task Approve(ApprovalActionRequest request, Guid userId);
-        Task Reject(ApprovalActionRequest request, Guid userId);
-    }
-
-    public class ApprovalService : BaseService, IApprovalService
-    {
-        public ApprovalService(AppDbContext dbContext) : base(dbContext) { }
-
-        public async Task<BaseDatatableResponse> Datatable(DataTableApprovalRequest request)
-        {
-            var query = _dbContext.ApprovalRequests.Include(x => x.RequestedByUser).Where(x => !x.IsDeleted);
-            if (!string.IsNullOrWhiteSpace(request.DocumentType)) query = query.Where(x => x.DocumentType == request.DocumentType);
-            if (!string.IsNullOrWhiteSpace(request.Status)) query = query.Where(x => x.Status == request.Status);
-            var total = await query.CountAsync();
-            var data = await query.OrderByDescending(x => x.RequestedAt).Skip((request.Page - 1) * request.Size).Take(request.Size)
-                .Select(x => new ApprovalRequestViewModel
-                {
-                    ApprovalRequestId = x.ApprovalRequestId,
-                    DocumentType = x.DocumentType,
-                    DocumentId = x.DocumentId,
-                    Status = x.Status,
-                    RequestedByName = x.RequestedByUser.FullName,
-                    RequestedAt = x.RequestedAt,
-                    Notes = x.Notes
-                }).ToListAsync();
-            return new BaseDatatableResponse { Draw = request.Draw, RecordsTotal = total, RecordsFiltered = total, Data = data };
-        }
-
-        public async Task Submit(SubmitApprovalRequest request, Guid userId)
-        {
-            _dbContext.ApprovalRequests.Add(new ApprovalRequestEntity
-            {
-                ApprovalRequestId = Guid.NewGuid(),
-                DocumentType = request.DocumentType,
-                DocumentId = request.DocumentId,
-                Status = "Pending",
-                RequestedBy = userId,
-                RequestedAt = DateTime.UtcNow,
-                CurrentApproverId = request.CurrentApproverId,
-                Notes = request.Notes,
-                CreatedBy = userId.ToString()
-            });
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public Task Approve(ApprovalActionRequest request, Guid userId) => ChangeStatus(request, userId, "Approved");
-        public Task Reject(ApprovalActionRequest request, Guid userId) => ChangeStatus(request, userId, "Rejected");
-
-        private async Task ChangeStatus(ApprovalActionRequest request, Guid userId, string status)
-        {
-            var approval = await _dbContext.ApprovalRequests.FirstOrDefaultAsync(x => x.ApprovalRequestId == request.ApprovalRequestId && !x.IsDeleted);
-            if (approval == null) throw new Exception("Approval request not found");
-            approval.Status = status;
-            approval.UpdatedBy = userId.ToString();
-            _dbContext.ApprovalHistories.Add(new ApprovalHistoryEntity
-            {
-                ApprovalHistoryId = Guid.NewGuid(),
-                ApprovalRequestId = approval.ApprovalRequestId,
-                ApproverId = userId,
-                Action = status,
-                ActionAt = DateTime.UtcNow,
-                Notes = request.Notes,
-                CreatedBy = userId.ToString()
-            });
-            await _dbContext.SaveChangesAsync();
-        }
-    }
-
     public interface IDocumentAttachmentService : IBaseService
     {
         Task<BaseDatatableResponse> Datatable(DataTableDocumentAttachmentRequest request);

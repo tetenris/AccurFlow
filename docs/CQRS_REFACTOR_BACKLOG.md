@@ -160,7 +160,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetStockBatchDatatableQuery` (filter ItemId + Search; Status Available/Partial/Out), `GetStockBatchItemsQuery` (hanya item tipe Inventory)
   - Command: `CreateStockBatchCommand` (register batch/serial), `ConsumeStockBatchCommand` (cekal melebihi RemainingQuantity), `DeleteStockBatchCommand` (tolak batch sudah terpakai)
   - Handler port 1:1 dari `StockBatchService`. Build 0 error.
-- [ ] **B35. Approvals** (User Manual §9) — `Approval` → submit/approve/reject.
+- [x] **B35. Approvals** (User Manual §9) — Selesai. `IApprovalService`/`ApprovalService` (`Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI (file kini hanya berisi `IDocumentAttachmentService`). `ApprovalController` → MediatR (`ISender`). Semua lewat `Application/Features/Approvals`:
+  - Query: `GetApprovalDatatableQuery` (filter DocumentType/Status + paging, resolve nama requester)
+  - Command: `SubmitApprovalCommand` (status Pending, CurrentApproverId), `ApproveApprovalCommand` (status Approved + riwayat), `RejectApprovalCommand` (status Rejected + riwayat)
+  - Handler port 1:1 dari `ApprovalService`. Build 0 error.
 - [ ] **B36. Kas & Bank > Cash & Bank Accounts** (User Manual §10.1) — `CashBank` → list akun + saldo.
 - [ ] **B37. Kas & Bank > Cash Bank Transfers** (User Manual §10.2) — `CashBank` → transfer antar akun.
 - [ ] **B38. Kas & Bank > Bank Reconciliation** (User Manual §10.3) — `CashBank` → rekonsiliasi bank.
