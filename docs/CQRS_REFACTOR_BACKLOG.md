@@ -5,7 +5,6 @@ Catatan kerja refactor dari pola **tradisional MVC + Service Layer** ke **Clean 
 > Branch kerja: `feature/cqrs-refactor`
 > Database target baru: `AccuFlowCqrsDb` (LocalDB)
 > Terakhir diperbarui: 2026-08-18
-
 ---
 
 ## 1. Yang Sudah Dikerjakan
@@ -52,8 +51,14 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Command: `CreateRoleCommand`, `EditRoleCommand` (cek active users, role type change, deactivate guard), `DeleteRoleCommand` (soft delete role + role menus, cek user assigned), `SaveRoleMenuPermissionsCommand` (replace permission), `FixRoleTypeDataCommand`
   Build 0 error (25 warning).
   - **UI Role (2026-08-18)**: halaman Edit (pensil) hanya untuk edit info role (description + active); halaman `Permissions` (kunci) terpisah untuk manage access control (`/Role/Permissions`); **Delete role dihapus** (controller action + `DeleteRoleCommand` + handler + tombol).
-- [ ] **B5. Master > Chart of Accounts (PILOT)** (User Manual §4.1) — `ChartOfAccount` → Command: Create, Update, Delete, ToggleStatus, Import; Query: Paginated, GetById, GetParents, GetHierarchy, GetActive, GenerateCode, ValidateCode; plus DownloadTemplate.
-- [ ] **B6. Master > Customers** (User Manual §4.2) — `Customer` → CRUD, ToggleStatus, Export.
+- [x] **B5. Master > Chart of Accounts (PILOT)** (User Manual §4.1) — Selesai. `ChartOfAccountController` lepas dari `IChartOfAccountService` → MediatR (`ISender`). Semua lewat `Application/Features/ChartOfAccounts`:
+  - Command: `CreateCoaCommand`, `UpdateCoaCommand`, `DeleteCoaCommand`, `ToggleCoaStatusCommand`, `ImportCoaCommand`
+  - Query: `GetCoaDatatableQuery`, `GetCoaByIdQuery`, `GetCoaHierarchyQuery`, `GetCoaActiveAccountsQuery`, `GetCoaParentAccountsQuery`, `ValidateCoaCodeQuery`, `GenerateCoaCodeQuery`, `ExportCoaQuery`, `DownloadCoaTemplateQuery`
+  - Handler port 1:1 dari `ChartOfAccountService` (logika sama; perbaiki bug rekalkulasi level di Update yang tidak pernah jalan di service lama). `ChartOfAccountService` lama **dipertahankan** (masih dipakai `JournalEntryController`, `MemoJournalController`, `GeneralLedgerController`). Build 0 error.
+- [x] **B6. Master > Customers** (User Manual §4.2) — Selesai. `CustomerService` (`ICustomerService`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. `CustomerController` → MediatR (`ISender`). Semua lewat `Application/Features/Customers`:
+  - Command: `CreateCustomerCommand`, `UpdateCustomerCommand`, `DeleteCustomerCommand`, `ToggleCustomerStatusCommand`
+  - Query: `GetCustomerDatatableQuery` (search/filter/sort/paging + resolve nama user), `GetCustomerByIdQuery`, `GetCustomerActiveQuery`, `ValidateCustomerCodeQuery`, `GenerateCustomerCodeQuery`, `ExportCustomerQuery`
+  - Handler port 1:1 dari `CustomerService`. Build 0 error.
 - [ ] **B7. Master > Suppliers** (User Manual §4.3) — `Supplier` → CRUD, ToggleStatus, Export.
 - [ ] **B8. Accounting > Journal Entry** (User Manual §5.1) — `JournalEntry` → draft/post/reverse.
 - [ ] **B9. Accounting > General Ledger** (User Manual §5.2) — `GeneralLedger` → summary + ledger.
