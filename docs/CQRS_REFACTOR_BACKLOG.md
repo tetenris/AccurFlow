@@ -105,7 +105,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetFixedAssetDatatableQuery` (filter category/status/search), `GetFixedAssetByIdQuery` (detail + history penyusutan)
   - Command: `CreateFixedAssetCommand` (auto number `FA-`), `UpdateFixedAssetCommand`, `DeleteFixedAssetCommand` (tolak jika ada riwayat penyusutan), `DepreciateFixedAssetCommand` (hitung bulan + cap, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`, simpan `FixedAssetDepreciation`)
   - Handler port 1:1 dari `FixedAssetService`. Build 0 error.
-- [ ] **B19. Accounting > Year-End Closing** (User Manual §5.12) — `YearEndClosing` → tutup tahun + jurnal otomatis.
+- [x] **B19. Accounting > Year-End Closing** (User Manual §5.12) — Selesai. `IYearEndClosingService`/`YearEndClosingService` (`Services/YearEndClosingService.cs`) **DIHAPUS** beserta registrasi DI. `YearEndClosingController` → MediatR (`ISender`). Semua lewat `Application/Features/YearEndClosings`:
+  - Query: `GetYearEndClosingPreviewQuery` (saldo per akun laba-rugi s.d. 31/12 via `GeneralLedgerHelper.CalculateBalance`), `GetYearEndClosingHistoryQuery`
+  - Command: `CloseYearEndClosingCommand` (cekal fiscal year ganda, tutup akun revenue/expense → `RetainedEarnings`, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`)
+  - Handler port 1:1 dari `YearEndClosingService`. Build 0 error.
 - [ ] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — `MemoJournal` → memo/adjustment.
 - [ ] **B21. Sales > Sales Quotation** (User Manual §6.1) — `SalesQuotation` → draft/approve, from quote → order.
 - [ ] **B22. Sales > Sales Order** (User Manual §6.2) — `SalesOrder` → draft/approve, generate dari quotation.
