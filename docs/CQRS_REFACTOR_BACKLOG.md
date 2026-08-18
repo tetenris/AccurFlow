@@ -101,7 +101,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetTaxDatatableQuery` (search/filter/paging), `GetTaxByIdQuery`, `GetVatReportQuery` (laporan PPN: DPP + Output/Input VAT dari invoice posted, anonim object `{ lines, summary }`)
   - Command: `CreateTaxCommand` (cek duplikasi kode), `UpdateTaxCommand`, `DeleteTaxCommand` (soft delete)
   - Handler port 1:1 dari `TaxService`. Build 0 error.
-- [ ] **B18. Accounting > Fixed Assets** (User Manual §5.11) — `FixedAsset` → daftar aset + penyusutan.
+- [x] **B18. Accounting > Fixed Assets** (User Manual §5.11) — Selesai. `IFixedAssetService`/`FixedAssetService` (`Services/FixedAssetService.cs`) **DIHAPUS** beserta registrasi DI. `FixedAssetController` → MediatR (`ISender`). Semua lewat `Application/Features/FixedAssets`:
+  - Query: `GetFixedAssetDatatableQuery` (filter category/status/search), `GetFixedAssetByIdQuery` (detail + history penyusutan)
+  - Command: `CreateFixedAssetCommand` (auto number `FA-`), `UpdateFixedAssetCommand`, `DeleteFixedAssetCommand` (tolak jika ada riwayat penyusutan), `DepreciateFixedAssetCommand` (hitung bulan + cap, auto jurnal via `CreateJournalCommand` + `PostJournalCommand`, simpan `FixedAssetDepreciation`)
+  - Handler port 1:1 dari `FixedAssetService`. Build 0 error.
 - [ ] **B19. Accounting > Year-End Closing** (User Manual §5.12) — `YearEndClosing` → tutup tahun + jurnal otomatis.
 - [ ] **B20. Accounting > Jurnal Memo / Penyesuaian** (User Manual §5.13) — `MemoJournal` → memo/adjustment.
 - [ ] **B21. Sales > Sales Quotation** (User Manual §6.1) — `SalesQuotation` → draft/approve, from quote → order.

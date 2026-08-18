@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.FixedAssets.Commands;
+using AccuFlow.Application.Features.FixedAssets.Queries;
 using AccuFlow.Models.FixedAsset;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class FixedAssetController : BaseController
     {
-        private readonly IFixedAssetService _fixedAssetService;
+        private readonly ISender _mediator;
 
-        public FixedAssetController(IFixedAssetService fixedAssetService) : base(fixedAssetService)
+        public FixedAssetController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _fixedAssetService = fixedAssetService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,17 +25,17 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableFixedAssetRequest request) => Json(await _fixedAssetService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableFixedAssetRequest request) => Json(await _mediator.Send(new GetFixedAssetDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _fixedAssetService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetFixedAssetByIdQuery(id)));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateFixedAssetRequest request)
         {
             try
             {
-                await _fixedAssetService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateFixedAssetCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Fixed asset created successfully" });
             }
             catch (Exception ex)
@@ -46,7 +49,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _fixedAssetService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateFixedAssetCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Fixed asset updated successfully" });
             }
             catch (Exception ex)
@@ -60,7 +63,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _fixedAssetService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteFixedAssetCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Fixed asset deleted successfully" });
             }
             catch (Exception ex)
@@ -74,7 +77,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var deprec = await _fixedAssetService.Depreciate(request.AssetId, request.PeriodDate, _currentUserService!.UserId);
+                var deprec = await _mediator.Send(new DepreciateFixedAssetCommand(request.AssetId, request.PeriodDate, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Depreciation posted successfully", data = deprec });
             }
             catch (Exception ex)
