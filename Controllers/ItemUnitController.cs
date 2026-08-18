@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.Units.Commands;
+using AccuFlow.Application.Features.Units.Queries;
 using AccuFlow.Models.Inventory;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +11,11 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class ItemUnitController : BaseController
     {
-        private readonly IItemUnitService _itemUnitService;
+        private readonly ISender _mediator;
 
-        public ItemUnitController(IItemUnitService itemUnitService) : base(itemUnitService)
+        public ItemUnitController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _itemUnitService = itemUnitService;
+            _mediator = mediator;
         }
 
         public IActionResult Index()
@@ -22,20 +25,20 @@ namespace AccuFlow.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableUnitRequest request) => Json(await _itemUnitService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableUnitRequest request) => Json(await _mediator.Send(new GetUnitDatatableQuery(request)));
 
         [HttpGet]
-        public async Task<IActionResult> GetById(Guid id) => Json(await _itemUnitService.GetById(id));
+        public async Task<IActionResult> GetById(Guid id) => Json(await _mediator.Send(new GetUnitByIdQuery(id)));
 
         [HttpGet]
-        public async Task<IActionResult> GetActiveUnits() => Json(await _itemUnitService.GetActiveUnits());
+        public async Task<IActionResult> GetActiveUnits() => Json(await _mediator.Send(new GetActiveUnitsQuery()));
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUnitRequest request)
         {
             try
             {
-                await _itemUnitService.Create(request, _currentUserService!.UserId);
+                await _mediator.Send(new CreateUnitCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Unit created successfully" });
             }
             catch (Exception ex)
@@ -49,7 +52,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _itemUnitService.Update(request, _currentUserService!.UserId);
+                await _mediator.Send(new UpdateUnitCommand(request, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Unit updated successfully" });
             }
             catch (Exception ex)
@@ -63,7 +66,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _itemUnitService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteUnitCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Unit deleted successfully" });
             }
             catch (Exception ex)

@@ -147,7 +147,10 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
   - Query: `GetItemGroupDatatableQuery` (termasuk `ItemCount`), `GetItemGroupByIdQuery`, `GetActiveItemGroupsQuery`
   - Command: `CreateItemGroupCommand` (cekal GroupCode ganda), `UpdateItemGroupCommand`, `DeleteItemGroupCommand` (tolak jika dipakai item)
   - Handler port 1:1 dari `ItemGroupService`. Build 0 error.
-- [ ] **B31. Inventory > Units** (User Manual §8.5) — `ItemUnit` → CRUD satuan.
+- [x] **B31. Inventory > Units** (User Manual §8.5) — Selesai. `IItemUnitService`/`ItemUnitService` (`Services/InventoryAndWorkflowServices.cs`) **DIHAPUS** beserta registrasi DI (file kini hanya berisi `IApprovalService` dan `IDocumentAttachmentService`). `ItemUnitController` → MediatR. Semua lewat `Application/Features/Units`:
+  - Query: `GetUnitDatatableQuery` (search UnitCode/UnitName), `GetUnitByIdQuery`, `GetActiveUnitsQuery`
+  - Command: `CreateUnitCommand` (cekal UnitCode ganda), `UpdateUnitCommand`, `DeleteUnitCommand`
+  - Handler port 1:1 dari `ItemUnitService`. Build 0 error.
 - [ ] **B32. Inventory > Stock Transfer** (User Manual §8.6) — `StockTransfer` → mutasi antar gudang.
 - [ ] **B33. Inventory > Stock Minimum** (User Manual §8.7) — `StockMinimum` → reorder point.
 - [ ] **B34. Inventory > Serial Number / Batch** (User Manual §8.8) — `SerialBatch` → register lot/serial, consume.
