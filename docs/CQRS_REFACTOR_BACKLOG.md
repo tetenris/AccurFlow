@@ -27,13 +27,20 @@ Penomoran mengikuti urutan modul di `docs/USER_MANUAL.md` (1. Login → 12. Prod
 
 - [x] **A1. Pindahkan entity** — 45 file `Entities/Entity` → `Domain/Entities`; `BaseEntity` & `IEntity` → `Domain/Common`. Namespace: `AccuFlow.Entities.Entity` → `AccuFlow.Domain.Entities`, `AccuFlow.Entities.Abstractions` → `AccuFlow.Domain.Common`. Semua referensi (Controllers, Services, Models, Infrastructures, EntityConfigurations, Seeders, Migrations Designer) di-update. Build sukses (0 error). Folder `Entities/Abstractions` & `Entities/Entity` dihapus.
 - [x] **A2. Pindahkan DbContext & migrasi** — `AppDbContext` → `Infrastructure/Persistence/AppDbContext.cs`; 57 file migrasi → `Infrastructure/Persistence/Migrations/`. Namespace: `AccuFlow.Entities.Context` → `AccuFlow.Infrastructure.Persistence`, `AccuFlow.Entities.Migrations` → `AccuFlow.Infrastructure.Persistence.Migrations`. Tambah `AppDbContextFactory` (design-time, dukung SqlServer/Postgres/MySql dari `Database:Provider`). Semua referensi (Program.cs, Controllers, Services, Seeders, Infrastructures) di-update (33 file). Build 0 error; `dotnet ef migrations list` & `database update` ke DB fresh terverifikasi (design-time factory jalan). Folder `Entities/Context` & `Entities/Migrations` dihapus.
-- [ ] **A3. Repository pattern** — `IRepository<T>` (generic) + implementasi EF; `IUnitOfWork`; daftarkan di `InfrastructureModule`.
-- [ ] **A4. Behaviors MediatR** — `ValidationBehavior` & `LoggingBehavior` (opsional).
+- [x] **A3. Repository pattern** — `IRepository<T>` (generic, + `FirstOrDefaultWithIncludesAsync`) di `Application/Common/Interfaces`; implementasi EF `Repository<T>` & `UnitOfWork` di `Infrastructure/Persistence/Repositories`; didaftarkan di `InfrastructureModule`. Build 0 error.
+- [ ] **A4. Behaviors MediatR** — (opsional; ditunda ke modul berikutnya).
 - [x] **A5. Migrasi pertama ke `AccuFlowCqrsDb`** — `dotnet ef database update` sukses, 55 tabel dibuat. Seeder belum diverifikasi (dijalankan saat app startup).
 
 ### B. Modul Per Menu
 
-- [ ] **B1. Login / Akun** (User Manual §1) — `Account` → Query/Command: Login, Logout, Change Password, Forgot Password, Lock/Unlock.
+> **PILOT diubah** → mulai dari Login/akun terlebih dahulu (bukan COA), sesuai keputusan 2026-08-18.
+
+- [x] **B1. Login / Akun** (User Manual §1) — Selesai penuh. `AccountService` (`IAccountService` + `LoginResult` + `ValidateUser`, `RequestPasswordResetAsync`, `ChangePasswordAsync`) **DIHAPUS** dari `Services/` & `AppServiceCollection`. Semua aksi akun lewat MediatR:
+  - Login → `LoginCommand` + `LoginCommandHandler` + `LoginResultDto` (validasi user, lock max 3x gagal, reset counter)
+  - Change Password → `ChangePasswordCommand` + handler
+  - Forgot Password → `ForgotPasswordCommand` + handler
+  - Logout/Profile tetap di controller (tanpa service).
+  Build 0 error; user percobaan `admin` / `Admin123!`.
 - [ ] **B2. Dashboard** (User Manual §2) — `Home` → Query: ringkasan metrik keuangan, journal posting health, recent activity, quick actions.
 - [ ] **B3. User Management > Users** (User Manual §3.1) — `User` → CRUD, Unlock/Reset Password, Audit Trail.
 - [ ] **B4. User Management > Roles** (User Manual §3.2) — `Role` → CRUD + permission matrix.

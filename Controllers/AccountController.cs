@@ -1,5 +1,7 @@
-using AccuFlow.Services;
+using AccuFlow.Application.Features.Account.Commands;
 using AccuFlow.Models.Account;
+using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +12,11 @@ namespace AccuFlow.Controllers
 {
     public class AccountController : BaseController
     {
-        private readonly IAccountService _accountService;
+        private readonly ISender _mediator;
 
-        public AccountController(IAccountService accountService, IBaseService baseService) : base(baseService)
+        public AccountController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _accountService = accountService;
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -29,29 +31,34 @@ namespace AccuFlow.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string username, string password, string? returnUrl = null)
         {
-            var result = await _accountService.ValidateUser(username, password);
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError("", "Username dan password wajib diisi.");
+                return View();
+            }
 
-            if (!result.Succeeded || result.User == null)
+            var result = await _mediator.Send(new LoginCommand(username, password));
+
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Message);
                 return View();
             }
 
-            var user = result.User;
-            var passwordExpired = user.PasswordExpiresAt.HasValue && user.PasswordExpiresAt.Value <= DateTime.UtcNow;
+            var passwordExpired = result.PasswordExpiresAt.HasValue && result.PasswordExpiresAt.Value <= DateTime.UtcNow;
 
             var claims = new List<Claim>
             {
-                new Claim("UserId", user.UserId.ToString()),
-                new Claim("UserName", user.UserName),
-                new Claim("Email", user.Email),
-                new Claim("RoleName", user.Role?.RoleName ?? "User"),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim("FullName", user.FullName),
-                new Claim("RoleId", user.RoleId.ToString()),
+                new Claim("UserId", result.UserId.ToString()),
+                new Claim("UserName", result.UserName),
+                new Claim("Email", result.Email),
+                new Claim("RoleName", result.RoleName ?? "User"),
+                new Claim(ClaimTypes.Name, result.UserName),
+                new Claim(ClaimTypes.Email, result.Email),
+                new Claim("FullName", result.FullName),
+                new Claim("RoleId", result.RoleId.ToString()),
                 new Claim("PasswordExpired", passwordExpired.ToString().ToLowerInvariant()),
-                new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "User")
+                new Claim(ClaimTypes.Role, result.RoleName ?? "User")
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -95,7 +102,7 @@ namespace AccuFlow.Controllers
                 return View(model);
             }
 
-            await _accountService.RequestPasswordResetAsync(model.Email);
+            await _mediator.Send(new ForgotPasswordCommand(model.Email));
             ViewBag.SuccessMessage = "Jika email terdaftar, instruksi reset password akan dikirim setelah layanan email aktif.";
             return View(new ForgotPasswordViewModel());
         }
@@ -133,7 +140,7 @@ namespace AccuFlow.Controllers
                 }
 
                 var wasPasswordExpired = string.Equals(User.FindFirst("PasswordExpired")?.Value, "true", StringComparison.OrdinalIgnoreCase);
-                await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+                await _mediator.Send(new ChangePasswordCommand(userId, model.CurrentPassword, model.NewPassword));
                 await RefreshPasswordExpiredClaimAsync(false);
                 TempData["SuccessMessage"] = "Password berhasil diperbarui.";
                 return RedirectToAction("Index", "Home");
