@@ -13,12 +13,6 @@ namespace AccuFlow.Infrastructures
             
             // Register base services
             services.AddScoped<IBaseService, BaseService>();
-            
-            // Register services
-            services.AddScoped<Services.Interfaces.IMenuService, MenuService>();
-            services.AddScoped<IJournalEntryService, JournalEntryService>();
-            services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
-            services.AddScoped<IDocumentAttachmentService, DocumentAttachmentService>();
 
             return services;
         }

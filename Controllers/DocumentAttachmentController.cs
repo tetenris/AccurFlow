@@ -1,5 +1,8 @@
+using AccuFlow.Application.Features.DocumentAttachments.Commands;
+using AccuFlow.Application.Features.DocumentAttachments.Queries;
 using AccuFlow.Models.DocumentAttachment;
 using AccuFlow.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,20 +11,20 @@ namespace AccuFlow.Controllers
     [Authorize]
     public class DocumentAttachmentController : BaseController
     {
-        private readonly IDocumentAttachmentService _documentAttachmentService;
+        private readonly ISender _mediator;
 
-        public DocumentAttachmentController(IDocumentAttachmentService documentAttachmentService) : base(documentAttachmentService)
+        public DocumentAttachmentController(ISender mediator, IBaseService baseService) : base(baseService)
         {
-            _documentAttachmentService = documentAttachmentService;
+            _mediator = mediator;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Datatable([FromBody] DataTableDocumentAttachmentRequest request) => Json(await _documentAttachmentService.Datatable(request));
+        public async Task<IActionResult> Datatable([FromBody] DataTableDocumentAttachmentRequest request) => Json(await _mediator.Send(new GetAttachmentDatatableQuery(request)));
 
         [HttpGet]
         public async Task<IActionResult> GetByDocument(string documentType, Guid documentId)
         {
-            var result = await _documentAttachmentService.GetByDocument(documentType, documentId);
+            var result = await _mediator.Send(new GetAttachmentsByDocumentQuery(documentType, documentId));
             return Json(result);
         }
 
@@ -30,7 +33,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var result = await _documentAttachmentService.Upload(request, file, _currentUserService!.UserId);
+                var result = await _mediator.Send(new UploadAttachmentCommand(request, file, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Attachment uploaded successfully", id = result.DocumentAttachmentId });
             }
             catch (Exception ex)
@@ -44,7 +47,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                var attachment = await _documentAttachmentService.GetFile(id);
+                var attachment = await _mediator.Send(new GetAttachmentFileQuery(id));
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), attachment.FilePath);
                 if (!System.IO.File.Exists(filePath)) return NotFound();
 
@@ -62,7 +65,7 @@ namespace AccuFlow.Controllers
         {
             try
             {
-                await _documentAttachmentService.Delete(id, _currentUserService!.UserId);
+                await _mediator.Send(new DeleteAttachmentCommand(id, _currentUserService!.UserId));
                 return Ok(new { success = true, message = "Attachment deleted successfully" });
             }
             catch (Exception ex)

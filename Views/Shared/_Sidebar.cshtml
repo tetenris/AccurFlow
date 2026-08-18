@@ -1,5 +1,5 @@
 ﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
-@inject AccuFlow.Services.Interfaces.IMenuService MenuService
+@inject MediatR.ISender Mediator
 @using System.Security.Claims
 @{
     var currentPath = HttpContextAccessor.HttpContext.Request.Path.ToString().ToLower();
@@ -10,8 +10,8 @@
     
     // Load menu based on role permissions
     var menus = roleId != Guid.Empty 
-        ? await MenuService.GetMenuHierarchyByRoleAsync(roleId)
-        : await MenuService.GetMenuHierarchyAsync();
+        ? await Mediator.Send(new AccuFlow.Application.Features.Menus.Queries.GetMenuHierarchyQuery(roleId))
+        : await Mediator.Send(new AccuFlow.Application.Features.Menus.Queries.GetMenuHierarchyQuery());
 
     bool IsActive(string path)
     {
