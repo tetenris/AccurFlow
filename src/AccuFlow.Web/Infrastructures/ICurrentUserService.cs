@@ -1,15 +1,7 @@
+using AccuFlow.Application.Common.Interfaces;
+
 namespace AccuFlow.Infrastructures
 {
-    public interface ICurrentUserService
-    {
-        Guid UserId { get; }
-        string UserName { get; }
-        string FullName { get; }
-        string Email { get; }
-        Guid RoleId { get; }
-        string RoleName { get; }
-    }
-
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

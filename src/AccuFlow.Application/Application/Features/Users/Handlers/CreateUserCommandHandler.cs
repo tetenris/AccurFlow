@@ -1,4 +1,4 @@
-using AccuFlow.Application.Common.Helpers;
+﻿using AccuFlow.Application.Common.Helpers;
 using AccuFlow.Application.Common.Interfaces;
 using AccuFlow.Application.Features.Users.Commands;
 using AccuFlow.Domain.Entities;
@@ -13,7 +13,7 @@ namespace AccuFlow.Application.Features.Users.Handlers
         private readonly IRepository<RoleEntity> _roleRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISuperAdminCheck _superAdminCheck;
-        private readonly AccuFlow.Infrastructures.ICurrentUserService _currentUserService;
+        private readonly ICurrentUserService _currentUserService;
 
         private const string DefaultPassword = "Qwerty@123";
 
@@ -22,7 +22,7 @@ namespace AccuFlow.Application.Features.Users.Handlers
             IRepository<RoleEntity> roleRepository,
             IUnitOfWork unitOfWork,
             ISuperAdminCheck superAdminCheck,
-            AccuFlow.Infrastructures.ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;

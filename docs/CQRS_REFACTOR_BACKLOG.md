@@ -4,7 +4,7 @@ Catatan kerja refactor dari pola **tradisional MVC + Service Layer** ke **Clean 
 
 > Branch kerja: `feature/cqrs-refactor`
 > Database target baru: `AccuFlowCqrsDb` (LocalDB)
-> Terakhir diperbarui: 2026-08-19 (backlog E1 scrollX false selesai — 12/12 lokasi)
+> Terakhir diperbarui: 2026-08-19 (rencana F pemisahan multi-project/solution ditambahkan)
 ---
 
 ## 1. Yang Sudah Dikerjakan
@@ -259,6 +259,68 @@ Beberapa icon root menu di `MenuSeed.cs` merujuk kelas yang **tidak ada** di fon
 Langkah:
 - [x] E1. Semua `scrollX: true` → `scrollX: false` (12 lokasi di 10 file: customer, supplier, user, role, journalentry, memojournal, generalledger/summary, payroll×2, production×2, serialbatch). COA sudah selesai sebelumnya. `rg "scrollX:\\s*true"` → 0 hasil. Selesai 2026-08-19.
 - [ ] E2. Verifikasi manual per halaman: datatable tidak overflow (pakai wrapper `table-responsive`), kolom action tidak bergeser saat layar disempitkan.
+
+---
+
+## F. Pemisahan Multi-Project & Solution (RENCANA — 2026-08-19)
+
+> **Klarifikasi tujuan refactor dari pemilik:** "ke cqrs itu dibuat solution masing-masing, sehingga yang dipublish itu cuma solution yang web."
+> Artinya: bukan sekadar pisah folder/layer dalam satu proyek, tapi **memecah menjadi project-project terpisah** dalam satu solution (`AccuFlow.sln`), sehingga target build & publish utama hanyalah **project Web** (output deploy bersih: `AccuFlow.Web.dll` + dependency library).
+
+### F.1 Target struktur
+
+```
+AccuFlow.sln                       ← satu solution mencakup semua project
+├─ src/
+│  ├─ AccuFlow.Domain            → Library (classlib net8.0)
+│  ├─ AccuFlow.Application       → Library; ref: Domain
+│  ├─ AccuFlow.Infrastructure    → Library; ref: Application, Domain
+│  └─ AccuFlow.Web               → Web (SDK Web); ref: Infrastructure, Application, Domain
+```
+
+Publish cukup: `dotnet publish src/AccuFlow.Web/AccuFlow.Web.csproj -c Release`
+(Build seluruh solution tetap kompilasi penuh; hanya Web + dependency-nya yang masuk ke output publish.)
+
+### F.2 Pemetaan folder saat ini → project tujuan
+
+| Folder sekarang (satu proyek) | Project tujuan | Catatan |
+|---|---|---|
+| `Domain/` (Entities + Common) | `AccuFlow.Domain` | Inti domain murni, tanpa dependensi EF/ASP.NET |
+| `Entities/Enums/` | `AccuFlow.Domain` | Enums dipakai entity (AccountUsage, RoleEnum, dll) → `Domain/Enums` |
+| `Application/` (Features + Common/Interfaces, Common/Helpers) | `AccuFlow.Application` | Contains CQRS; ref ke Domain saja + paket MediatR, NPOI, DinkToPdf (untuk export). Tanpa dependensi EF langsung (dipakai `IRepository<T>.Query()`) |
+| `Entities/EntityConfigurations/` | `AccuFlow.Infrastructure` | EF Core Fluent config → `Infrastructure/Persistence/` |
+| `Entities/Seeders/` | `AccuFlow.Infrastructure` | Seeder butuh `AppDbContext` |
+| `Infrastructure/` (Persistence + Repositories + InfrastructureModule) | `AccuFlow.Infrastructure` | EF Core, design-time factory, paket EF |
+| `Infrastructures/` (AppServiceCollection, ICurrentUserService, PermissionAuthorizationFilter) | `AccuFlow.Infrastructure` | Filter authorization SDK ASP.NET → tetap bisa di classlib (ref `Microsoft.AspNetCore.*`) |
+| `Models/`, `Controllers/`, `Views/`, `wwwroot/`, `Helpers/`, `Extentions/`, `Services/` (BaseService), `Properties/` | `AccuFlow.Web` | Layer presentasi |
+| `Program.cs`, `appsettings.json` | `AccuFlow.Web` | Startup/DI tetap di Web |
+
+### F.3 Dependensi & referensi project
+
+- `Domain` — standalone (tidak perlu paket). Bisa berisi `System.Text.Json` attribute bila entity punya.
+- `Application` → `Domain`; paket: `MediatR` (12.x). Export Excel/NPOI + PDF DinkToPdf bila handler export tetap di Application (pilih: pindahkan service export ke Infrastructure agar Application tetap tipis — **keputusan saat eksekusi**).
+- `Infrastructure` → `Application`, `Domain`; paket: `Microsoft.EntityFrameworkCore.*` (8.0.11), `Npgsql`, `Pomelo`, `Hangfire`, `BCrypt`, `DinkToPdf` (jika dipakai di sini). Ref `FrameworkReference Microsoft.AspNetCore.App` untuk filter/`IWebHostEnvironment`/`IFormFile`.
+- `Web` → segalanya; paket tersisa (Sass? tidak ada) + semua ref framework SDK Web.
+
+### F.4 Langkah kerja
+
+1. **Backup/copy** — pastikan branch bersih; kerja di `feature/cqrs-refactor`.
+2. **Buat `src/` + 4 csproj** — `dotnet new classlib`/`web` di `src/`, lalu salin file dari folder sesuai F.2 (pertahankan namespace `AccuFlow.*` agar minim edit using).
+3. **Wire referensi project** — tambahkan `<ProjectReference>` berantai Web→Infrastructure→Application→Domain.
+4. **Pindahkan paket** ke csproj masing-masing; Web hanya simpan yang dipakai presentasi + DI (MediatR tetap di Web? — MediatR register di `ApplicationModule` yang dipanggil dari `Program.cs`, jadi Web butuh MediatR extensibility; keputusan saat eksekusi).
+5. **Rename proyek web** — `AccuFlow.csproj` → `src/AccuFlow.Web/AccuFlow.Web.csproj`; hapus csproj/sln lama di root; buat `AccuFlow.sln` baru berisi 4 project.
+6. **Fix namespace/usings** — terutama file dengan namespace `AccuFlow.Entities.*` (sisa EntityConfigurations/Seeders/Enums) & file `Infrastructures.*`; target `dotnet build` 0 error.
+7. **Verifikasi publish** — `dotnet publish src/AccuFlow.Web -c Release` → pastikan output hanya berisi web app + dependency library (tidak ada dangling ref `AccuFlow.dll`).
+8. **Verifikasi runtime** — app jalan, login, dashboard (jika memungkinkan run web).
+9. **Commit + push.**
+
+### F.5 Risiko / catatan
+
+- Cakupan besar: ±700+ file akan bergeser lokasi; namespace **dipertahankan** minimal (hanya lokasi file berubah) untuk menekan jumlah edit.
+- `Entities/Enums/Extensions/EnumExtention.cs` (typo original) ikut dipindah apa adanya.
+- Design-time EF (`AppDbContextFactory`) yang memakai `IConfiguration` + connection string perlu diarahkan ulang (bisa membaca `appsettings.json` Web atau env var) — tetap di Infrastructure.
+- Output publish sebelumnya berisi `AccuFlow.dll` (aplikasi tunggal); setelah pecah, nama web menjadi `AccuFlow.Web.dll`. Update script/CI deploy jika menunjuk nama dll lama.
+- Tidak mengubah URL/route/web.config; **hanya struktur proyek**.
 
 ---
 

@@ -2,6 +2,7 @@ using AccuFlow.Application.Common.Interfaces;
 using AccuFlow.Application.Features.DocumentAttachments.Commands;
 using AccuFlow.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AccuFlow.Application.Features.DocumentAttachments.Handlers
 {
